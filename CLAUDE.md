@@ -25,12 +25,15 @@
 - gemma3_4b: 6/8 configs done (medline/emea/cas1 0+5shot done, cas2 5shot running)
 - Remaining models: gaperon_8b, eurollm_9b, olmo_7b, qwen3_8b, gemma3_27b, gaperon_24b, olmo_32b, medgemma_27b
 
-**Early Results (Gemma3-4B)**:
-| Dataset | 0-shot F1 | 5-shot F1 | Notes |
-|---------|-----------|-----------|-------|
-| MEDLINE | 4.08% | **40.19%** | 10x improvement with few-shot! |
-| EMEA | 0.14% | TBD | Very small dataset (11-15 samples) |
-| CAS1 | TBD | TBD | - |
+**Early Results**:
+| Model | MEDLINE 0-shot | MEDLINE 5-shot | Notes |
+|-------|----------------|----------------|-------|
+| Gemma3-4B | 4.08% | **40.19%** | 10x improvement with few-shot! |
+| Gaperon-8B | 8.05% | 19.60% | Less benefit from few-shot |
+| EuroLLM-9B | - | - | Running... |
+
+**Key Insight**: Gemma3-4B benefits much more from few-shot (10x) than Gaperon-8B (2.4x).
+This may be due to Gaperon being a completion model while Gemma3 is pretrained differently.
 
 **GPU Issue**: GPU0 shows ERR state, needs system reset. Running on GPU1 only.
 
