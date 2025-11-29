@@ -32,8 +32,20 @@
 | Gaperon-8B | 8.05% | 19.60% | Less benefit from few-shot |
 | EuroLLM-9B | - | - | Running... |
 
-**Key Insight**: Gemma3-4B benefits much more from few-shot (10x) than Gaperon-8B (2.4x).
-This may be due to Gaperon being a completion model while Gemma3 is pretrained differently.
+**Small Models Results (MEDLINE Exact F1)**:
+| Model | Size | 0-shot | 5-shot | Improvement |
+|-------|------|--------|--------|-------------|
+| Gemma3-4B | 4B | 4.08% | **40.19%** | 9.8x |
+| EuroLLM-9B | 9B | 10.88% | 34.03% | 3.1x |
+| OLMo-7B | 7B | 5.54% | 25.72% | 4.6x |
+| Gaperon-8B | 8B | 8.05% | 19.60% | 2.4x |
+| Qwen3-8B | 8B | 0.0% | 0.0% | FAILED |
+
+**Key Insights**:
+- Gemma3-4B (smallest!) achieves best 5-shot F1 (40.19%)
+- Qwen3-8B fails completely - likely due to thinking mode output format
+- Few-shot leakage affects all models but some adapt better
+- Large models (gemma3_27b, etc.) now running...
 
 **GPU Issue**: GPU0 shows ERR state, needs system reset. Running on GPU1 only.
 
