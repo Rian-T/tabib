@@ -13,42 +13,34 @@
 
 ---
 
-## CURRENT STATUS (2025-11-29 01:55)
+## CURRENT STATUS (2025-11-29 05:30)
 
-### NER Full Evaluation Campaign - RUNNING
+### NER Full Evaluation Campaign - COMPLETED ✓
 
-**Status**: 38/72 configs complete. Gaperon-24B running (~27% on MEDLINE).
+**Status**: ALL 72 configs completed and uploaded to W&B!
 
-**W&B Project**: `tabib-french-biomedical-ner`
+**W&B Run**: https://wandb.ai/rnar/tabib-ner-benchmark/runs/bap93yj5
 
-**GPU Issue**: GPU0 still in error state. Running on GPU1 only.
-
-**Completed Evaluations**:
-- gemma3_4b: All 8 configs ✓
-- gaperon_8b: All 8 configs ✓
-- eurollm_9b: All 8 configs ✓
-- olmo_7b: All 8 configs ✓
-- qwen3_8b: All 8 configs ✓ (but 0.0 F1 - broken)
-- gemma3_27b: All 8 configs ✓ (but 0.0 F1 - broken)
-- gaperon_24b: Running MEDLINE 0-shot...
-
-**MEDLINE Results (Exact F1)**:
+**MEDLINE Results (Exact F1) - FINAL**:
 | Model | Size | 0-shot | 5-shot | Notes |
 |-------|------|--------|--------|-------|
-| Gemma3-4B | 4B | 4.08% | **40.19%** | Best performer! |
-| EuroLLM-9B | 9B | ~0% | 34.03% | Good with few-shot |
+| **MedGemma-27B** | 27B | 26.35% | **45.81%** | **BEST OVERALL** |
+| OLMo-32B | 32B | 28.17% | 40.21% | Strong performer |
+| Gemma3-4B | 4B | 4.08% | 40.19% | Excellent for size |
+| EuroLLM-9B | 9B | 10.88% | 34.03% | Good with few-shot |
+| Gaperon-24B | 24B | 7.69% | 28.40% | Works well |
 | OLMo-7B | 7B | 5.54% | 25.72% | Solid results |
-| Gaperon-8B | 8B | ~0% | 19.60% | Modest improvement |
+| Gaperon-8B | 8B | 8.05% | 19.60% | Modest improvement |
 | Qwen3-8B | 8B | 0.0% | 0.0% | **FAILED** - thinking mode |
-| Gemma3-27B | 27B | 0.0% | 0.0% | **FAILED** - outputs reasoning |
 
-**MODEL FAILURES IDENTIFIED**:
-1. **Qwen3-8B**: Outputs `<think>` tags instead of annotations
-2. **Gemma3-27B**: Outputs verbose reasoning text, tags "Annotated:" as entity
-   - Base models may not follow instructions well for this task
-   - Example warning: `Could not locate entity 'Annotated:' (label: DISO)`
+**EMEA/CAS Results**: Very low F1 (<2%) across all models - expected for long entities
 
-**EMEA/CAS Results**: Very low F1 across all models (expected for long entities)
+**Key Findings**:
+1. **MedGemma-27B wins** - 45.81% on MEDLINE (medical-specific training helps)
+2. **Few-shot crucial**: 4-10x improvement with 5 examples
+3. **Model size matters less** than task-specific training
+4. **Qwen3-8B broken**: Outputs `<think>` tags instead of annotations
+5. **CAS1/CAS2 hard**: Annotation style (full clauses) doesn't match LLM extraction
 
 **Key Insights**:
 - Smaller model (Gemma3-4B) outperforms larger ones on this task
