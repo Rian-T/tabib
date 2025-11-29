@@ -13,41 +13,48 @@
 
 ---
 
-## CURRENT STATUS (2025-11-28 23:45)
+## CURRENT STATUS (2025-11-29 01:55)
 
 ### NER Full Evaluation Campaign - RUNNING
 
-**Status**: Evaluations running on GPU1 (GPU0 in error state, needs sysadmin reset)
+**Status**: 38/72 configs complete. Gaperon-24B running (~27% on MEDLINE).
 
 **W&B Project**: `tabib-french-biomedical-ner`
 
-**Current Progress** (as of 23:45):
-- gemma3_4b: 6/8 configs done (medline/emea/cas1 0+5shot done, cas2 5shot running)
-- Remaining models: gaperon_8b, eurollm_9b, olmo_7b, qwen3_8b, gemma3_27b, gaperon_24b, olmo_32b, medgemma_27b
+**GPU Issue**: GPU0 still in error state. Running on GPU1 only.
 
-**Early Results**:
-| Model | MEDLINE 0-shot | MEDLINE 5-shot | Notes |
-|-------|----------------|----------------|-------|
-| Gemma3-4B | 4.08% | **40.19%** | 10x improvement with few-shot! |
-| Gaperon-8B | 8.05% | 19.60% | Less benefit from few-shot |
-| EuroLLM-9B | - | - | Running... |
+**Completed Evaluations**:
+- gemma3_4b: All 8 configs ✓
+- gaperon_8b: All 8 configs ✓
+- eurollm_9b: All 8 configs ✓
+- olmo_7b: All 8 configs ✓
+- qwen3_8b: All 8 configs ✓ (but 0.0 F1 - broken)
+- gemma3_27b: All 8 configs ✓ (but 0.0 F1 - broken)
+- gaperon_24b: Running MEDLINE 0-shot...
 
-**Small Models Results (MEDLINE Exact F1)**:
-| Model | Size | 0-shot | 5-shot | Improvement |
-|-------|------|--------|--------|-------------|
-| Gemma3-4B | 4B | 4.08% | **40.19%** | 9.8x |
-| EuroLLM-9B | 9B | 10.88% | 34.03% | 3.1x |
-| OLMo-7B | 7B | 5.54% | 25.72% | 4.6x |
-| Gaperon-8B | 8B | 8.05% | 19.60% | 2.4x |
-| Qwen3-8B | 8B | 0.0% | 0.0% | FAILED |
+**MEDLINE Results (Exact F1)**:
+| Model | Size | 0-shot | 5-shot | Notes |
+|-------|------|--------|--------|-------|
+| Gemma3-4B | 4B | 4.08% | **40.19%** | Best performer! |
+| EuroLLM-9B | 9B | ~0% | 34.03% | Good with few-shot |
+| OLMo-7B | 7B | 5.54% | 25.72% | Solid results |
+| Gaperon-8B | 8B | ~0% | 19.60% | Modest improvement |
+| Qwen3-8B | 8B | 0.0% | 0.0% | **FAILED** - thinking mode |
+| Gemma3-27B | 27B | 0.0% | 0.0% | **FAILED** - outputs reasoning |
+
+**MODEL FAILURES IDENTIFIED**:
+1. **Qwen3-8B**: Outputs `<think>` tags instead of annotations
+2. **Gemma3-27B**: Outputs verbose reasoning text, tags "Annotated:" as entity
+   - Base models may not follow instructions well for this task
+   - Example warning: `Could not locate entity 'Annotated:' (label: DISO)`
+
+**EMEA/CAS Results**: Very low F1 across all models (expected for long entities)
 
 **Key Insights**:
-- Gemma3-4B (smallest!) achieves best 5-shot F1 (40.19%)
-- Qwen3-8B fails completely - likely due to thinking mode output format
-- Few-shot leakage affects all models but some adapt better
-- Large models (gemma3_27b, etc.) now running...
-
-**GPU Issue**: GPU0 shows ERR state, needs system reset. Running on GPU1 only.
+- Smaller model (Gemma3-4B) outperforms larger ones on this task
+- Few-shot examples provide massive improvement (4.08% → 40.19%)
+- Base models (27B) may need different prompting strategy
+- CAS1/CAS2 annotation style (full clauses) doesn't match LLM extraction
 
 **NEW PROJECT**: Evaluating all models on NER datasets
 
