@@ -1,0 +1,14 @@
+task: ner_span
+dataset: emea
+model: vllm_ner
+model_name_or_path: google/medgemma2-27b-it
+do_train: false
+do_eval: true
+preprocessing:
+  type: sentence_chunker
+  max_tokens: 512
+backend_args:
+  use_chat: true
+  max_tokens: 6144
+  tensor_parallel_size: 2
+  gpu_memory_utilization: 0.5

@@ -13,34 +13,38 @@
 
 ---
 
-## CURRENT STATUS (2025-11-29 05:30)
+## CURRENT STATUS (2025-11-29 11:45)
 
-### NER Full Evaluation Campaign - COMPLETED ✓
+### NER v2 - MAJOR BREAKTHROUGH ✓
 
-**Status**: ALL 72 configs completed and uploaded to W&B!
+**Two Key Fixes**:
 
-**W&B Run**: https://wandb.ai/rnar/tabib-ner-benchmark/runs/bap93yj5
+1. **Prompt Fix** (few-shot leakage):
+   - Added stop tokens + clear section headers
+   - Warnings: 23,572 → 6 (**99.97% reduction**)
 
-**MEDLINE Results (Exact F1) - FINAL**:
-| Model | Size | 0-shot | 5-shot | Notes |
-|-------|------|--------|--------|-------|
-| **MedGemma-27B** | 27B | 26.35% | **45.81%** | **BEST OVERALL** |
-| OLMo-32B | 32B | 28.17% | 40.21% | Strong performer |
-| Gemma3-4B | 4B | 4.08% | 40.19% | Excellent for size |
-| EuroLLM-9B | 9B | 10.88% | 34.03% | Good with few-shot |
-| Gaperon-24B | 24B | 7.69% | 28.40% | Works well |
-| OLMo-7B | 7B | 5.54% | 25.72% | Solid results |
-| Gaperon-8B | 8B | 8.05% | 19.60% | Modest improvement |
-| Qwen3-8B | 8B | 0.0% | 0.0% | **FAILED** - thinking mode |
+2. **Chunk Size Fix** (EMEA/CAS performance):
+   - EMEA docs are ~5000 chars, MEDLINE docs are ~50 chars
+   - Small chunks (128 tokens) lost context
+   - **Solution**: Increase chunk size to 2048 tokens
 
-**EMEA/CAS Results**: Very low F1 (<2%) across all models - expected for long entities
+**NEW RESULTS (MedGemma-27B 5-shot)**:
+| Dataset | Old (128 tok) | New (2048 tok) | Improvement |
+|---------|---------------|----------------|-------------|
+| MEDLINE | 45.81% | **49.76%** | +4% |
+| EMEA | 1.27% | **60.52%** | **+59%** |
 
-**Key Findings**:
-1. **MedGemma-27B wins** - 45.81% on MEDLINE (medical-specific training helps)
-2. **Few-shot crucial**: 4-10x improvement with 5 examples
-3. **Model size matters less** than task-specific training
-4. **Qwen3-8B broken**: Outputs `<think>` tags instead of annotations
-5. **CAS1/CAS2 hard**: Annotation style (full clauses) doesn't match LLM extraction
+**Key Insight**: EMEA was failing due to **chunk size**, not annotation style!
+
+**Next**: Update all EMEA/CAS configs with 2048-token chunks and re-run
+
+### Added Gaperon-Garlic Models
+
+Added 16 configs for contamination research models:
+- `almanach/Gaperon-Garlic-1125-8B`
+- `almanach/Gaperon-Garlic-1125-24B`
+
+Note: These are **intentionally contaminated** (~50% benchmark test data) for contamination detection research.
 
 **Key Insights**:
 - Smaller model (Gemma3-4B) outperforms larger ones on this task

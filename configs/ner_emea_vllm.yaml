@@ -1,0 +1,9 @@
+task: ner_span
+dataset: medline
+model: vllm_ner
+model_name_or_path: Qwen/Qwen2.5-7B-Instruct
+do_train: false
+do_eval: true
+preprocessing:
+  type: sentence_chunker
+  max_tokens: 32768

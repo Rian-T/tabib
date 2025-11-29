@@ -1,0 +1,26 @@
+task: ner_span
+dataset: emea
+model: bert_token_ner
+model_name_or_path: camembert-base
+do_train: true
+do_eval: true
+preprocessing:
+  type: sentence_chunker
+  max_tokens: 512
+training:
+  output_dir: runs/emea_camembert_long
+  num_train_epochs: 500
+  per_device_train_batch_size: 4
+  per_device_eval_batch_size: 8
+  learning_rate: 2e-5
+  warmup_steps: 50
+  logging_steps: 20
+  eval_steps: 50
+  save_steps: 50
+  save_total_limit: 3
+  load_best_model_at_end: true
+  seed: 42
+  metric_for_best_model: eval_loss
+  greater_is_better: false
+  early_stopping_patience: 5
+

@@ -1,0 +1,15 @@
+task: ner_span
+dataset: cas2
+model: vllm_ner
+model_name_or_path: Qwen/Qwen2.5-7B-Instruct
+do_train: false
+do_eval: true
+preprocessing:
+  type: sentence_chunker
+  max_tokens: 512
+backend_args:
+  use_chat: true
+  tensor_parallel_size: 1
+  gpu_memory_utilization: 0.9
+  max_tokens: 8192
+  num_few_shot: 3
