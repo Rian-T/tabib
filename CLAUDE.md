@@ -17,7 +17,7 @@ ONLY after investigating all issues with simple, working code:
 - [x] FRACCO: camembert-base (63.95% acc, 9.79% F1)
 - [x] FRACCO: camembert-bio (66.91% acc, 12.42% F1)
 - [x] FRACCO: BioClinical-ModernBERT (80.83% acc, 37.67% F1) ✓
-- [ ] FRACCO: ModernCamemBERT (training 37%)
+- [x] FRACCO: ModernCamemBERT (**80.55% acc, 38.88% F1**) ✓ BEST!
 - [x] NER CAS1: ModernCamemBERT (34.88% F1)
 - [x] NER CAS2: ModernCamemBERT (35.79% F1)
 - [ ] NER CAS1/CAS2: camembert-base, camembert-bio (need to run)
@@ -32,6 +32,22 @@ tail -30 results/fracco_bioclinical_modernbert.log
 ---
 
 ## 📓 SESSION JOURNAL (2025-11-30)
+
+### 03:15 - FRACCO ModernCamemBERT Complete + Starting NER 2048
+
+**FRACCO Results Summary:**
+| Model | Accuracy | F1 | Verdict |
+|-------|----------|-----|---------|
+| camembert-base | 63.95% | 9.79% | Poor |
+| camembert-bio | 66.91% | 12.42% | Poor |
+| BioClinical-ModernBERT | 80.83% | 37.67% | Good |
+| **ModernCamemBERT** | **80.55%** | **38.88%** | **BEST!** |
+
+**Key insight**: ModernCamemBERT beats specialized Bio models!
+
+**Started**: NER CAS1 with max_length=2048 on GPU1
+- Log: `results/ner_cas1_2048.log`
+- Expected: 50-60% F1 (vs 35% at 512 tokens due to truncation fix)
 
 ### 03:00 - FIX: Configurable max_length for NER
 
