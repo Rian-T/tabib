@@ -33,6 +33,27 @@ tail -30 results/fracco_bioclinical_modernbert.log
 
 ## 📓 SESSION JOURNAL (2025-11-30)
 
+### 02:00 - CRITICAL: 45% of docs truncated at 512 tokens!
+
+**Root cause of low NER F1 found:**
+- CAS1/CAS2 avg text length: 2444 chars (~600 tokens)
+- **45% of train docs truncated** at max_length=512
+- **39% of test docs truncated**
+- Entities in truncated portions are completely lost!
+
+**This explains the ~35% F1:**
+- partial_F1 = 66.2% (entities ARE found when not truncated)
+- exact_F1 = 34.88% (boundary issues + truncation)
+- We're losing ~40% of potential F1 due to truncation alone
+
+**Solutions to explore:**
+1. **Sliding window with stride** - split long docs, keep overlap for context
+2. **Use sentence_chunker** with proper reassembly
+3. **Increase max_length** to 1024 if model supports
+4. **Longformer/BigBird** - models supporting 4096 tokens
+
+**Next step:** Add sentence_chunker preprocessing BACK but fix the reassembly issue we found earlier. The problem wasn't chunking itself - it was losing the chunk_offset for proper span reassembly.
+
 ### 01:45 - NER Error Analysis Complete
 
 **CAS1 Error Analysis** (`playground/analyze_ner_errors.py`):
