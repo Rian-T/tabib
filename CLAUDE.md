@@ -21,7 +21,8 @@ ONLY after investigating all issues with simple, working code:
 - [x] NER CAS1: ModernCamemBERT @ 2048 tokens (**40.84% F1**) ✓
 - [x] NER CAS2: ModernCamemBERT @ 2048 tokens (**53.21% F1**) ✓ EXCELLENT!
 - [x] NER CAS2: camembert-base @ 512 (**33.99% F1** after B-tag fix!)
-- [ ] NER CAS1: camembert-base (running)
+- [x] NER CAS1: camembert-base @ 512 (**27.11% F1**)
+- [x] **W&B Table uploaded**: https://wandb.ai/rnar/tabib-bert-benchmark/runs/7ru51j8l
 
 ### 04:15 - CRITICAL FIX: B-tag parsing bug
 
