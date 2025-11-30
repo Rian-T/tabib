@@ -1,0 +1,22 @@
+task: similarity
+dataset: clister
+model: bert_similarity
+model_name_or_path: almanach/moderncamembert-base
+do_train: true
+do_eval: true
+training:
+  output_dir: runs/clister_moderncamembert
+  num_train_epochs: 10
+  per_device_train_batch_size: 16
+  per_device_eval_batch_size: 16
+  learning_rate: 2e-5
+  warmup_steps: 100
+  logging_steps: 50
+  eval_steps: 100
+  save_steps: 100
+  save_total_limit: 2
+  load_best_model_at_end: true
+  metric_for_best_model: eval_loss
+  greater_is_better: false
+  early_stopping_patience: 3
+  seed: 42
