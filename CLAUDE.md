@@ -157,8 +157,11 @@ tail -30 results/fracco_bioclinical_modernbert.log
 | Model | Accuracy | F1 | Notes |
 |-------|----------|-----|-------|
 | camembert-base | 63.95% | 9.79% | ✓ |
-| camembert-bio-base | **66.91%** | **12.42%** | ✓ Best so far |
-| BioClinical-ModernBERT | training... | - | |
+| camembert-bio-base | 66.91% | 12.42% | ✓ |
+| **BioClinical-ModernBERT** | **80.83%** | **37.67%** | ✓ **BEST!** |
+| ModernCamemBERT | pending | - | |
+
+**BioClinical-ModernBERT is 3x better F1 than CamemBERT!**
 
 ### NER Results (without preprocessing):
 
