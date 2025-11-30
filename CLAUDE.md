@@ -18,10 +18,26 @@ ONLY after investigating all issues with simple, working code:
 - [x] FRACCO: camembert-bio (66.91% acc, 12.42% F1)
 - [x] FRACCO: BioClinical-ModernBERT (80.83% acc, 37.67% F1) ✓
 - [x] FRACCO: ModernCamemBERT (**80.55% acc, 38.88% F1**) ✓ BEST!
-- [x] NER CAS1: ModernCamemBERT @ 512 tokens (34.88% F1)
-- [x] NER CAS1: ModernCamemBERT @ 2048 tokens (**40.84% F1**) ✓ +6%!
-- [x] NER CAS2: ModernCamemBERT @ 512 tokens (35.79% F1)
-- [ ] NER CAS1/CAS2: camembert-base (need to run)
+- [x] NER CAS1: ModernCamemBERT @ 2048 tokens (**40.84% F1**) ✓
+- [x] NER CAS2: ModernCamemBERT @ 2048 tokens (**53.21% F1**) ✓ EXCELLENT!
+- [x] NER CAS2: camembert-base @ 512 (**33.99% F1** after B-tag fix!)
+- [ ] NER CAS1: camembert-base (running)
+
+### 04:15 - CRITICAL FIX: B-tag parsing bug
+
+**Problem**: Models that only predict I- tags (no B-) got 0% F1
+- camembert-base: 0 B-tags, 7012 I-tags
+- `_iob2_to_spans()` ignored orphan I- tags
+
+**Fix**: Treat I- without current_span as starting new span
+```python
+# Before: elif label.startswith('I-') and current_span:
+# After:  elif label.startswith('I-'):
+#             if current_span: continue span
+#             else: start new span  # FIX!
+```
+
+**Result**: camembert-base CAS2: 0% → **33.99% F1**
 
 ## ⚠️ MONITORING TIP
 Use `tail` on log files, not BashOutput (too verbose):

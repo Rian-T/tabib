@@ -518,14 +518,24 @@ class BERTTokenNERAdapter(ModelAdapter):
                     'end': int(offset_mapping[i][1]),
                     'label': entity_type
                 }
-            elif label.startswith('I-') and current_span:
-                # Continue current span - allow small gaps for whitespace
+            elif label.startswith('I-'):
+                # Handle I- tag: continue span or start new if no current span
                 entity_type = label[2:]
                 token_start = int(offset_mapping[i][0])
-                # Allow gap of up to 2 chars (space, punctuation) between tokens
-                gap = token_start - current_span['end']
-                if entity_type == current_span['label'] and 0 <= gap <= 2:
-                    current_span['end'] = int(offset_mapping[i][1])
+                token_end = int(offset_mapping[i][1])
+
+                if current_span:
+                    # Continue current span if same entity type and small gap
+                    gap = token_start - current_span['end']
+                    if entity_type == current_span['label'] and 0 <= gap <= 2:
+                        current_span['end'] = token_end
+                    else:
+                        # Different entity or large gap - start new span
+                        spans.append(current_span)
+                        current_span = {'start': token_start, 'end': token_end, 'label': entity_type}
+                else:
+                    # No current span - start new span (handles models that don't predict B-)
+                    current_span = {'start': token_start, 'end': token_end, 'label': entity_type}
             elif label == 'O':
                 # End current span
                 if current_span:
