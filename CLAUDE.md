@@ -14,6 +14,53 @@ tail -30 results/fracco_bioclinical_modernbert.log
 
 ## 📓 SESSION JOURNAL (2025-11-30)
 
+### 01:45 - NER Error Analysis Complete
+
+**CAS1 Error Analysis** (`playground/analyze_ner_errors.py`):
+- Total: 1453 gold, 1226 predicted
+- **Exact matches: 489 (33.7%)**
+- **Boundary errors: 480** ← Main issue!
+- False negatives: 451, False positives: 224
+
+**By entity type**:
+- sosy: 37.1% exact (475/1282) - decent
+- pathologie: **8.2%** exact (14/171) - very poor!
+
+**Key error patterns**:
+1. **Truncated predictions**: "ép" instead of "épileptique"
+2. **Over-extension**: "masse palpable ni hépatosplénomégalie" instead of just "masse palpable"
+3. **Type confusion**: pathologie predicted as sosy (tumeur, adénopathies)
+
+**Root causes**:
+- Class imbalance: 1628 sosy vs 343 pathologie in train
+- Long entities hard to capture: pathologie avg 27 chars, max 108
+- Boundary detection is weak
+
+**Improvement ideas**:
+1. Add CRF layer for better boundary detection
+2. Class weights for pathologie
+3. More training epochs
+4. Use BIO-medical pretrained model
+
+### 01:42 - CAS2 NER Results
+
+**CAS2 exact_f1: 35.79%** (without preprocessing)
+
+| Entity Type | exact_F1 | Train Count | Test Count |
+|-------------|----------|-------------|------------|
+| examen | 49.02% | 1112 | 812 |
+| valeur | 42.86% | 543 | 436 |
+| anatomie | 36.19% | 1409 | 1142 |
+| substance | 32.12% | 926 | 321 |
+| traitement | 10.95% | 329 | 304 |
+| moment | 2.27% | 430 | 171 |
+| **dose** | **0%** | 386 | 46 |
+| **mode** | **0%** | 230 | 95 |
+
+**Puzzling**: dose/mode have decent training samples but 0% F1!
+- Very short (avg 8-9 chars) - easily confused?
+- Need to investigate sample examples
+
 ### 01:35 - FRACCO Low F1 Investigation
 
 **Question**: Why is FRACCO F1 only 9-12% despite 64-67% accuracy?
