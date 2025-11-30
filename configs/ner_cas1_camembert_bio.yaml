@@ -1,7 +1,7 @@
 task: ner_span
 dataset: cas1
 model: bert_token_ner
-model_name_or_path: camembert/camembert-bio-base
+model_name_or_path: almanach/camembert-bio-base
 do_train: true
 do_eval: true
 # NOTE: Disabled preprocessing - sentence_splitter removes context and hurts predictions
