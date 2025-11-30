@@ -16,8 +16,8 @@ ONLY after investigating all issues with simple, working code:
 **Progress**:
 - [x] FRACCO: camembert-base (63.95% acc, 9.79% F1)
 - [x] FRACCO: camembert-bio (66.91% acc, 12.42% F1)
-- [ ] FRACCO: BioClinical-ModernBERT (training 42%)
-- [ ] FRACCO: ModernCamemBERT (need to run)
+- [x] FRACCO: BioClinical-ModernBERT (80.83% acc, 37.67% F1) ✓
+- [ ] FRACCO: ModernCamemBERT (training 37%)
 - [x] NER CAS1: ModernCamemBERT (34.88% F1)
 - [x] NER CAS2: ModernCamemBERT (35.79% F1)
 - [ ] NER CAS1/CAS2: camembert-base, camembert-bio (need to run)
@@ -32,6 +32,58 @@ tail -30 results/fracco_bioclinical_modernbert.log
 ---
 
 ## 📓 SESSION JOURNAL (2025-11-30)
+
+### 03:00 - FIX: Configurable max_length for NER
+
+**Problem**: NER max_length hardcoded at 512, causing 45% truncation.
+
+**Solution**: Made max_length configurable in `bert_token_ner.py`:
+- Added `_max_length` attribute to BERTTokenNERAdapter
+- Read from `backend_args` in config
+- ModernCamemBERT supports 8192 tokens!
+
+**Config** (`configs/ner_cas1_moderncamembert_2048.yaml`):
+```yaml
+backend_args:
+  max_length: 2048  # Captures ALL docs without truncation
+```
+
+**Test confirmed**: 602 tokens allowed (> 512) with max_length=2048
+
+**Expected improvement**: ~35% F1 → 50-60% F1 (no truncation loss)
+
+### 02:30 - CamemBERT-bio NER 0% F1 - ROOT CAUSE FOUND
+
+**The model never learns B- tags!**
+
+| Model | B- tags (5 docs) | I- tags | Result |
+|-------|------------------|---------|--------|
+| CamemBERT-bio | **0** | 855 | **0% F1** |
+| ModernCamemBERT | 97 | 826 | 34.88% F1 |
+
+**Why 0% F1?**
+- Without B- (begin) tags, spans can't be formed in IOB2
+- `_iob2_to_spans()` correctly ignores I- tags without preceding B-
+- CamemBERT-bio predicts ONLY I-sosy (never B-sosy, B-pathologie)
+
+**IOB Label Distribution in CAS1 training data:**
+```
+O:            64.99%
+I-sosy:       26.59%
+I-pathologie:  4.29%
+B-sosy:        3.40%
+B-pathologie:  0.73%  ← Extremely rare!
+```
+
+**B/I ratio: 0.13** - For every B- tag, there are ~7.5 I- tags!
+
+**Why ModernCamemBERT learns B- but CamemBERT-bio doesn't:**
+- Both have same class imbalance, same data
+- Different architectures react differently to extreme imbalance
+- CamemBERT-bio may need: more epochs, lower LR, or class weights
+
+**Conclusion:** CamemBERT-bio NER is NOT suitable without modifications.
+Focus on ModernCamemBERT and camembert-base for NER comparisons.
 
 ### 02:00 - CRITICAL: 45% of docs truncated at 512 tokens!
 
