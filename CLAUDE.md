@@ -18,9 +18,10 @@ ONLY after investigating all issues with simple, working code:
 - [x] FRACCO: camembert-bio (66.91% acc, 12.42% F1)
 - [x] FRACCO: BioClinical-ModernBERT (80.83% acc, 37.67% F1) ✓
 - [x] FRACCO: ModernCamemBERT (**80.55% acc, 38.88% F1**) ✓ BEST!
-- [x] NER CAS1: ModernCamemBERT (34.88% F1)
-- [x] NER CAS2: ModernCamemBERT (35.79% F1)
-- [ ] NER CAS1/CAS2: camembert-base, camembert-bio (need to run)
+- [x] NER CAS1: ModernCamemBERT @ 512 tokens (34.88% F1)
+- [x] NER CAS1: ModernCamemBERT @ 2048 tokens (**40.84% F1**) ✓ +6%!
+- [x] NER CAS2: ModernCamemBERT @ 512 tokens (35.79% F1)
+- [ ] NER CAS1/CAS2: camembert-base (need to run)
 
 ## ⚠️ MONITORING TIP
 Use `tail` on log files, not BashOutput (too verbose):
@@ -45,9 +46,22 @@ tail -30 results/fracco_bioclinical_modernbert.log
 
 **Key insight**: ModernCamemBERT beats specialized Bio models!
 
-**Started**: NER CAS1 with max_length=2048 on GPU1
-- Log: `results/ner_cas1_2048.log`
-- Expected: 50-60% F1 (vs 35% at 512 tokens due to truncation fix)
+**NER CAS1 max_length=2048 Results:**
+| Metric | 512 tokens | 2048 tokens | Improvement |
+|--------|------------|-------------|-------------|
+| **exact_f1** | 34.88% | **40.84%** | **+5.96%** |
+| **partial_f1** | 66.2% | **76.41%** | **+10.2%** |
+| pathologie_exact_f1 | 8.2% | 23.3% | +15.1% |
+| sosy_exact_f1 | 37.1% | 43.1% | +6.0% |
+
+**Truncation fix validation: SUCCESS!**
+- Exact F1 improved by ~6 points
+- Partial F1 improved by ~10 points
+- pathologie nearly tripled (8.2% → 23.3%)
+
+**Why still below 50%?**
+- Boundary issues: 35% gap between partial and exact F1
+- pathologie still hard: long entities, few training samples
 
 ### 03:00 - FIX: Configurable max_length for NER
 
