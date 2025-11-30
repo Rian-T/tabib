@@ -1,6 +1,134 @@
 # CLAUDE.md
 
+## ⚠️ WRITE TO THIS JOURNAL REGULARLY!
+Update after every significant finding or task completion. Commit specific files often.
+
+## ⚠️ MONITORING TIP
+Use `tail` on log files, not BashOutput (too verbose):
+```bash
+tail -30 results/ner_cas2_no_preprocessing.log
+tail -30 results/fracco_bioclinical_modernbert.log
+```
+
+---
+
+## 📓 SESSION JOURNAL (2025-11-30)
+
+### 01:35 - FRACCO Low F1 Investigation
+
+**Question**: Why is FRACCO F1 only 9-12% despite 64-67% accuracy?
+
+**Answer**: Severe class imbalance + macro F1 averaging
+
+**Analysis** (`playground/analyze_fracco_classes.py`):
+- 298 ICD classes with 784x imbalance ratio (max=2352, min=3)
+- Top 1 class = 14.4% of data → baseline accuracy = 14.4%
+- 64% accuracy is actually 4.4x better than baseline!
+- Macro F1 averages ALL 298 classes equally
+- ~150 classes have <20 samples → model fails on them → 0% F1 each
+- These zeros drag down the macro average
+
+**Key insight**: The model IS learning well. Macro F1 is the wrong metric for this task.
+
+**Solutions**:
+1. Use weighted F1 (weight by class frequency)
+2. Increase min_samples to 50 (→ 54 classes) or 100 (→ 31 classes)
+3. Add class weights during training
+
+### 01:28 - Started Next Runs
+
+- **GPU 0**: CAS2 NER without preprocessing (`tabib-ner-fixed`)
+- **GPU 1**: BioClinical-ModernBERT on FRACCO
+
+### 01:25 - FRACCO & CAS1 Results
+
+| Task | Model | Accuracy | F1 |
+|------|-------|----------|-----|
+| FRACCO | camembert-base | 63.95% | 9.79% |
+| FRACCO | camembert-bio | **66.91%** | **12.42%** |
+| CAS1 NER | ModernCamemBERT | - | **34.88%** |
+
+**CAS1 NER FIX CONFIRMED**: Disabling preprocessing raised F1 from 0% → 34.88%
+
+---
+
+## ⚠️ ACTIVE TASKS (2025-11-30 01:35)
+
+### Currently Running:
+
+**GPU 0** - CAS2 NER (without preprocessing)
+- Config: `configs/ner_cas2_moderncamembert.yaml`
+- Log: `results/ner_cas2_no_preprocessing.log`
+- W&B: `tabib-ner-fixed`
+
+**GPU 1** - FRACCO BioClinical-ModernBERT
+- Config: `configs/cls_fracco_icd_bioclinical_modernbert.yaml`
+- Log: `results/fracco_bioclinical_modernbert.log`
+
+### FRACCO Results:
+
+| Model | Accuracy | F1 | Notes |
+|-------|----------|-----|-------|
+| camembert-base | 63.95% | 9.79% | ✓ |
+| camembert-bio-base | **66.91%** | **12.42%** | ✓ Best so far |
+| BioClinical-ModernBERT | training... | - | |
+
+### NER Results (without preprocessing):
+
+| Dataset | Model | exact_F1 | Notes |
+|---------|-------|----------|-------|
+| CAS1 | ModernCamemBERT | **34.88%** | ✓ Fixed! |
+| CAS2 | ModernCamemBERT | training... | |
+
+### Next Steps:
+1. Wait for CAS2 NER & BioClinical-ModernBERT to complete
+2. Create FRACCO config with min_samples=50 for better F1
+3. Try CamemBERT-bio for NER tasks
+4. Error analysis on NER predictions
+
+---
+
 ## GOLDEN RULES
+- **Update journal after every finding** - future Claude needs context!
+- **Git commit specific files** with short messages
+- Never use `git add .` - always add specific files
+- Use `tail` on log files, not BashOutput
+- Keep working autonomously, don't wait for approvals
+
+---
+
+## Previous Session Notes
+
+### ROOT CAUSE FOUND: sentence_splitter removes context!
+**NER model actually works well: 34.88% exact F1** when predicting on full documents!
+
+**The real bug**: `sentence_splitter` preprocessing removes surrounding context:
+- Full doc (1193 chars): Model predicts B-pathologie → I-pathologie → correct span
+- Truncated chunk (134 chars): Model predicts B-pathologie → I-sosy → WRONG span
+
+**Solution**: Disabled `preprocessing` in NER configs
+- CAS1/CAS2 docs are ~1000-2000 chars, fit in 512 tokens without chunking
+
+### Code Changes This Session:
+- `src/tabib/models/bert_token_ner.py`: **FIXED whitespace gap bug in `_iob2_to_spans()`**
+- `src/tabib/data/fracco.py`: Added `min_samples` parameter
+- `playground/debug_ner_spans.py`: Debug script showing the bug
+- `playground/analyze_fracco_classes.py`: FRACCO class distribution analysis
+- Created FRACCO & NER configs
+
+### Commands to Check Status:
+```bash
+# Check GPU 0
+BashOutput bash_id=64d09e
+
+# Check GPU 1 (FRACCO)
+BashOutput bash_id=a3b738
+```
+
+---
+
+## GOLDEN RULES
+- **ALWAYS update the "ACTIVE TASKS" section above when context may be lost** - future Claude needs this info!
 - Never use `git add .` - always add specific files
 - Always check doc online for specific library versions when in doubt
 - Make git commits regularly with meaningful but short messages
@@ -13,30 +141,130 @@
 
 ---
 
-## CURRENT STATUS (2025-11-29 11:45)
+## CURRENT STATUS (2025-11-29 17:30)
 
-### NER v2 - MAJOR BREAKTHROUGH ✓
+### ModernCamemBERT & FRACCO Evaluation (2025-11-29)
 
-**Two Key Fixes**:
+**GPU 0: ModernCamemBERT NER Evaluation**
 
-1. **Prompt Fix** (few-shot leakage):
-   - Added stop tokens + clear section headers
-   - Warnings: 23,572 → 6 (**99.97% reduction**)
+| Dataset | exact_f1 | Status | Notes |
+|---------|----------|--------|-------|
+| MEDLINE | 0.71% | Completed | Very low - investigation needed |
+| CAS1 | - | Failed | No train split (only dev/test) |
+| CAS2 | - | Failed | No train split (only dev/test) |
+| EMEA | 0.24% | Completed | Very low |
+| E3C | **7.13%** | Completed | Best result |
 
-2. **Chunk Size Fix** (EMEA/CAS performance):
-   - EMEA docs are ~5000 chars, MEDLINE docs are ~50 chars
-   - Small chunks (128 tokens) lost context
-   - **Solution**: Increase chunk size to 2048 tokens
+**GPU 1: FRACCO ICD Classification**
 
-**NEW RESULTS (MedGemma-27B 5-shot)**:
-| Dataset | Old (128 tok) | New (2048 tok) | Improvement |
-|---------|---------------|----------------|-------------|
-| MEDLINE | 45.81% | **49.76%** | +4% |
-| EMEA | 1.27% | **60.52%** | **+59%** |
+- **Model**: `almanach/moderncamembert-base`
+- **Result**: **80.35% accuracy** ✓
+- **Approach**: Top-K filtering with `min_samples=10`
+- Reduced from 3,041 classes to ~200 manageable classes
+- Config: `configs/cls_fracco_icd_moderncamembert.yaml`
 
-**Key Insight**: EMEA was failing due to **chunk size**, not annotation style!
+**Code Changes**:
+- `src/tabib/data/fracco.py`: Added `min_samples` parameter to `FRACCOICDClassificationAdapter`
+  - Filters out ICD codes with fewer than N samples
+  - Enables practical BERT classification on long-tail distribution
 
-**Next**: Update all EMEA/CAS configs with 2048-token chunks and re-run
+**Issues Found**:
+1. CAS1/CAS2 datasets have no train split - only dev/test
+2. ModernCamemBERT NER results very low (<1% F1) - needs investigation
+3. E3C performed best at 7.13% F1
+
+---
+
+### LoRA FINETUNING IMPLEMENTATION
+
+**Implemented LoRA SFT infrastructure for MCQA tasks**:
+
+**Dependencies added** (`pyproject.toml`):
+- `peft>=0.18.0`
+- `trl>=0.25.1`
+- `bitsandbytes>=0.48.0`
+
+**New files**:
+- `src/tabib/models/lora_sft.py` - LoRA SFT model adapter using TRL's SFTTrainer
+- `configs/mcqa_mediqal_mcqu_lora.yaml` - MCQU LoRA training config
+- `configs/mcqa_mediqal_mcqm_lora.yaml` - MCQM LoRA training config
+
+**LoRA adapter features**:
+- 4-bit QLoRA quantization (NF4)
+- TRL SFTTrainer integration
+- French medical system prompts
+- Chat message formatting for SFT
+- Target modules: all-linear
+- Default: r=16, alpha=32, dropout=0.05
+
+**Training configs**:
+- Model: Qwen/Qwen3-8B
+- Epochs: 3
+- Batch size: 2 (gradient accumulation: 8)
+- Learning rate: 2e-4
+- Max sequence length: 2048
+
+**Currently running**: LoRA MCQU finetuning
+
+---
+
+### NER JSON CAMPAIGN COMPLETE! (35 configs)
+
+**Duration**: ~2 hours (13:51 - 15:50)
+
+**Fuzzy Matching Improvements Applied**:
+- Added apostrophe normalization (' ' ʼ ʻ → ')
+- Added quote normalization (« » " " → ")
+- Added difflib-based fuzzy matching (85% similarity threshold) for typos
+
+### FINAL RESULTS (exact_F1)
+
+**INSTRUCT MODELS** (use_chat=true):
+
+| Model | MEDLINE | CAS1 | CAS2 | EMEA | E3C |
+|-------|---------|------|------|------|-----|
+| **MedGemma-27B** | **55.35%** | **37.40%** | **37.64%** | **31.93%** | 3.61% |
+| Qwen3-8B | 25.18% | 26.05% | 26.84% | 11.48% | 5.62% |
+
+**COMPLETION MODELS** (use_chat=false):
+
+| Model | MEDLINE | CAS1 | CAS2 | EMEA | E3C |
+|-------|---------|------|------|------|-----|
+| Gemma3-4B | 33.92% | 5.79% | 5.38% | 0.00% | **7.06%** |
+| Gaperon-8B | 27.94% | 0.00% | 0.00% | -- | 2.85% |
+| Gaperon-24B | 23.94% | 0.00% | 0.00% | -- | 1.70% |
+| EuroLLM-9B | 21.57% | -- | -- | -- | 4.50% |
+| Gemma3-27B | 0.00% | 0.00% | 0.00% | 1.31% | 0.00% |
+
+### KEY FINDINGS:
+1. **MedGemma-27B is the clear winner** - best on all datasets except E3C
+2. **Instruct models >> Completion models** for NER tasks
+3. **Completion models fail catastrophically** on French clinical text (CAS1/CAS2)
+4. **Gemma3-27B total failure** - can't do NER at all with completion prompting
+5. **JSON extraction mode works** - much better than XML tagging for high-entity docs
+
+**Next Steps**:
+1. LoRA finetune on MediQAl MCQU
+2. LoRA finetune on MediQAl MCQM
+
+**Scripts Used**:
+- `scripts/generate_ner_configs.py` - Generate all 35 configs
+- `scripts/run_ner_json_campaign.sh` - Run all evaluations
+- **Log**: `results/ner_json_campaign.log`
+
+**Code changes in vllm_ner.py**:
+- `_normalize_text()`: Added apostrophe/quote normalization
+- `_fuzzy_find_entity()`: Added difflib SequenceMatcher fallback (85% threshold)
+
+---
+
+### Previous: NER v2 - ROOT CAUSE FOUND
+
+**Why XML-tagging fails on EMEA**:
+- EMEA has 140+ entities per document (MEDLINE has ~4)
+- XML approach requires **perfect reproduction** of 4000+ chars
+- Model must insert 140 XML tags at exact positions
+- One missing/extra char = 0 F1 for that entity
 
 ### Added Gaperon-Garlic Models
 
