@@ -3,6 +3,25 @@
 ## ⚠️ WRITE TO THIS JOURNAL REGULARLY!
 Update after every significant finding or task completion. Commit specific files often.
 
+## 🎯 FINAL GOAL
+**Upload to W&B table: All models × All datasets with F1 scores**
+
+ONLY after investigating all issues with simple, working code:
+
+| Task | Datasets | Models to Compare |
+|------|----------|-------------------|
+| FRACCO ICD | fracco | ModernCamemBERT, CamemBERT-base, CamemBERT-bio, BioClinical-ModernBERT |
+| NER | CAS1, CAS2 | ModernCamemBERT, CamemBERT-base, CamemBERT-bio |
+
+**Progress**:
+- [x] FRACCO: camembert-base (63.95% acc, 9.79% F1)
+- [x] FRACCO: camembert-bio (66.91% acc, 12.42% F1)
+- [ ] FRACCO: BioClinical-ModernBERT (training 42%)
+- [ ] FRACCO: ModernCamemBERT (need to run)
+- [x] NER CAS1: ModernCamemBERT (34.88% F1)
+- [x] NER CAS2: ModernCamemBERT (35.79% F1)
+- [ ] NER CAS1/CAS2: camembert-base, camembert-bio (need to run)
+
 ## ⚠️ MONITORING TIP
 Use `tail` on log files, not BashOutput (too verbose):
 ```bash
