@@ -1,23 +1,22 @@
 task: classification
 dataset: diamed
 model: bert_text_cls
-model_name_or_path: camembert/camembert-bio-base
+model_name_or_path: almanach/camembert-bio-base
 do_train: true
 do_eval: true
 training:
   output_dir: runs/diamed_camembert_bio
   num_train_epochs: 10
-  per_device_train_batch_size: 16
-  per_device_eval_batch_size: 32
+  per_device_train_batch_size: 8
+  per_device_eval_batch_size: 16
   learning_rate: 2e-5
   warmup_ratio: 0.1
   seed: 42
-  metric_for_best_model: f1
-  greater_is_better: true
-  load_best_model_at_end: true
+  save_total_limit: 2
   eval_strategy: epoch
   save_strategy: epoch
-  save_total_limit: 2
-  early_stopping_patience: 3
+  load_best_model_at_end: true
+  metric_for_best_model: eval_loss
+  greater_is_better: false
 backend_args:
   max_length: 512

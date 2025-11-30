@@ -39,6 +39,46 @@ Create comprehensive W&B table comparing all BERT models and LLMs (≤10B) on Fr
 
 ## Current Progress (2025-11-30)
 
+### 21:01 - W&B Upload Complete
+
+Results uploaded to W&B: https://wandb.ai/rnar/tabib-drbenchmark/runs/9dz6dagq
+
+Created `scripts/upload_drbenchmark_results.py` for reproducibility.
+
+### 19:15 - DrBenchmark COMPLETE!
+
+**ESSAI (Negation/Speculation, 4 classes)**
+| Model | Accuracy | F1 |
+|-------|----------|-----|
+| **CamemBERT-bio** | **98.07%** | **92.24%** |
+| CamemBERT-base | 96.97% | 90.59% |
+| ModernCamemBERT | 96.28% | 89.96% |
+
+**DiaMED (ICD-10 chapters, 22 classes)**
+| Model | Accuracy | F1 |
+|-------|----------|-----|
+| **ModernCamemBERT** | **52.05%** | **28.94%** |
+| CamemBERT-bio | 50.29% | 21.14% |
+| CamemBERT-base | 46.78% | 13.13% |
+
+**Key insights**:
+1. **ESSAI**: CamemBERT-bio wins! Biomedical pretraining helps for negation/speculation
+2. **DiaMED**: ModernCamemBERT wins! Modern architecture helps for 22-class ICD-10
+
+**Bug fixed**: CamemBERT-bio model path (`almanach/camembert-bio-base`, not `camembert/...`)
+
+### 18:15 - DrBenchmark Trainings Started
+
+**Bug fixed in `bert_text_cls.py`**:
+- Changed `eval_strategy` assignment to use `setdefault()` (was overwriting config values)
+- Changed `load_best_model_at_end` to use `setdefault()`
+- Config values now properly respected
+
+**Config fixes for DrBenchmark**:
+- Reduced batch size 16→8 (OOM on ModernCamemBERT)
+- Changed `metric_for_best_model: f1` → `eval_loss` (F1 not computed during training)
+- Added `greater_is_better: false`
+
 ### Configs Created
 - DiaMED: 3 models (moderncamembert, camembert_bio, camembert)
 - ESSAI: 3 models
