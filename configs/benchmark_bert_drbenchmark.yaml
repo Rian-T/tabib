@@ -1,10 +1,10 @@
 description: DrBenchmark - French Biomedical NLP with BERT Models
 
 datasets:
-  ner: [emea, cas1, cas2]
-  cls: [essai, diamed, morfitt]
+  ner: [emea, cas1, cas2, fracco_expression_ner]
+  cls: [essai, diamed, morfitt, fracco_icd_classification, fracco_icd_top50, meddialog_women]
   sim: [clister]
-  mcqa: [mediqal_mcqm, mediqal_mcqu]
+  mcqa: [mediqal_mcqm, mediqal_mcqu, french_med_mcqa_extended]
 
 model_groups:
   bert:

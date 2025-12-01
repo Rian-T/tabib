@@ -17,6 +17,7 @@ from tabib.data.fracco import (
 from tabib.data.french_med_mcqa_extended import FrenchMedMCQAExtendedAdapter
 from tabib.data.jnlpba import JNLPBAAdapter
 from tabib.data.mantragsc import MANTRAGSCAdapter
+from tabib.data.meddialog import MedDialogWomenAdapter
 from tabib.data.mediqal import (
     MediQAlMCQMAdapter,
     MediQAlMCQUAdapter,
@@ -49,5 +50,6 @@ __all__ = [
     "MediQAlMCQUAdapter",
     "MediQAlMCQMAdapter",
     "MediQAlOEQAdapter",
+    "MedDialogWomenAdapter",
 ]
 
