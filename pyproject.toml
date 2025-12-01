@@ -1,0 +1,41 @@
+[project]
+name = "tabib"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "rian-t",email = "rian.touchent@inria.fr"}
+]
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "transformers",
+    "wandb",
+    "datasets",
+    "torch",
+    "evaluate",
+    "numpy (==1.26)",
+    "pydantic",
+    "typer",
+    "pyyaml",
+    "rich",
+    "seqeval",
+    "gliner",
+    "gliner2",
+    "huggingface-hub",
+    "weave",
+    "scikit-learn"
+]
+
+[project.optional-dependencies]
+vllm = ["vllm"]
+lora = ["peft", "trl", "bitsandbytes"]
+
+[tool.poetry]
+packages = [{include = "tabib", from = "src"}]
+
+[tool.poetry.scripts]
+tabib = "tabib.cli:main"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

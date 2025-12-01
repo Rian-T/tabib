@@ -1,0 +1,21 @@
+description: Example comparison across two NER datasets.
+defaults:
+  do_train: false
+  do_eval: true
+datasets:
+  ner_emea: ner_emea_camembert.yaml
+  ner_medline: ner_medline_camembert.yaml
+experiments:
+  camembert_vs_qwen:
+    datasets: [ner_emea, ner_medline]
+    models:
+      - name: camembert
+      - name: qwen
+        model: vllm_ner
+        model_name_or_path: Qwen/Qwen2.5-7B-Instruct
+        do_train: false
+        training: null
+        backend_args:
+          model_name_or_path: Qwen/Qwen2.5-7B-Instruct
+output_path: ../results/example_compare.json
+

@@ -1,7 +1,8 @@
-"""vLLM-based NER model adapter with XML-tagged entity extraction."""
+"""vLLM-based NER model adapter with XML-tagged or JSON entity extraction."""
 
 from __future__ import annotations
 
+import json
 import re
 from collections import defaultdict
 from dataclasses import dataclass
@@ -28,6 +29,7 @@ class _VLLMResources:
     chat_template_kwargs: dict[str, Any]
     use_chat: bool
     few_shot_examples: list[dict[str, str]]  # List of {input, output} example pairs
+    extraction_mode: str = "xml"  # "xml" or "json" - JSON is better for high-entity docs
 
 
 class VLLMNERAdapter(ModelAdapter):
@@ -67,6 +69,8 @@ class VLLMNERAdapter(ModelAdapter):
             "traitement": "Treatment (therapeutic interventions, procedures)",
             "valeur": "Value (numerical measurements, lab values, quantities)",
             "dose": "Dose (medication dosages, amounts)",
+            # E3C entity types
+            "CLINENTITY": "Clinical Entity (diseases, symptoms, medications, procedures, anatomical structures)",
         }
         # User prompt template - {few_shot} and {text} will be filled in _build_prompt
         # V2: Clear section headers to prevent few-shot leakage
@@ -78,6 +82,22 @@ class VLLMNERAdapter(ModelAdapter):
             "=== YOUR INPUT (annotate ONLY this text, NOT the examples above) ===\n\n"
             "Input: \"{text}\"\n"
             "Output:"
+        )
+        # JSON mode prompts - better for high-entity documents
+        self._json_system_prompt = (
+            "You are a biomedical named entity recognition expert. "
+            "Extract all entities from the text and return them as a JSON array. "
+            "Each entity should have 'text' (exact text as it appears) and 'type' (entity type)."
+        )
+        self._json_user_prompt = (
+            "=== TASK: French Biomedical Named Entity Recognition ===\n\n"
+            "Extract all biomedical entities from the text below.\n\n"
+            "Entity types:\n{entity_definitions}\n"
+            "{few_shot}\n"
+            "=== YOUR INPUT ===\n\n"
+            "Text: \"{text}\"\n\n"
+            "Return a JSON array with all entities found:\n"
+            "JSON:"
         )
 
     @property
@@ -109,10 +129,11 @@ class VLLMNERAdapter(ModelAdapter):
         train_data: Any | None = None,
         sampling_overrides: dict[str, Any] | None = None,
         chat_template_kwargs: dict[str, Any] | None = None,
+        extraction_mode: str = "xml",
         **kwargs: Any,
     ) -> _VLLMResources:
         """Build vLLM model with structured outputs for NER.
-        
+
         Args:
             task: NERSpanTask instance
             model_name_or_path: Model name or path
@@ -121,8 +142,11 @@ class VLLMNERAdapter(ModelAdapter):
             enable_thinking: Toggle for the vLLM chat template.
             sampling_overrides: Overrides for the shared sampling defaults.
             chat_template_kwargs: Extra kwargs forwarded to ``llm.chat``'s template.
+            extraction_mode: "xml" or "json". JSON is better for high-entity documents
+                (e.g., EMEA with 147 entities/doc). XML requires perfect text reproduction,
+                while JSON just needs to list entities.
             **kwargs: Additional vLLM engine arguments
-            
+
         Returns:
             VLLMResources with LLM engine and configuration
         """
@@ -158,24 +182,34 @@ class VLLMNERAdapter(ModelAdapter):
         few_shot_examples = []
         if train_data and num_few_shot > 0:
             few_shot_examples = self._create_few_shot_examples(
-                train_data, entity_types, num_few_shot
+                train_data, entity_types, num_few_shot, extraction_mode
             )
+
+        # Select prompts based on extraction mode
+        if extraction_mode == "json":
+            default_system = self._json_system_prompt
+            default_user = self._json_user_prompt
+        else:
+            default_system = self._default_system_prompt
+            default_user = self._default_user_prompt
 
         resources = _VLLMResources(
             engine=engine,
             entity_types=entity_types,
-            system_prompt=system_prompt or self._default_system_prompt,
-            user_prompt_template=user_prompt_template or self._default_user_prompt,
+            system_prompt=system_prompt or default_system,
+            user_prompt_template=user_prompt_template or default_user,
             enable_thinking=enable_thinking,
             chat_template_kwargs=dict(chat_template_kwargs or {}),
             use_chat=use_chat,
             few_shot_examples=few_shot_examples,
+            extraction_mode=extraction_mode,
         )
         self._resources = resources
         return resources
 
     def _create_few_shot_examples(
-        self, train_data: Any, entity_types: list[str], num_examples: int
+        self, train_data: Any, entity_types: list[str], num_examples: int,
+        extraction_mode: str = "xml"
     ) -> list[dict[str, str]]:
         """Create few-shot examples from training data.
 
@@ -183,6 +217,7 @@ class VLLMNERAdapter(ModelAdapter):
             train_data: Training dataset
             entity_types: List of entity types
             num_examples: Number of examples to create
+            extraction_mode: "xml" or "json" - determines output format
 
         Returns:
             List of {input, output} dictionaries
@@ -217,12 +252,22 @@ class VLLMNERAdapter(ModelAdapter):
             if not text or not spans:
                 continue
 
-            # Create XML-tagged output
-            tagged_text = self._create_tagged_text(text, spans)
+            if extraction_mode == "json":
+                # Create JSON output: [{"text": "...", "type": "..."}]
+                json_entities = [
+                    {"text": span.get('text', text[span['start']:span['end']]),
+                     "type": span.get('label', '')}
+                    for span in spans
+                    if span.get('label')
+                ]
+                output = json.dumps(json_entities, ensure_ascii=False)
+            else:
+                # Create XML-tagged output
+                output = self._create_tagged_text(text, spans)
 
             examples.append({
                 'input': text,
-                'output': tagged_text
+                'output': output
             })
 
         return examples
@@ -366,8 +411,11 @@ class VLLMNERAdapter(ModelAdapter):
                 generated_text = output.outputs[0].text.strip()
                 # Log raw LLM output
                 self._log_llm_call(meta['text'], all_prompts[i], generated_text)
-                # Parse XML-tagged output
-                entities = self._parse_xml_tags(generated_text, meta['text'])
+                # Parse output based on extraction mode
+                if resources.extraction_mode == "json":
+                    entities = self._parse_json_output(generated_text, meta['text'])
+                else:
+                    entities = self._parse_xml_tags(generated_text, meta['text'])
 
             chunk_predictions.append({
                 'doc_id': meta['doc_id'],
@@ -493,6 +541,7 @@ class VLLMNERAdapter(ModelAdapter):
         - œ <-> oe
         - æ <-> ae
         - Accents (é -> e, à -> a, etc.)
+        - Apostrophe variants (' ' ʼ ʻ ʹ ʺ ′ ″ → ')
         - Multiple spaces -> single space
         - Case insensitive
         """
@@ -501,6 +550,15 @@ class VLLMNERAdapter(ModelAdapter):
         # Replace ligatures
         text = text.replace('œ', 'oe').replace('Œ', 'OE')
         text = text.replace('æ', 'ae').replace('Æ', 'AE')
+
+        # Normalize apostrophes (various Unicode apostrophe variants)
+        apostrophes = ["'", "'", "ʼ", "ʻ", "ʹ", "ʺ", "′", "″", "`", "´"]
+        for apo in apostrophes:
+            text = text.replace(apo, "'")
+
+        # Normalize quotes
+        text = text.replace('"', '"').replace('"', '"')
+        text = text.replace('«', '"').replace('»', '"')
 
         # Remove accents
         text = ''.join(
@@ -559,6 +617,48 @@ class VLLMNERAdapter(ModelAdapter):
 
             return (search_offset + start, search_offset + end)
 
+        # Try difflib fuzzy matching for small typos (sliding window approach)
+        from difflib import SequenceMatcher
+        entity_len = len(norm_entity)
+        if entity_len < 3:
+            return None  # Too short for fuzzy matching
+
+        best_ratio = 0.0
+        best_match = None
+
+        # Slide window over normalized search text
+        words = norm_search.split()
+        for i in range(len(words)):
+            for j in range(i + 1, min(i + 10, len(words) + 1)):  # Max 10 words window
+                candidate = ' '.join(words[i:j])
+                if abs(len(candidate) - entity_len) > entity_len * 0.3:  # Length must be within 30%
+                    continue
+                ratio = SequenceMatcher(None, norm_entity, candidate).ratio()
+                if ratio > best_ratio and ratio >= 0.85:  # 85% similarity threshold
+                    best_ratio = ratio
+                    best_match = candidate
+
+        if best_match:
+            # Find position of best match in original text
+            match_idx = norm_search.find(best_match)
+            if match_idx != -1:
+                orig_idx = 0
+                norm_idx = 0
+                while norm_idx < match_idx and orig_idx < len(search_text):
+                    if self._normalize_text(search_text[orig_idx]):
+                        norm_idx += len(self._normalize_text(search_text[orig_idx]))
+                    orig_idx += 1
+                start = orig_idx
+
+                norm_end = match_idx + len(best_match)
+                while norm_idx < norm_end and orig_idx < len(search_text):
+                    if self._normalize_text(search_text[orig_idx]):
+                        norm_idx += len(self._normalize_text(search_text[orig_idx]))
+                    orig_idx += 1
+                end = orig_idx
+
+                return (search_offset + start, search_offset + end)
+
         return None
 
     def _parse_xml_tags(self, tagged_text: str, original_text: str) -> list[dict]:
@@ -597,6 +697,58 @@ class VLLMNERAdapter(ModelAdapter):
 
             # Try fuzzy find
             result = self._fuzzy_find_entity(entity_text, search_window, search_offset)
+
+            if result:
+                abs_start, abs_end = result
+                spans.append({
+                    'start': abs_start,
+                    'end': abs_end,
+                    'label': label,
+                    'text': original_text[abs_start:abs_end],
+                })
+            else:
+                print(f"Warning: Could not locate entity '{entity_text}' (label: {label}) in original text")
+
+        return spans
+
+    def _parse_json_output(self, json_text: str, original_text: str) -> list[dict]:
+        """Parse JSON entity extraction output and locate entities in original text.
+
+        Args:
+            json_text: Model output containing JSON array
+            original_text: Original input text
+
+        Returns:
+            List of entity spans with start, end, label, text
+        """
+        spans = []
+
+        # Try to extract JSON array from output
+        try:
+            # Look for JSON array pattern
+            match = re.search(r'\[.*\]', json_text, re.DOTALL)
+            if match:
+                entities = json.loads(match.group())
+            else:
+                print(f"Warning: No JSON array found in output")
+                return spans
+        except json.JSONDecodeError as e:
+            print(f"Warning: Failed to parse JSON: {e}")
+            return spans
+
+        # Process each extracted entity
+        for entity in entities:
+            if not isinstance(entity, dict):
+                continue
+
+            entity_text = entity.get('text', '').strip()
+            label = entity.get('type', '')
+
+            if not entity_text or not label:
+                continue
+
+            # Find this entity in the original text using fuzzy matching
+            result = self._fuzzy_find_entity(entity_text, original_text, 0)
 
             if result:
                 abs_start, abs_end = result
