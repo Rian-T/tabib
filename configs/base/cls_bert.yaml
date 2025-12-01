@@ -1,0 +1,22 @@
+task: classification
+dataset: __DATASET__
+model: bert_text_cls
+model_name_or_path: __MODEL__
+do_train: true
+do_eval: true
+training:
+  output_dir: __OUTPUT_DIR__
+  num_train_epochs: 10
+  per_device_train_batch_size: 8
+  per_device_eval_batch_size: 16
+  learning_rate: 2e-5
+  warmup_ratio: 0.1
+  seed: 42
+  save_total_limit: 2
+  eval_strategy: epoch
+  save_strategy: epoch
+  load_best_model_at_end: true
+  metric_for_best_model: eval_loss
+  greater_is_better: false
+backend_args:
+  max_length: 512

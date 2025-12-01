@@ -1,0 +1,28 @@
+description: DrBenchmark - French Biomedical NLP with BERT Models
+
+datasets:
+  ner: [emea, cas1, cas2]
+  cls: [essai, diamed, morfitt]
+  sim: [clister]
+  mcqa: [mediqal_mcqm, mediqal_mcqu]
+
+model_groups:
+  bert:
+    configs:
+      ner: base/ner_bert.yaml
+      cls: base/cls_bert.yaml
+      sim: base/sim_bert.yaml
+      mcqa: base/mcqa_bert.yaml
+    models:
+      camembert: camembert-base
+      camembert-bio: almanach/camembert-bio-base
+      camembertv2: almanach/camembertv2-base
+      camembertv2-bio: rntc/camembertv2-bio-edu_gt3
+      moderncamembert: almanach/moderncamembert-base
+
+output:
+  json: ../results/bert_drbenchmark.json
+  markdown: ../results/bert_drbenchmark.md
+  wandb:
+    project: tabib-drbenchmark
+    table: bert_results

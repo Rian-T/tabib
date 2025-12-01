@@ -7,6 +7,7 @@ import typer
 from rich.console import Console
 import yaml
 
+from tabib.comparison.benchmark import load_benchmark_spec, run_benchmark
 from tabib.comparison.runner import execute_comparison
 from tabib.comparison.spec import load_comparison_spec
 from tabib.config import RunConfig
@@ -122,6 +123,59 @@ def _format_metrics(metrics: dict[str, Any]) -> str:
         else:
             formatted.append(f"{key}={value}")
     return ", ".join(formatted)
+
+
+@app.command()
+def benchmark(
+    spec_path: str,
+    dry_run: bool = typer.Option(
+        False,
+        "--dry-run",
+        help="Only list planned runs without executing them.",
+    ),
+) -> None:
+    """Run a benchmark comparing multiple model groups across tasks/datasets.
+
+    Uses simplified spec format with model_groups for easy BERT vs LLM comparisons.
+    Outputs results to JSON, Markdown, and optionally W&B.
+
+    Example spec:
+
+        datasets:
+          ner: [emea, cas1]
+          cls: [essai]
+        model_groups:
+          bert:
+            configs: {ner: base/ner_bert.yaml}
+            models: {camembert: camembert-base}
+        output:
+          markdown: results/benchmark.md
+    """
+    console.print(f"[bold]Loading benchmark spec from {spec_path}[/bold]")
+    spec = load_benchmark_spec(spec_path)
+
+    if spec.description:
+        console.print(f"[bold]Description:[/bold] {spec.description}")
+
+    runs = spec.expand_runs()
+    console.print(f"[bold]Planned runs:[/bold] {len(runs)}")
+
+    if dry_run:
+        for run in runs:
+            console.print(f"  - {run.run_id}")
+        return
+
+    results = run_benchmark(spec, dry_run=False, verbose=True)
+
+    # Print summary
+    console.print("\n[bold green]Benchmark complete![/bold green]")
+    console.print(f"  Successful: {sum(1 for r in results.results if r.status == 'success')}")
+    console.print(f"  Errors: {sum(1 for r in results.results if r.status == 'error')}")
+
+    if spec.output.markdown_path:
+        console.print(f"\n[bold]Markdown report:[/bold] {spec.output.markdown_path}")
+    if spec.output.json_path:
+        console.print(f"[bold]JSON results:[/bold] {spec.output.json_path}")
 
 
 def main() -> None:

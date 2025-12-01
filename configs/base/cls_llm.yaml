@@ -1,0 +1,9 @@
+task: classification
+dataset: __DATASET__
+model: vllm_classification
+model_name_or_path: __MODEL__
+do_train: false
+do_eval: true
+backend_args:
+  num_few_shot: 5
+  use_chat: false
