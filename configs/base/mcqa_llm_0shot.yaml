@@ -1,0 +1,14 @@
+task: mcqa
+dataset: __DATASET__
+model: vllm_classification
+model_name_or_path: __MODEL__
+do_train: false
+do_eval: true
+backend_args:
+  num_few_shot: 0
+  use_chat: false
+  system_prompt: >
+    Reponds aux questions medicales a choix multiples. Certaines ont un cas
+    clinique, d'autres sont des questions directes. Plusieurs reponses peuvent
+    etre correctes. Reponds uniquement par les lettres correctes separees par
+    des virgules (ex: A, C, E).
