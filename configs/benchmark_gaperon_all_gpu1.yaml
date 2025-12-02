@@ -1,0 +1,22 @@
+description: Gaperon Full Benchmark - GPU 1 (8B-SFT + 24B)
+
+datasets:
+  mcqa_0shot: [mediqal_mcqm, mediqal_mcqu, french_med_mcqa_extended]
+  mcqa_5shot: [mediqal_mcqm, mediqal_mcqu, french_med_mcqa_extended]
+
+model_groups:
+  llm:
+    configs:
+      mcqa_0shot: base/mcqa_llm_0shot.yaml
+      mcqa_5shot: base/mcqa_llm_5shot.yaml
+    models:
+      gaperon-8b-sft: almanach/Gaperon-1125-8B-SFT
+      gaperon-24b-base: almanach/Gaperon-1125-24B
+      gaperon-24b-sft: almanach/Gaperon-1125-24B-SFT
+
+output:
+  json: ../results/gaperon_all_gpu1.json
+  markdown: ../results/gaperon_all_gpu1.md
+  wandb:
+    project: tabib-drbenchmark
+    table: gaperon_all_results

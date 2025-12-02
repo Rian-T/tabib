@@ -1,0 +1,31 @@
+description: Gaperon Full Benchmark (All sizes + EuroLLM baselines) - 2 GPU
+
+datasets:
+  mcqa_0shot: [mediqal_mcqm, mediqal_mcqu, french_med_mcqa_extended]
+  mcqa_5shot: [mediqal_mcqm, mediqal_mcqu, french_med_mcqa_extended]
+
+model_groups:
+  llm:
+    configs:
+      mcqa_0shot: base/mcqa_llm_0shot_2gpu.yaml
+      mcqa_5shot: base/mcqa_llm_5shot_2gpu.yaml
+    models:
+      # Gaperon 1B
+      gaperon-1b-base: almanach/Gaperon-1125-1B
+      gaperon-1b-sft: almanach/Gaperon-1125-1B-SFT
+      # Gaperon 8B
+      gaperon-8b-base: almanach/Gaperon-1125-8B
+      gaperon-8b-sft: almanach/Gaperon-1125-8B-SFT
+      # Gaperon 24B
+      gaperon-24b-base: almanach/Gaperon-1125-24B
+      gaperon-24b-sft: almanach/Gaperon-1125-24B-SFT
+      # EuroLLM baselines
+      eurollm-1.7b: utter-project/EuroLLM-1.7B-Instruct
+      eurollm-9b: utter-project/EuroLLM-9B-Instruct
+
+output:
+  json: ../results/gaperon_full.json
+  markdown: ../results/gaperon_full.md
+  wandb:
+    project: tabib-drbenchmark
+    table: gaperon_full_results
