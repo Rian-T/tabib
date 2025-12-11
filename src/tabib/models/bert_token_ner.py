@@ -83,14 +83,23 @@ class BERTTokenNERAdapter(ModelAdapter):
             cache_dir=cache_dir,
         )
 
+        # Check if this is a ModernBERT model - disable torch.compile to avoid
+        # DataParallel conflicts
+        from transformers import AutoConfig
+        config = AutoConfig.from_pretrained(model_name_or_path)
+        extra_kwargs = {}
+        if config.model_type == "modernbert":
+            extra_kwargs["reference_compile"] = False
+
         model = AutoModelForTokenClassification.from_pretrained(
             model_name_or_path,
             num_labels=num_labels,
             id2label={i: label for i, label in enumerate(label_list)},
             label2id=label_space,
             cache_dir=cache_dir,
+            **extra_kwargs,
         )
-        
+
         return model, self._tokenizer
     
     def _tokenize_dataset(self, dataset: Any, tokenizer: AutoTokenizer) -> Any:
@@ -458,12 +467,16 @@ class BERTTokenNERAdapter(ModelAdapter):
         device = self._resolve_device()
         model.to(device)
         model.eval()
-        
+
         batch_size = kwargs.get("batch_size", 8)
-        
+
         # Store chunk predictions
         chunk_predictions = []
-        
+
+        # Store IOB2 predictions for seqeval metric
+        all_iob2_preds = []
+        all_iob2_golds = []
+
         for example in inputs:
             # Tokenize single example
             text = example['text']
@@ -474,21 +487,40 @@ class BERTTokenNERAdapter(ModelAdapter):
                 return_offsets_mapping=True,
                 return_tensors='pt'
             )
-            
+
             # Get predictions
             input_ids = tokens['input_ids'].to(device)
             attention_mask = tokens['attention_mask'].to(device)
             offset_mapping = tokens['offset_mapping'][0]
-            
+
             with torch.no_grad():
                 outputs = model(input_ids=input_ids, attention_mask=attention_mask)
                 logits = outputs.logits
-            
+
             predictions = torch.argmax(logits, dim=-1)[0].cpu().numpy()
-            
+
             # Convert IOB2 predictions to spans
             spans = self._iob2_to_spans(predictions, offset_mapping, text)
-            
+
+            # Store IOB2 labels for seqeval (exclude special tokens)
+            pred_iob2 = []
+            gold_iob2 = []
+            gold_entities = example.get('entities', [])
+            gold_labels = self._spans_to_iob2_labels(gold_entities, offset_mapping.tolist())
+
+            for i, (pred_id, gold_id) in enumerate(zip(predictions, gold_labels)):
+                # Skip special tokens
+                if offset_mapping[i][0] == 0 and offset_mapping[i][1] == 0:
+                    continue
+                if gold_id == -100:
+                    continue
+                pred_iob2.append(self._label_list[pred_id])
+                gold_iob2.append(self._label_list[gold_id])
+
+            if pred_iob2:
+                all_iob2_preds.append(pred_iob2)
+                all_iob2_golds.append(gold_iob2)
+
             # Store with metadata for reassembly
             chunk_predictions.append({
                 'doc_id': example['doc_id'],
@@ -496,10 +528,18 @@ class BERTTokenNERAdapter(ModelAdapter):
                 'chunk_offset': example.get('chunk_offset', 0),
                 'spans': spans
             })
-        
+
         # Reassemble chunks into documents
         documents = self._reassemble_chunks(chunk_predictions)
-        
+
+        # Attach IOB2 data for seqeval computation
+        if all_iob2_preds:
+            documents = {
+                'documents': documents,
+                'iob2_predictions': all_iob2_preds,
+                'iob2_references': all_iob2_golds
+            }
+
         return documents
     
     def _iob2_to_spans(self, predictions, offset_mapping, text):
@@ -552,12 +592,30 @@ class BERTTokenNERAdapter(ModelAdapter):
         # Add final span if any
         if current_span:
             spans.append(current_span)
-        
-        # Add text to spans
+
+        # Normalize span boundaries by stripping leading/trailing whitespace
+        # Some tokenizers (e.g., DrBERT) include leading spaces in offset mappings
+        normalized_spans = []
         for span in spans:
-            span['text'] = text[span['start']:span['end']]
-        
-        return spans
+            start = span['start']
+            end = span['end']
+
+            # Strip leading whitespace
+            while start < end and start < len(text) and text[start].isspace():
+                start += 1
+
+            # Strip trailing whitespace
+            while end > start and text[end-1].isspace():
+                end -= 1
+
+            # Only keep non-empty spans
+            if start < end:
+                span['start'] = start
+                span['end'] = end
+                span['text'] = text[start:end]
+                normalized_spans.append(span)
+
+        return normalized_spans
     
     def _reassemble_chunks(self, chunk_predictions):
         """Reassemble chunk predictions into document-level predictions."""

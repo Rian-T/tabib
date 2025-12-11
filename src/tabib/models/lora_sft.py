@@ -55,9 +55,10 @@ class LoRASFTAdapter(ModelAdapter):
         load_in_4bit: bool = True,
         system_prompt: str | None = None,
         prompt_template: str | None = None,
+        adapter_path: str | None = None,
         **kwargs: Any,
     ) -> _LoRASFTResources:
-        """Build model for LoRA finetuning.
+        """Build model for LoRA finetuning or inference.
 
         Args:
             task: Classification task instance
@@ -65,6 +66,7 @@ class LoRASFTAdapter(ModelAdapter):
             load_in_4bit: Whether to load model in 4-bit quantization
             system_prompt: System prompt for chat format
             prompt_template: Template for user prompts
+            adapter_path: Path to pre-trained LoRA adapter (for eval-only mode)
 
         Returns:
             Resources containing model, tokenizer, and task info
@@ -105,17 +107,23 @@ class LoRASFTAdapter(ModelAdapter):
             cache_dir=cache_dir,
         )
 
-        # Default prompts for French medical MCQA
+        # Load pre-trained LoRA adapter if provided (for eval-only mode)
+        if adapter_path and os.path.exists(adapter_path):
+            try:
+                from peft import PeftModel
+
+                print(f"Loading LoRA adapter from {adapter_path}")
+                model = PeftModel.from_pretrained(model, adapter_path)
+                model.eval()
+            except Exception as e:
+                print(f"Warning: Could not load adapter from {adapter_path}: {e}")
+
+        # Default prompts for French medical MCQA (simple, no special chars)
         default_system = (
-            "Tu es un·e expert·e médical·e français·e. "
-            "Réponds uniquement par la ou les lettres majuscules correspondant aux bonnes réponses."
+            "Reponds aux questions medicales a choix multiples. "
+            "Reponds uniquement par les lettres correctes separees par des espaces (ex: A C E)."
         )
-        default_template = (
-            "Analyse le cas clinique et la question suivante, puis réponds.\n\n"
-            "{text}\n\n"
-            "Options possibles: {labels}\n"
-            "Réponse:"
-        )
+        default_template = "{text}\n\nReponse:"
 
         resources = _LoRASFTResources(
             model=model,
@@ -236,6 +244,19 @@ class LoRASFTAdapter(ModelAdapter):
             target_modules=target_modules,
         )
 
+        # Filter out kwargs that are explicitly set or not supported by SFTConfig
+        extra_kwargs = {
+            k: v for k, v in kwargs.items()
+            if k not in {
+                "output_dir", "num_train_epochs", "per_device_train_batch_size",
+                "per_device_eval_batch_size", "learning_rate", "gradient_accumulation_steps",
+                "warmup_ratio", "logging_steps", "save_steps", "eval_strategy", "eval_steps",
+                "seed", "bf16", "gradient_checkpointing", "max_length", "max_seq_length",
+                "packing", "report_to", "early_stopping_patience", "early_stopping_threshold",
+                "lora_r", "lora_alpha", "lora_dropout", "target_modules",
+            }
+        }
+
         # SFT training configuration
         sft_config = SFTConfig(
             output_dir=output_dir,
@@ -252,15 +273,15 @@ class LoRASFTAdapter(ModelAdapter):
             seed=seed,
             bf16=True,
             gradient_checkpointing=True,
-            max_seq_length=max_seq_length,
+            max_length=max_seq_length,  # TRL uses max_length not max_seq_length
             packing=False,  # Don't pack multiple examples
             report_to="wandb",
-            **kwargs,
+            **extra_kwargs,
         )
 
         trainer = SFTTrainer(
             model=resources.model,
-            tokenizer=resources.tokenizer,
+            processing_class=resources.tokenizer,  # TRL renamed tokenizer to processing_class
             train_dataset=formatted_train,
             eval_dataset=formatted_eval,
             peft_config=peft_config,
@@ -280,7 +301,7 @@ class LoRASFTAdapter(ModelAdapter):
         """Run inference with the model (optionally with loaded adapter).
 
         Args:
-            model: Model resources
+            model: Model resources or PeftModel from training
             inputs: Input examples
             adapter_path: Path to LoRA adapter (if not already merged)
             max_new_tokens: Maximum tokens to generate
@@ -292,18 +313,35 @@ class LoRASFTAdapter(ModelAdapter):
 
         import numpy as np
 
-        resources = model if isinstance(model, _LoRASFTResources) else self._resources
+        # Handle different model types:
+        # 1. _LoRASFTResources from build_model
+        # 2. PeftModel from trainer.model after training
+        # 3. Fall back to self._resources
+        resources = self._resources
+        if isinstance(model, _LoRASFTResources):
+            resources = model
         if resources is None:
             raise ValueError("Model not built. Call build_model first.")
 
-        # Load adapter if path provided
+        # Determine which model instance to use for generation
+        # If model is a PeftModel (from training), use it directly
+        try:
+            from peft import PeftModel
+            if isinstance(model, PeftModel):
+                model_instance = model
+            else:
+                model_instance = resources.model
+        except ImportError:
+            model_instance = resources.model
+
+        # Load adapter if path provided and model_instance is not already a PeftModel
         if adapter_path and os.path.exists(adapter_path):
             try:
                 from peft import PeftModel
 
-                if not isinstance(resources.model, PeftModel):
-                    resources.model = PeftModel.from_pretrained(
-                        resources.model,
+                if not isinstance(model_instance, PeftModel):
+                    model_instance = PeftModel.from_pretrained(
+                        model_instance,
                         adapter_path,
                     )
             except Exception as e:
@@ -317,7 +355,6 @@ class LoRASFTAdapter(ModelAdapter):
                 "formatted_predictions": [],
             }
 
-        model_instance = resources.model
         model_instance.eval()
 
         labels_str = ", ".join(resources.label_list)
@@ -346,8 +383,8 @@ class LoRASFTAdapter(ModelAdapter):
                 max_length=2048,
             ).to(model_instance.device)
 
-            # Generate
-            with torch.no_grad():
+            # Generate with autocast for consistent dtype handling
+            with torch.no_grad(), torch.amp.autocast("cuda", dtype=torch.bfloat16):
                 outputs = model_instance.generate(
                     **inputs_enc,
                     max_new_tokens=max_new_tokens,

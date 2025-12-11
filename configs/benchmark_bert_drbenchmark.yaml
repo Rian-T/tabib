@@ -1,7 +1,8 @@
 description: DrBenchmark - French Biomedical NLP with BERT Models
 
 datasets:
-  ner: [emea, cas1, cas2, fracco_expression_ner]
+  # fracco_expression_ner removed: requires ner_token task, incompatible with ner_span
+  ner: [emea, cas1, cas2]
   cls: [essai, diamed, morfitt, fracco_icd_classification, fracco_icd_top50, meddialog_women]
   sim: [clister]
   mcqa: [mediqal_mcqm, mediqal_mcqu, french_med_mcqa_extended]
@@ -19,6 +20,9 @@ model_groups:
       camembertv2: almanach/camembertv2-base
       camembertv2-bio: rntc/camembertv2-bio-edu_gt3
       moderncamembert: almanach/moderncamembert-base
+      drbert: Dr-BERT/DrBERT-7GB
+      bioclinical-modernbert: thomas-sounack/BioClinical-ModernBERT-base
+      camembert-enriched: rntc/camembert-enriched-v4-full-enriched-v4-full-no_other_scores_ge2
 
 output:
   json: ../results/bert_drbenchmark.json

@@ -64,6 +64,38 @@ class VLLMClassificationAdapter(ModelAdapter):
         unique_letters = sorted(set(letter.upper() for letter in letters))
         return " ".join(unique_letters)
 
+    @staticmethod
+    def _parse_single_answer(text: str, valid_labels: set[str]) -> str:
+        """Parse free-form single-answer output to extract the answer.
+
+        Handles various formats like:
+        - "A" or "B" (direct answer)
+        - "(A)" or "(B)" (parenthesized)
+        - "The answer is A" or "La réponse est B"
+        - "A. Some explanation"
+
+        Returns the first valid label found, or empty string if none found.
+        """
+        import re
+        text_upper = text.upper()
+        # First try: exact match at start (after stripping)
+        first_char = text_upper[0] if text_upper else ""
+        if first_char in valid_labels:
+            return first_char
+        # Second try: parenthesized like "(A)" or "(B)"
+        paren_match = re.search(r'\(([A-Z])\)', text_upper)
+        if paren_match and paren_match.group(1) in valid_labels:
+            return paren_match.group(1)
+        # Third try: find first occurrence of valid label as standalone
+        for match in re.finditer(r'\b([A-Z])\b', text_upper):
+            if match.group(1) in valid_labels:
+                return match.group(1)
+        # Fourth try: any valid label character
+        for char in text_upper:
+            if char in valid_labels:
+                return char
+        return ""
+
     @weave.op()
     def _log_llm_call(self, input_text: str, prompt: str, output: str, expected_label: str | None = None) -> dict:
         """Log LLM call details to Weave for debugging."""
@@ -213,8 +245,11 @@ class VLLMClassificationAdapter(ModelAdapter):
                 formatted.append(parsed_text)
                 predictions.append(resources.label_to_id.get(parsed_text, -1))
             else:
-                formatted.append(raw_text)
-                predictions.append(resources.label_to_id.get(raw_text, -1))
+                # Parse single answer - extract first valid label from response
+                valid_labels = set(resources.label_to_id.keys())
+                parsed_text = self._parse_single_answer(raw_text, valid_labels)
+                formatted.append(parsed_text if parsed_text else raw_text)
+                predictions.append(resources.label_to_id.get(parsed_text, -1))
 
             # Log to Weave for debugging (visible in Weave trace)
             input_text = records[i].get("text") or records[i].get("content") or ""

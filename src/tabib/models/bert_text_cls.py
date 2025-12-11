@@ -55,12 +55,21 @@ class BERTTextClassificationAdapter(ModelAdapter):
             cache_dir=cache_dir,
         )
 
+        # Check if this is a ModernBERT model - disable torch.compile to avoid
+        # DataParallel conflicts
+        from transformers import AutoConfig
+        config = AutoConfig.from_pretrained(model_name_or_path)
+        extra_kwargs = {}
+        if config.model_type == "modernbert":
+            extra_kwargs["reference_compile"] = False
+
         model = AutoModelForSequenceClassification.from_pretrained(
             model_name_or_path,
             num_labels=task.num_labels,
             id2label={idx: label for idx, label in enumerate(task.label_list)},
             label2id={label: idx for idx, label in enumerate(task.label_list)},
             cache_dir=cache_dir,
+            **extra_kwargs,
         )
         return model, self._tokenizer
 

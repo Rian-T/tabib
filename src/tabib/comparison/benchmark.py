@@ -27,6 +27,8 @@ from __future__ import annotations
 
 import copy
 import json
+import statistics
+from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -52,9 +54,16 @@ class BenchmarkRun:
     model_name: str
     model_path: str
     config: dict[str, Any]
+    seed: int | None = None  # None means use config's default seed
 
     @property
     def run_id(self) -> str:
+        base = f"{self.group}.{self.task}.{self.dataset}.{self.model_name}"
+        return f"{base}.seed{self.seed}" if self.seed is not None else base
+
+    @property
+    def base_run_id(self) -> str:
+        """Run ID without seed suffix, for grouping."""
         return f"{self.group}.{self.task}.{self.dataset}.{self.model_name}"
 
 
@@ -68,6 +77,24 @@ class BenchmarkResult:
 
 
 @dataclass
+class AggregatedResult:
+    """Aggregated metrics across multiple seeds."""
+    group: str
+    task: str
+    dataset: str
+    model_name: str
+    model_path: str
+    seeds: list[int]
+    num_seeds: int
+    metrics_mean: dict[str, float]
+    metrics_std: dict[str, float]
+
+    @property
+    def base_run_id(self) -> str:
+        return f"{self.group}.{self.task}.{self.dataset}.{self.model_name}"
+
+
+@dataclass
 class BenchmarkSpec:
     """Parsed benchmark specification."""
     path: Path
@@ -75,11 +102,18 @@ class BenchmarkSpec:
     datasets: dict[str, list[str]]  # task -> [dataset1, dataset2, ...]
     model_groups: dict[str, ModelGroupSpec]
     output: OutputSpec
+    seeds: list[int] | None = None  # None = single run with base config seed
 
     def expand_runs(self) -> list[BenchmarkRun]:
-        """Expand spec into individual run configurations."""
+        """Expand spec into individual run configurations.
+
+        If seeds are specified, duplicates each run for each seed.
+        """
         runs: list[BenchmarkRun] = []
         config_cache: dict[Path, dict[str, Any]] = {}
+
+        # Determine seeds to run (None = single run with base config seed)
+        seeds_to_run: list[int | None] = self.seeds if self.seeds else [None]
 
         for group_name, group in self.model_groups.items():
             for task, datasets in self.datasets.items():
@@ -93,22 +127,25 @@ class BenchmarkSpec:
 
                 for dataset in datasets:
                     for model_name, model_path in group.models.items():
-                        config = self._build_config(
-                            base_config,
-                            group_name=group_name,
-                            task=task,
-                            dataset=dataset,
-                            model_name=model_name,
-                            model_path=model_path,
-                        )
-                        runs.append(BenchmarkRun(
-                            group=group_name,
-                            task=task,
-                            dataset=dataset,
-                            model_name=model_name,
-                            model_path=model_path,
-                            config=config,
-                        ))
+                        for seed in seeds_to_run:
+                            config = self._build_config(
+                                base_config,
+                                group_name=group_name,
+                                task=task,
+                                dataset=dataset,
+                                model_name=model_name,
+                                model_path=model_path,
+                                seed=seed,
+                            )
+                            runs.append(BenchmarkRun(
+                                group=group_name,
+                                task=task,
+                                dataset=dataset,
+                                model_name=model_name,
+                                model_path=model_path,
+                                config=config,
+                                seed=seed,
+                            ))
         return runs
 
     def _build_config(
@@ -120,6 +157,7 @@ class BenchmarkSpec:
         dataset: str,
         model_name: str,
         model_path: str,
+        seed: int | None = None,
     ) -> dict[str, Any]:
         """Build final config by substituting placeholders."""
         config = copy.deepcopy(base)
@@ -128,9 +166,18 @@ class BenchmarkSpec:
         config["dataset"] = dataset
         config["model_name_or_path"] = model_path
 
-        # Set output_dir dynamically
+        # Override seed if specified
+        if seed is not None:
+            if "training" not in config:
+                config["training"] = {}
+            config["training"]["seed"] = seed
+
+        # Set output_dir dynamically (include seed in path to avoid conflicts)
         if "training" in config and config.get("do_train"):
-            output_dir = f"runs/{group_name}/{task}_{dataset}_{model_name}"
+            if seed is not None:
+                output_dir = f"runs/{group_name}/{task}_{dataset}_{model_name}_seed{seed}"
+            else:
+                output_dir = f"runs/{group_name}/{task}_{dataset}_{model_name}"
             config["training"]["output_dir"] = output_dir
 
         return config
@@ -158,6 +205,17 @@ def load_benchmark_spec(path: str | Path) -> BenchmarkSpec:
     raw = _load_yaml(spec_path)
 
     description = raw.get("description")
+
+    # Parse seeds (optional)
+    raw_seeds = raw.get("seeds")
+    seeds: list[int] | None = None
+    if raw_seeds is not None:
+        if isinstance(raw_seeds, list):
+            seeds = [int(s) for s in raw_seeds]
+        elif isinstance(raw_seeds, int):
+            seeds = [raw_seeds]
+        else:
+            raise ValueError(f"'seeds' must be a list or int, got {type(raw_seeds)}")
 
     # Parse datasets
     raw_datasets = raw.get("datasets", {})
@@ -187,6 +245,7 @@ def load_benchmark_spec(path: str | Path) -> BenchmarkSpec:
         datasets=datasets,
         model_groups=model_groups,
         output=output,
+        seeds=seeds,
     )
 
 
@@ -241,22 +300,105 @@ class BenchmarkResults:
     def add_result(self, result: BenchmarkResult) -> None:
         self.results.append(result)
 
+    def has_multi_seed(self) -> bool:
+        """Check if results contain multi-seed runs."""
+        seeds_seen: set[int] = set()
+        for r in self.results:
+            if r.run.seed is not None:
+                seeds_seen.add(r.run.seed)
+        return len(seeds_seen) > 1
+
+    def aggregate_by_seed(self) -> list[AggregatedResult]:
+        """Aggregate results across seeds for each model/dataset combination.
+
+        Returns list of AggregatedResult, one per unique (group, task, dataset, model).
+        """
+        # Group results by base_run_id
+        grouped: dict[str, list[BenchmarkResult]] = defaultdict(list)
+        for result in self.results:
+            if result.status == "success":
+                grouped[result.run.base_run_id].append(result)
+
+        aggregated: list[AggregatedResult] = []
+        for base_id, results in grouped.items():
+            if not results:
+                continue
+
+            # Extract info from first result
+            first = results[0]
+            seeds = [r.run.seed for r in results if r.run.seed is not None]
+
+            # Aggregate metrics
+            metrics_all: dict[str, list[float]] = defaultdict(list)
+            for r in results:
+                for metric_name, value in r.metrics.items():
+                    if isinstance(value, (int, float)):
+                        metrics_all[metric_name].append(float(value))
+
+            metrics_mean: dict[str, float] = {}
+            metrics_std: dict[str, float] = {}
+            for metric_name, values in metrics_all.items():
+                if len(values) > 0:
+                    metrics_mean[metric_name] = statistics.mean(values)
+                    metrics_std[metric_name] = (
+                        statistics.stdev(values) if len(values) > 1 else 0.0
+                    )
+
+            aggregated.append(AggregatedResult(
+                group=first.run.group,
+                task=first.run.task,
+                dataset=first.run.dataset,
+                model_name=first.run.model_name,
+                model_path=first.run.model_path,
+                seeds=seeds,
+                num_seeds=len(results),
+                metrics_mean=metrics_mean,
+                metrics_std=metrics_std,
+            ))
+
+        return aggregated
+
     def to_dict(self) -> dict[str, Any]:
-        """Convert results to nested dictionary structure."""
+        """Convert results to nested dictionary structure.
+
+        Includes both individual and aggregated results when multi-seed.
+        """
         data: dict[str, Any] = {
             "metadata": self.metadata,
             "results": {},
         }
 
+        # Individual results
         for r in self.results:
             data["results"].setdefault(r.run.group, {})
             data["results"][r.run.group].setdefault(r.run.task, {})
             data["results"][r.run.group][r.run.task].setdefault(r.run.dataset, {})
-            data["results"][r.run.group][r.run.task][r.run.dataset][r.run.model_name] = {
+
+            # Key by model_name or model_name.seedN if multi-seed
+            key = r.run.model_name
+            if r.run.seed is not None:
+                key = f"{r.run.model_name}.seed{r.run.seed}"
+
+            data["results"][r.run.group][r.run.task][r.run.dataset][key] = {
                 "metrics": r.metrics,
                 "status": r.status,
                 "error": r.error,
+                "seed": r.run.seed,
             }
+
+        # Aggregated results (if multi-seed)
+        if self.has_multi_seed():
+            data["aggregated"] = {}
+            for agg in self.aggregate_by_seed():
+                path = data["aggregated"].setdefault(agg.group, {})
+                path = path.setdefault(agg.task, {})
+                path = path.setdefault(agg.dataset, {})
+                path[agg.model_name] = {
+                    "seeds": agg.seeds,
+                    "num_seeds": agg.num_seeds,
+                    "metrics_mean": agg.metrics_mean,
+                    "metrics_std": agg.metrics_std,
+                }
 
         return data
 
@@ -280,7 +422,10 @@ class BenchmarkResults:
         return rows
 
     def to_markdown(self) -> str:
-        """Generate markdown tables grouped by task."""
+        """Generate markdown tables grouped by task.
+
+        Shows mean +/- std when multi-seed results available.
+        """
         lines: list[str] = []
 
         if self.spec.description:
@@ -288,6 +433,60 @@ class BenchmarkResults:
 
         lines.append(f"Generated: {self.metadata.get('generated_at', 'N/A')}\n")
 
+        # Add seed info if multi-seed
+        if self.has_multi_seed() and self.spec.seeds:
+            lines.append(f"Seeds: {self.spec.seeds} (n={len(self.spec.seeds)})\n")
+
+        # Use aggregated results if multi-seed, otherwise individual
+        if self.has_multi_seed():
+            return self._markdown_from_aggregated(lines)
+        else:
+            return self._markdown_from_individual(lines)
+
+    def _markdown_from_aggregated(self, lines: list[str]) -> str:
+        """Generate markdown from aggregated results (mean +/- std)."""
+        aggregated = self.aggregate_by_seed()
+
+        # Group by task
+        by_task: dict[str, list[AggregatedResult]] = {}
+        for agg in aggregated:
+            by_task.setdefault(agg.task, []).append(agg)
+
+        for task, task_results in by_task.items():
+            lines.append(f"\n## {task.upper()}\n")
+
+            datasets = sorted(set(r.dataset for r in task_results))
+            models = sorted(set(r.model_name for r in task_results))
+            primary_metric = self._get_primary_metric(task)
+
+            header = "| Model | " + " | ".join(datasets) + " |"
+            separator = "|-------|" + "|".join(["-------"] * len(datasets)) + "|"
+            lines.append(header)
+            lines.append(separator)
+
+            for model in models:
+                row_values = [model]
+                for dataset in datasets:
+                    matching = [
+                        r for r in task_results
+                        if r.model_name == model and r.dataset == dataset
+                    ]
+                    if matching:
+                        agg = matching[0]
+                        if primary_metric in agg.metrics_mean:
+                            mean = agg.metrics_mean[primary_metric]
+                            std = agg.metrics_std.get(primary_metric, 0.0)
+                            row_values.append(f"{mean*100:.2f}% +/- {std*100:.2f}%")
+                        else:
+                            row_values.append("-")
+                    else:
+                        row_values.append("-")
+                lines.append("| " + " | ".join(row_values) + " |")
+
+        return "\n".join(lines)
+
+    def _markdown_from_individual(self, lines: list[str]) -> str:
+        """Generate markdown from individual results (single values)."""
         # Group by task
         by_task: dict[str, list[BenchmarkResult]] = {}
         for r in self.results:
@@ -296,24 +495,18 @@ class BenchmarkResults:
         for task, task_results in by_task.items():
             lines.append(f"\n## {task.upper()}\n")
 
-            # Get unique datasets and models
             datasets = sorted(set(r.run.dataset for r in task_results))
             models = sorted(set(r.run.model_name for r in task_results))
-
-            # Determine primary metric
             primary_metric = self._get_primary_metric(task)
 
-            # Build table header
             header = "| Model | " + " | ".join(datasets) + " |"
             separator = "|-------|" + "|".join(["-------"] * len(datasets)) + "|"
             lines.append(header)
             lines.append(separator)
 
-            # Build table rows
             for model in models:
                 row_values = [model]
                 for dataset in datasets:
-                    # Find result for this model+dataset
                     matching = [
                         r for r in task_results
                         if r.run.model_name == model and r.run.dataset == dataset
@@ -362,7 +555,10 @@ class BenchmarkResults:
             f.write(self.to_markdown())
 
     def upload_to_wandb(self, project: str, table_name: str) -> None:
-        """Upload results to W&B as a table."""
+        """Upload results to W&B as a table.
+
+        If multi-seed, uploads aggregated results (mean/std) only.
+        """
         try:
             import wandb
         except ImportError:
@@ -370,23 +566,43 @@ class BenchmarkResults:
             return
 
         run = wandb.init(project=project, job_type="benchmark")
-        table = wandb.Table(
-            columns=["group", "task", "dataset", "model", "metric", "value"]
-        )
 
-        for r in self.results:
-            if r.status != "success":
-                continue
-            primary_metric = self._get_primary_metric(r.run.task)
-            if primary_metric in r.metrics:
-                table.add_data(
-                    r.run.group,
-                    r.run.task,
-                    r.run.dataset,
-                    r.run.model_name,
-                    primary_metric,
-                    r.metrics[primary_metric],
-                )
+        if self.has_multi_seed():
+            # Aggregated results table with mean/std
+            table = wandb.Table(
+                columns=["group", "task", "dataset", "model", "num_seeds", "metric", "mean", "std"]
+            )
+            for agg in self.aggregate_by_seed():
+                primary_metric = self._get_primary_metric(agg.task)
+                if primary_metric in agg.metrics_mean:
+                    table.add_data(
+                        agg.group,
+                        agg.task,
+                        agg.dataset,
+                        agg.model_name,
+                        agg.num_seeds,
+                        primary_metric,
+                        agg.metrics_mean[primary_metric],
+                        agg.metrics_std.get(primary_metric, 0.0),
+                    )
+        else:
+            # Individual results table (single seed)
+            table = wandb.Table(
+                columns=["group", "task", "dataset", "model", "metric", "value"]
+            )
+            for r in self.results:
+                if r.status != "success":
+                    continue
+                primary_metric = self._get_primary_metric(r.run.task)
+                if primary_metric in r.metrics:
+                    table.add_data(
+                        r.run.group,
+                        r.run.task,
+                        r.run.dataset,
+                        r.run.model_name,
+                        primary_metric,
+                        r.metrics[primary_metric],
+                    )
 
         run.log({table_name: table})
         run.finish()

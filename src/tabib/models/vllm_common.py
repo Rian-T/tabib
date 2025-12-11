@@ -80,6 +80,57 @@ def build_messages(
     return messages
 
 
+def shutdown_vllm_engine(engine: VLLMEngine) -> None:
+    """Properly shut down a vLLM engine and free GPU memory.
+
+    Args:
+        engine: Instance returned by :func:`create_vllm_engine`.
+    """
+    import gc
+    import os
+    import signal
+
+    try:
+        import torch
+    except ImportError:
+        torch = None
+
+    llm = engine.llm
+
+    # vLLM v1 uses multiprocessing - we need to terminate child processes
+    try:
+        import multiprocessing
+        current_process = multiprocessing.current_process()
+        # Get all child processes and terminate them
+        for child in multiprocessing.active_children():
+            if "Engine" in child.name or "Worker" in child.name:
+                child.terminate()
+                child.join(timeout=5)
+    except Exception:
+        pass
+
+    # Try vLLM's distributed cleanup if available
+    try:
+        from vllm.distributed.parallel_state import destroy_distributed_environment
+        destroy_distributed_environment()
+    except (ImportError, Exception):
+        pass
+
+    # Delete the engine reference
+    try:
+        del engine.llm
+    except Exception:
+        pass
+
+    # Force garbage collection
+    gc.collect()
+
+    # Clear CUDA cache if available
+    if torch is not None and torch.cuda.is_available():
+        torch.cuda.empty_cache()
+        torch.cuda.synchronize()
+
+
 def chat_with_vllm(
     engine: VLLMEngine,
     conversations: Sequence[Sequence[dict[str, str]]],

@@ -52,3 +52,6 @@ class RunConfig(BaseModel):
     # Offline mode options
     offline_dir: str | None = Field(default=None, description="Offline cache directory. Defaults to $SCRATCH/tabib if SCRATCH is set.")
 
+    # LLM-as-a-Judge evaluation
+    judge_config: dict[str, Any] | None = Field(default=None, description="LLM judge configuration")
+

@@ -52,11 +52,20 @@ class BERTSimilarityAdapter(ModelAdapter):
             cache_dir=cache_dir,
         )
 
+        # Check if this is a ModernBERT model - disable torch.compile to avoid
+        # DataParallel conflicts
+        from transformers import AutoConfig
+        config = AutoConfig.from_pretrained(model_name_or_path)
+        extra_kwargs = {}
+        if config.model_type == "modernbert":
+            extra_kwargs["reference_compile"] = False
+
         model = AutoModelForSequenceClassification.from_pretrained(
             model_name_or_path,
             num_labels=1,
             problem_type="regression",
             cache_dir=cache_dir,
+            **extra_kwargs,
         )
         return model, self._tokenizer
 

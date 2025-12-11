@@ -57,6 +57,9 @@ class VLLMOpenQAAdapter(ModelAdapter):
         if not isinstance(task, OpenQATask):
             raise ValueError(f"Expected OpenQATask, got {type(task)}")
 
+        # Filter out non-vLLM kwargs
+        kwargs.pop("train_data", None)
+
         engine = create_vllm_engine(
             model_name_or_path,
             sampling_overrides=sampling_overrides,

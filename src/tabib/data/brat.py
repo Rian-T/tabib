@@ -17,7 +17,13 @@ class BRATDatasetAdapter(DatasetAdapter):
     Supports chunking long documents at newline boundaries.
     """
 
-    def __init__(self, data_dir: str | Path, name: str = "brat", chunk_size: int = 0):
+    def __init__(
+        self,
+        data_dir: str | Path,
+        name: str = "brat",
+        chunk_size: int = 0,
+        filter_nested: bool = False,
+    ):
         """Initialize BRAT adapter.
 
         Args:
@@ -27,11 +33,15 @@ class BRATDatasetAdapter(DatasetAdapter):
                         0 = no chunking (default)
                         -1 = split line by line (one line = one sample)
                         >0 = group lines up to chunk_size chars
+            filter_nested: If True, keep only coarsest granularity entities
+                          (remove nested entities, keeping outermost spans).
+                          This matches CamemBERT-bio paper methodology.
         """
         self.data_dir = Path(data_dir)
         self._name = name
         self._entity_types: set[str] = set()
         self.chunk_size = chunk_size
+        self.filter_nested = filter_nested
     
     @property
     def name(self) -> str:
@@ -195,14 +205,51 @@ class BRATDatasetAdapter(DatasetAdapter):
         """Load a single BRAT document."""
         with open(txt_path, 'r', encoding='utf-8') as f:
             text = f.read()
-        
+
         entities = self._parse_annotations(ann_path)
-        
+
+        # Filter nested entities if requested (keep coarsest granularity)
+        if self.filter_nested:
+            entities = self._filter_nested_entities(entities)
+
         return {
             'doc_id': txt_path.stem,
             'text': text,
             'entities': entities
         }
+
+    def _filter_nested_entities(
+        self, entities: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
+        """Keep only coarsest granularity entities (remove nested ones).
+
+        This matches CamemBERT-bio paper methodology: "kept only the entities
+        with the coarsest granularity" for QUAERO datasets.
+
+        For overlapping entities, keeps the largest (outermost) span.
+        """
+        if not entities:
+            return entities
+
+        # Sort by span size (largest first), then by start position
+        sorted_ents = sorted(
+            entities, key=lambda e: (-(e['end'] - e['start']), e['start'])
+        )
+
+        kept = []
+        for ent in sorted_ents:
+            # Check if this entity is fully contained within any already kept entity
+            is_nested = False
+            for k in kept:
+                if ent['start'] >= k['start'] and ent['end'] <= k['end']:
+                    # ent is inside k (nested)
+                    is_nested = True
+                    break
+            if not is_nested:
+                kept.append(ent)
+
+        # Sort back by start position for consistent ordering
+        return sorted(kept, key=lambda e: e['start'])
     
     def _parse_annotations(self, ann_path: Path) -> list[dict[str, Any]]:
         """Parse BRAT .ann file and extract entities."""

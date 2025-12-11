@@ -16,17 +16,25 @@ class EMEAAdapter(BRATDatasetAdapter):
     Each line becomes one sample for better NER performance.
     """
 
-    def __init__(self, data_dir: str | Path | None = None, chunk_size: int = -1):
+    def __init__(
+        self,
+        data_dir: str | Path | None = None,
+        chunk_size: int = -1,
+        filter_nested: bool = True,
+    ):
         """Initialize EMEA adapter with line-by-line splitting.
 
         Args:
             data_dir: Path to EMEA data
             chunk_size: -1 for line-by-line (default), 0 for no chunking,
                         >0 for character-based chunks
+            filter_nested: If True (default), keep only coarsest granularity
+                          entities (matches CamemBERT-bio paper methodology)
         """
         super().__init__(
             data_dir=data_dir if data_dir else DEFAULT_DATA_DIR,
             name="emea",
-            chunk_size=chunk_size
+            chunk_size=chunk_size,
+            filter_nested=filter_nested,
         )
 

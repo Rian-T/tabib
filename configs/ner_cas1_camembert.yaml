@@ -4,8 +4,7 @@ model: bert_token_ner
 model_name_or_path: camembert-base
 do_train: true
 do_eval: true
-preprocessing:
-  type: sentence_splitter
+# NOTE: Disabled preprocessing - sentence_splitter removes context and hurts predictions
 training:
   output_dir: runs/ner_camembert/cas1
   num_train_epochs: 10

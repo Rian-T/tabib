@@ -185,7 +185,35 @@ class Pipeline:
             
             predictions = self.model_adapter.predict(model, eval_dataset)
             metrics = self.task.compute_metrics(predictions, original_eval)
-            
+
+            # LLM-as-a-Judge evaluation if configured
+            if self.config.judge_config:
+                import gc
+                import torch
+                from tabib.evaluation.llm_judge import LLMJudgeEvaluator, check_vram_availability
+                from tabib.models.vllm_common import shutdown_vllm_engine, VLLMEngine
+
+                can_parallel, available_gb = check_vram_availability(72.0)
+                print(f"\nVRAM available: {available_gb:.1f}GB (parallel: {can_parallel})")
+
+                if not can_parallel:
+                    # Properly shutdown vLLM engine if model has one
+                    if hasattr(model, "engine") and isinstance(model.engine, VLLMEngine):
+                        print("Shutting down candidate model vLLM engine...")
+                        shutdown_vllm_engine(model.engine)
+                    del model
+                    gc.collect()
+                    torch.cuda.empty_cache()
+                    # Give GPU some time to fully release memory
+                    import time
+                    time.sleep(2)
+                    torch.cuda.synchronize()
+
+                judge = LLMJudgeEvaluator(**self.config.judge_config)
+                questions = [ex.get("text", "") for ex in original_eval]
+                judge_metrics = judge.evaluate(predictions, original_eval, questions)
+                metrics.update(judge_metrics)
+
             print(f"\nEvaluation metrics ({eval_split_name} set):")
             for metric_name, metric_value in metrics.items():
                 print(f"  {metric_name}: {metric_value}")

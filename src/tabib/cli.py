@@ -7,7 +7,7 @@ import typer
 from rich.console import Console
 import yaml
 
-from tabib.comparison.benchmark import load_benchmark_spec, run_benchmark
+from tabib.comparison.benchmark import BenchmarkSpec, load_benchmark_spec, run_benchmark
 from tabib.comparison.runner import execute_comparison
 from tabib.comparison.spec import load_comparison_spec
 from tabib.config import RunConfig
@@ -164,14 +164,23 @@ def benchmark(
         "--dry-run",
         help="Only list planned runs without executing them.",
     ),
+    seeds: str | None = typer.Option(
+        None,
+        "--seeds",
+        help="Comma-separated seeds for multi-seed averaging (e.g., '42,43,44'). Overrides spec.",
+    ),
 ) -> None:
     """Run a benchmark comparing multiple model groups across tasks/datasets.
 
     Uses simplified spec format with model_groups for easy BERT vs LLM comparisons.
     Outputs results to JSON, Markdown, and optionally W&B.
 
+    Supports multi-seed averaging via --seeds option or 'seeds' key in spec.
+    Results show mean +/- std when multiple seeds are used.
+
     Example spec:
 
+        seeds: [42, 43, 44]  # optional multi-seed
         datasets:
           ner: [emea, cas1]
           cls: [essai]
@@ -181,15 +190,39 @@ def benchmark(
             models: {camembert: camembert-base}
         output:
           markdown: results/benchmark.md
+
+    Example with CLI seeds override:
+
+        tabib benchmark spec.yaml --seeds 42,43,44,45,46
     """
     console.print(f"[bold]Loading benchmark spec from {spec_path}[/bold]")
     spec = load_benchmark_spec(spec_path)
+
+    # Override seeds from CLI if provided
+    if seeds is not None:
+        parsed_seeds = [int(s.strip()) for s in seeds.split(",")]
+        spec = BenchmarkSpec(
+            path=spec.path,
+            description=spec.description,
+            datasets=spec.datasets,
+            model_groups=spec.model_groups,
+            output=spec.output,
+            seeds=parsed_seeds,
+        )
+        console.print(f"[bold]Seeds (CLI override):[/bold] {parsed_seeds}")
+    elif spec.seeds:
+        console.print(f"[bold]Seeds:[/bold] {spec.seeds}")
 
     if spec.description:
         console.print(f"[bold]Description:[/bold] {spec.description}")
 
     runs = spec.expand_runs()
     console.print(f"[bold]Planned runs:[/bold] {len(runs)}")
+
+    # Show breakdown if multi-seed
+    if spec.seeds and len(spec.seeds) > 1:
+        unique_configs = len(runs) // len(spec.seeds)
+        console.print(f"  ({unique_configs} configs x {len(spec.seeds)} seeds)")
 
     if dry_run:
         for run in runs:
@@ -202,6 +235,19 @@ def benchmark(
     console.print("\n[bold green]Benchmark complete![/bold green]")
     console.print(f"  Successful: {sum(1 for r in results.results if r.status == 'success')}")
     console.print(f"  Errors: {sum(1 for r in results.results if r.status == 'error')}")
+
+    # Show aggregated summary if multi-seed
+    if results.has_multi_seed():
+        console.print(f"\n[bold]Aggregated results (mean +/- std):[/bold]")
+        for agg in results.aggregate_by_seed():
+            primary = results._get_primary_metric(agg.task)
+            if primary in agg.metrics_mean:
+                mean = agg.metrics_mean[primary]
+                std = agg.metrics_std.get(primary, 0.0)
+                console.print(
+                    f"  {agg.task}/{agg.dataset}/{agg.model_name}: "
+                    f"{mean*100:.2f}% +/- {std*100:.2f}%"
+                )
 
     if spec.output.markdown_path:
         console.print(f"\n[bold]Markdown report:[/bold] {spec.output.markdown_path}")

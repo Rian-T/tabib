@@ -1,6 +1,10 @@
 results/*
 data/*
 playground/
+FRACCO
+/models/
+configs/results/
+logs/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
