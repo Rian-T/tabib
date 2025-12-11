@@ -10,6 +10,7 @@ import weave
 from tabib.config import RunConfig
 from tabib.data.base import DatasetAdapter
 from tabib.models.base import ModelAdapter
+from tabib.offline import get_model_cache_dir, get_offline_dir, resolve_model_path
 from tabib.preprocessing.base import Preprocessor
 from tabib.registry import get_dataset, get_model, get_task
 from tabib.tasks.base import Task
@@ -108,10 +109,19 @@ class Pipeline:
         # Build model (pass PREPROCESSED train data for few-shot examples)
         # Few-shot needs the formatted 'text' and 'label_text' fields created by preprocess()
         train_data = processed_splits.get("train") or processed_splits.get("dev")
+
+        # Resolve offline directory and model path
+        offline_dir = get_offline_dir(self.config.offline_dir)
+        model_cache_dir = get_model_cache_dir(offline_dir)
+        resolved_model_path = resolve_model_path(
+            self.config.model_name_or_path, offline_dir
+        )
+
         model = self.model_adapter.build_model(
             self.task,
-            model_name_or_path=self.config.model_name_or_path,
+            model_name_or_path=resolved_model_path,
             train_data=train_data,
+            cache_dir=str(model_cache_dir) if model_cache_dir else None,
             **self.config.backend_args
         )
         

@@ -46,13 +46,21 @@ class BERTTextClassificationAdapter(ModelAdapter):
         if not task.label_list:
             raise ValueError("ClassificationTask must have label_list before building model")
 
-        self._tokenizer = AutoTokenizer.from_pretrained(model_name_or_path, use_fast=True)
+        # Offline/cache support
+        cache_dir = kwargs.get('cache_dir')
+
+        self._tokenizer = AutoTokenizer.from_pretrained(
+            model_name_or_path,
+            use_fast=True,
+            cache_dir=cache_dir,
+        )
 
         model = AutoModelForSequenceClassification.from_pretrained(
             model_name_or_path,
             num_labels=task.num_labels,
             id2label={idx: label for idx, label in enumerate(task.label_list)},
             label2id={label: idx for idx, label in enumerate(task.label_list)},
+            cache_dir=cache_dir,
         )
         return model, self._tokenizer
 

@@ -75,9 +75,13 @@ class LoRASFTAdapter(ModelAdapter):
         if not task.label_list:
             raise ValueError("ClassificationTask must provide label_list")
 
+        # Offline/cache support
+        cache_dir = kwargs.get('cache_dir')
+
         tokenizer = AutoTokenizer.from_pretrained(
             model_name_or_path,
             trust_remote_code=True,
+            cache_dir=cache_dir,
         )
         if tokenizer.pad_token is None:
             tokenizer.pad_token = tokenizer.eos_token
@@ -98,6 +102,7 @@ class LoRASFTAdapter(ModelAdapter):
             device_map="auto",
             trust_remote_code=True,
             torch_dtype=torch.bfloat16 if not load_in_4bit else None,
+            cache_dir=cache_dir,
         )
 
         # Default prompts for French medical MCQA

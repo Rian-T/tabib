@@ -75,13 +75,20 @@ class BERTTokenNERAdapter(ModelAdapter):
         else:
             raise ValueError(f"Expected NERTokenTask or NERSpanTask, got {type(task)}")
         
-        self._tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
-        
+        # Offline/cache support
+        cache_dir = kwargs.get('cache_dir')
+
+        self._tokenizer = AutoTokenizer.from_pretrained(
+            model_name_or_path,
+            cache_dir=cache_dir,
+        )
+
         model = AutoModelForTokenClassification.from_pretrained(
             model_name_or_path,
             num_labels=num_labels,
             id2label={i: label for i, label in enumerate(label_list)},
             label2id=label_space,
+            cache_dir=cache_dir,
         )
         
         return model, self._tokenizer

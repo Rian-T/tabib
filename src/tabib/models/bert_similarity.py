@@ -43,12 +43,20 @@ class BERTSimilarityAdapter(ModelAdapter):
         if not isinstance(task, SimilarityTask):
             raise ValueError(f"Expected SimilarityTask, got {type(task)}")
 
-        self._tokenizer = AutoTokenizer.from_pretrained(model_name_or_path, use_fast=True)
+        # Offline/cache support
+        cache_dir = kwargs.get('cache_dir')
+
+        self._tokenizer = AutoTokenizer.from_pretrained(
+            model_name_or_path,
+            use_fast=True,
+            cache_dir=cache_dir,
+        )
 
         model = AutoModelForSequenceClassification.from_pretrained(
             model_name_or_path,
             num_labels=1,
             problem_type="regression",
+            cache_dir=cache_dir,
         )
         return model, self._tokenizer
 

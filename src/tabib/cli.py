@@ -126,6 +126,37 @@ def _format_metrics(metrics: dict[str, Any]) -> str:
 
 
 @app.command()
+def download(
+    config_path: str,
+    output_dir: str | None = typer.Option(
+        None,
+        "--output-dir",
+        "-o",
+        help="Output directory for downloads. Default: $SCRATCH/tabib",
+    ),
+) -> None:
+    """Download models for offline use.
+
+    Supports both single run configs and benchmark specs.
+    Downloads models to $SCRATCH/tabib/models/ by default.
+
+    Examples:
+
+        # Download model from a single config
+        tabib download configs/ner_cas1_camembert.yaml
+
+        # Download all models from a benchmark
+        tabib download configs/benchmark_bert_drbenchmark.yaml
+
+        # Specify custom output directory
+        tabib download configs/benchmark.yaml -o /data/models
+    """
+    from tabib.download import download as do_download
+
+    do_download(config_path, output_dir)
+
+
+@app.command()
 def benchmark(
     spec_path: str,
     dry_run: bool = typer.Option(

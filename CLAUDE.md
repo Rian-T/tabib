@@ -112,6 +112,19 @@ poetry run tabib train configs/your_config.yaml
 poetry run tabib eval configs/your_config.yaml
 ```
 
+## Changelog (2025-12-11)
+- **Offline mode**: Added `offline_dir` config option for HPC clusters without internet
+- **New CLI command**: `tabib download` - downloads models for offline use
+  ```bash
+  tabib download configs/benchmark_bert_drbenchmark.yaml -o /scratch/tabib
+  ```
+- **Automatic cache**: Uses `$SCRATCH/tabib/models/` by default if SCRATCH is set
+- **Model path format**: `almanach/camembert-bio-base` -> `almanach--camembert-bio-base`
+- **Files added**:
+  - `src/tabib/offline.py` - offline path utilities
+  - `src/tabib/download.py` - model download logic
+  - `scripts/upload_datasets_to_hf.py` - upload local datasets to HF
+
 ## Changelog (2025-12-02)
 - Added MedDialog-FR Women adapter (`meddialog_women`) - 80 multilabel classes (UMLS CUI combos)
 - Registered `fracco_icd_top50` dataset variant with pre-configured top_k=50

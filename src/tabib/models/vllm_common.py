@@ -26,6 +26,7 @@ def create_vllm_engine(
     model_name_or_path: str,
     *,
     sampling_overrides: MutableMapping[str, Any] | None = None,
+    cache_dir: str | None = None,
     **backend_kwargs: Any,
 ) -> VLLMEngine:
     """Instantiate an LLM engine with shared defaults for sampling.
@@ -34,6 +35,7 @@ def create_vllm_engine(
         model_name_or_path: Name or local path of the model to load.
         sampling_overrides: Optional mapping of sampling parameters that should
             augment or replace the shared defaults (e.g. structured outputs).
+        cache_dir: Directory for downloading/caching model files (offline support).
         **backend_kwargs: Extra keyword arguments forwarded to ``vllm.LLM``.
 
     Returns:
@@ -56,6 +58,11 @@ def create_vllm_engine(
         sampling_kwargs.update(sampling_overrides)
 
     sampling_params = SamplingParams(**sampling_kwargs)
+
+    # Pass cache_dir as download_dir for vLLM
+    if cache_dir:
+        backend_kwargs.setdefault("download_dir", cache_dir)
+
     llm = LLM(model=model_name_or_path, **backend_kwargs)
     return VLLMEngine(llm=llm, sampling_params=sampling_params)
 

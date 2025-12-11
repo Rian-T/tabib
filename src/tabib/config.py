@@ -49,3 +49,6 @@ class RunConfig(BaseModel):
     backend_args: dict[str, Any] = Field(default_factory=dict, description="Backend-specific arguments")
     backend_fallback: bool = Field(default=False, description="Fallback to hf if vLLM unavailable")
 
+    # Offline mode options
+    offline_dir: str | None = Field(default=None, description="Offline cache directory. Defaults to $SCRATCH/tabib if SCRATCH is set.")
+
