@@ -88,6 +88,73 @@ output:
 - **Nested entity filtering**: BRAT adapters filter to coarsest granularity
 - **Base configs**: `configs/base/` for reusable task configs
 
+## Tutorial: Offline Benchmark with ModernBERT
+
+Example: benchmark 3 ModernBERT models on NER (EMEA, CAS1) and CLS (ESSAI, DiaMED) on an HPC cluster without internet.
+
+### Step 1: Create benchmark config
+
+Create `configs/benchmark_modernbert_offline.yaml`:
+
+```yaml
+description: ModernBERT Offline Benchmark
+
+datasets:
+  ner: [emea, cas1]
+  cls: [essai, diamed]
+
+model_groups:
+  bert:
+    configs:
+      ner: base/ner_bert.yaml
+      cls: base/cls_bert.yaml
+    models:
+      modernbert-base: almanach/moderncamembert-base
+      modernbert-large: almanach/moderncamembert-large
+      modernbert-bio: rntc/moderncamembert-bio-base
+
+output:
+  json: results/modernbert_offline.json
+  markdown: results/modernbert_offline.md
+```
+
+### Step 2: Download models (with internet)
+
+```bash
+# On login node with internet access
+tabib download configs/benchmark_modernbert_offline.yaml
+
+# Models saved to $SCRATCH/tabib/models/:
+# - almanach--moderncamembert-base/
+# - almanach--moderncamembert-large/
+# - rntc--moderncamembert-bio-base/
+```
+
+### Step 3: Run benchmark (offline)
+
+```bash
+# On compute node without internet
+tabib benchmark configs/benchmark_modernbert_offline.yaml
+```
+
+The pipeline automatically resolves `almanach/moderncamembert-base` to `$SCRATCH/tabib/models/almanach--moderncamembert-base`.
+
+### Step 4: Check results
+
+```bash
+# View markdown table
+cat results/modernbert_offline.md
+
+# JSON for programmatic access
+cat results/modernbert_offline.json
+```
+
+### Notes
+
+- `$SCRATCH` is usually pre-defined on HPC clusters - no need to set it
+- Models are cached with `--` replacing `/` in path (e.g., `almanach/x` → `almanach--x`)
+- Use `--dry-run` to preview runs before launching
+
 ## Golden Rules
 
 - Git commit specific files (never `git add .`)
