@@ -1,0 +1,925 @@
+{
+  "metadata": {
+    "generated_at": "2025-12-12T11:57:13.193325+00:00",
+    "spec_path": "/tmp/eval_546394_1.yaml",
+    "description": "Evaluation of merged-ablation-dare-ties",
+    "num_runs": 35,
+    "dry_run": false
+  },
+  "results": {
+    "eval": {
+      "ner": {
+        "emea": {
+          "merged-ablation-dare-ties.seed42": {
+            "metrics": {
+              "exact_f1": 0.5196850393700788,
+              "exact_precision": 0.484375,
+              "exact_recall": 0.5605479452054795,
+              "partial_f1": 0.74072265625,
+              "partial_precision": 0.7182765151515151,
+              "partial_recall": 0.764616935483871,
+              "CHEM_exact_f1": 0.5869180907483795,
+              "PROC_exact_f1": 0.5037037037037037,
+              "DEVI_exact_f1": 0.022988505747126436,
+              "DISO_exact_f1": 0.416289592760181,
+              "LIVB_exact_f1": 0.7531914893617022,
+              "ANAT_exact_f1": 0.39344262295081966,
+              "PHYS_exact_f1": 0.36111111111111105,
+              "OBJC_exact_f1": 0.12371134020618557,
+              "PHEN_exact_f1": 0.0,
+              "GEOG_exact_f1": 0.3703703703703704,
+              "seqeval_f1": 0.49469049469049464,
+              "seqeval_precision": 0.4521780303030303,
+              "seqeval_recall": 0.5460263007432818
+            },
+            "status": "success",
+            "error": null,
+            "seed": 42
+          },
+          "merged-ablation-dare-ties.seed43": {
+            "metrics": {
+              "exact_f1": 0.5253940455341506,
+              "exact_precision": 0.48342541436464087,
+              "exact_recall": 0.5753424657534246,
+              "partial_f1": 0.7475330926594465,
+              "partial_precision": 0.7150092081031307,
+              "partial_recall": 0.7831568330811901,
+              "CHEM_exact_f1": 0.5705705705705706,
+              "PROC_exact_f1": 0.5133689839572193,
+              "DEVI_exact_f1": 0.11111111111111109,
+              "LIVB_exact_f1": 0.7805907172995781,
+              "DISO_exact_f1": 0.46353322528363045,
+              "ANAT_exact_f1": 0.3238866396761134,
+              "OBJC_exact_f1": 0.1081081081081081,
+              "PHYS_exact_f1": 0.4935064935064935,
+              "PHEN_exact_f1": 0.2222222222222222,
+              "GEOG_exact_f1": 0.75,
+              "seqeval_f1": 0.5070135169599591,
+              "seqeval_precision": 0.4576427255985267,
+              "seqeval_recall": 0.5683247570040023
+            },
+            "status": "success",
+            "error": null,
+            "seed": 43
+          },
+          "merged-ablation-dare-ties.seed44": {
+            "metrics": {
+              "exact_f1": 0.5759829968119022,
+              "exact_precision": 0.5590510572460031,
+              "exact_recall": 0.5939726027397261,
+              "partial_f1": 0.7605633802816902,
+              "partial_precision": 0.7519339865910263,
+              "partial_recall": 0.7693931398416887,
+              "CHEM_exact_f1": 0.676056338028169,
+              "PROC_exact_f1": 0.5145228215767635,
+              "PHYS_exact_f1": 0.42962962962962964,
+              "OBJC_exact_f1": 0.07079646017699115,
+              "DEVI_exact_f1": 0.13114754098360656,
+              "DISO_exact_f1": 0.4957555178268251,
+              "LIVB_exact_f1": 0.7494824016563147,
+              "ANAT_exact_f1": 0.4954128440366973,
+              "PHEN_exact_f1": 0.0,
+              "GEOG_exact_f1": 0.6666666666666666,
+              "seqeval_f1": 0.5618221258134489,
+              "seqeval_precision": 0.5342960288808665,
+              "seqeval_recall": 0.592338479130932
+            },
+            "status": "success",
+            "error": null,
+            "seed": 44
+          },
+          "merged-ablation-dare-ties.seed45": {
+            "metrics": {
+              "exact_f1": 0.54000508001016,
+              "exact_precision": 0.5033143939393939,
+              "exact_recall": 0.5824657534246576,
+              "partial_f1": 0.7655290940338817,
+              "partial_precision": 0.7381628787878788,
+              "partial_recall": 0.7950025497195309,
+              "CHEM_exact_f1": 0.6140979689366787,
+              "OBJC_exact_f1": 0.1848739495798319,
+              "PROC_exact_f1": 0.49097472924187724,
+              "DEVI_exact_f1": 0.15126050420168066,
+              "DISO_exact_f1": 0.47140381282495664,
+              "LIVB_exact_f1": 0.703476482617587,
+              "ANAT_exact_f1": 0.4533333333333333,
+              "PHYS_exact_f1": 0.40322580645161293,
+              "PHEN_exact_f1": 0.12903225806451613,
+              "GEOG_exact_f1": 0.56,
+              "seqeval_f1": 0.5086765086765087,
+              "seqeval_precision": 0.4649621212121212,
+              "seqeval_recall": 0.5614636935391653
+            },
+            "status": "success",
+            "error": null,
+            "seed": 45
+          },
+          "merged-ablation-dare-ties.seed46": {
+            "metrics": {
+              "exact_f1": 0.5163655407174653,
+              "exact_precision": 0.4944834503510532,
+              "exact_recall": 0.5402739726027397,
+              "partial_f1": 0.7508878741755455,
+              "partial_precision": 0.7422266800401204,
+              "partial_recall": 0.7597535934291582,
+              "CHEM_exact_f1": 0.5441085749537323,
+              "ANAT_exact_f1": 0.4621212121212121,
+              "PROC_exact_f1": 0.5720524017467249,
+              "DEVI_exact_f1": 0.125,
+              "DISO_exact_f1": 0.4165289256198347,
+              "LIVB_exact_f1": 0.7515923566878981,
+              "OBJC_exact_f1": 0.051948051948051945,
+              "PHYS_exact_f1": 0.41025641025641024,
+              "PHEN_exact_f1": 0.12903225806451613,
+              "GEOG_exact_f1": 0.5833333333333334,
+              "seqeval_f1": 0.5081485439487042,
+              "seqeval_precision": 0.4769307923771314,
+              "seqeval_recall": 0.5437392795883362
+            },
+            "status": "success",
+            "error": null,
+            "seed": 46
+          }
+        },
+        "e3c": {
+          "merged-ablation-dare-ties.seed42": {
+            "metrics": {
+              "exact_f1": 0.11205846528623631,
+              "exact_precision": 0.1141439205955335,
+              "exact_recall": 0.11004784688995216,
+              "partial_f1": 0.3552894211576847,
+              "partial_precision": 0.3680727874276261,
+              "partial_recall": 0.3433641975308642,
+              "CLINENTITY_exact_f1": 0.11205846528623631,
+              "seqeval_f1": 0.29885993485342016,
+              "seqeval_precision": 0.30355665839536805,
+              "seqeval_recall": 0.2943063352044908
+            },
+            "status": "success",
+            "error": null,
+            "seed": 42
+          },
+          "merged-ablation-dare-ties.seed43": {
+            "metrics": {
+              "exact_f1": 0.1608363490148774,
+              "exact_precision": 0.16220600162206,
+              "exact_recall": 0.1594896331738437,
+              "partial_f1": 0.36572788575961923,
+              "partial_precision": 0.37388483373884834,
+              "partial_recall": 0.3579192546583851,
+              "CLINENTITY_exact_f1": 0.1608363490148774,
+              "seqeval_f1": 0.43387096774193545,
+              "seqeval_precision": 0.43633414436334145,
+              "seqeval_recall": 0.4314354450681636
+            },
+            "status": "success",
+            "error": null,
+            "seed": 43
+          },
+          "merged-ablation-dare-ties.seed44": {
+            "metrics": {
+              "exact_f1": 0.13249211356466878,
+              "exact_precision": 0.15233160621761657,
+              "exact_recall": 0.11722488038277512,
+              "partial_f1": 0.3348174532502226,
+              "partial_precision": 0.38963730569948185,
+              "partial_recall": 0.2935206869633099,
+              "CLINENTITY_exact_f1": 0.13249211356466878,
+              "seqeval_f1": 0.3453887884267632,
+              "seqeval_precision": 0.39585492227979274,
+              "seqeval_recall": 0.3063352044907779
+            },
+            "status": "success",
+            "error": null,
+            "seed": 44
+          },
+          "merged-ablation-dare-ties.seed45": {
+            "metrics": {
+              "exact_f1": 0.07936507936507935,
+              "exact_precision": 0.09572072072072071,
+              "exact_recall": 0.06778309409888357,
+              "partial_f1": 0.3273563218390805,
+              "partial_precision": 0.4009009009009009,
+              "partial_recall": 0.2766122766122766,
+              "CLINENTITY_exact_f1": 0.07936507936507935,
+              "seqeval_f1": 0.214519906323185,
+              "seqeval_precision": 0.25788288288288286,
+              "seqeval_recall": 0.18364073777064957
+            },
+            "status": "success",
+            "error": null,
+            "seed": 45
+          },
+          "merged-ablation-dare-ties.seed46": {
+            "metrics": {
+              "exact_f1": 0.12437128486511201,
+              "exact_precision": 0.1457663451232583,
+              "exact_recall": 0.10845295055821372,
+              "partial_f1": 0.3358985966500679,
+              "partial_precision": 0.39764201500535906,
+              "partial_recall": 0.2907523510971787,
+              "CLINENTITY_exact_f1": 0.12437128486511201,
+              "seqeval_f1": 0.336697247706422,
+              "seqeval_precision": 0.3933547695605573,
+              "seqeval_recall": 0.2943063352044908
+            },
+            "status": "success",
+            "error": null,
+            "seed": 46
+          }
+        },
+        "medline": {
+          "merged-ablation-dare-ties.seed42": {
+            "metrics": {
+              "exact_f1": 0.4215530903328051,
+              "exact_precision": 0.46198379004245466,
+              "exact_recall": 0.38762953367875647,
+              "partial_f1": 0.6516931582584657,
+              "partial_precision": 0.7279042840602085,
+              "partial_recall": 0.5899280575539568,
+              "PROC_exact_f1": 0.44247787610619466,
+              "ANAT_exact_f1": 0.368692070030896,
+              "LIVB_exact_f1": 0.5394321766561515,
+              "DISO_exact_f1": 0.4440753045404208,
+              "CHEM_exact_f1": 0.5087014725568941,
+              "OBJC_exact_f1": 0.0,
+              "DEVI_exact_f1": 0.0,
+              "PHYS_exact_f1": 0.05581395348837209,
+              "GEOG_exact_f1": 0.0,
+              "PHEN_exact_f1": 0.0,
+              "seqeval_f1": 0.4172131147540984,
+              "seqeval_precision": 0.3928984947896565,
+              "seqeval_recall": 0.44473569244211447
+            },
+            "status": "success",
+            "error": null,
+            "seed": 42
+          },
+          "merged-ablation-dare-ties.seed43": {
+            "metrics": {
+              "exact_f1": 0.4218963165075034,
+              "exact_precision": 0.44560518731988474,
+              "exact_recall": 0.4005829015544041,
+              "partial_f1": 0.6435045317220545,
+              "partial_precision": 0.6905619596541787,
+              "partial_recall": 0.6024512884978002,
+              "PROC_exact_f1": 0.43894899536321486,
+              "DISO_exact_f1": 0.4255533199195171,
+              "LIVB_exact_f1": 0.5306748466257668,
+              "CHEM_exact_f1": 0.5395799676898223,
+              "OBJC_exact_f1": 0.0,
+              "ANAT_exact_f1": 0.35920177383592017,
+              "DEVI_exact_f1": 0.0,
+              "PHYS_exact_f1": 0.1509433962264151,
+              "GEOG_exact_f1": 0.32432432432432434,
+              "PHEN_exact_f1": 0.0,
+              "seqeval_f1": 0.43593287265547875,
+              "seqeval_precision": 0.3976945244956772,
+              "seqeval_recall": 0.48230668414154654
+            },
+            "status": "success",
+            "error": null,
+            "seed": 43
+          },
+          "merged-ablation-dare-ties.seed44": {
+            "metrics": {
+              "exact_f1": 0.4183206106870229,
+              "exact_precision": 0.43925899536872104,
+              "exact_recall": 0.39928756476683935,
+              "partial_f1": 0.6413459936698318,
+              "partial_precision": 0.685785536159601,
+              "partial_recall": 0.6023153942428036,
+              "PROC_exact_f1": 0.4814495254529767,
+              "ANAT_exact_f1": 0.32998885172798215,
+              "GEOG_exact_f1": 0.5263157894736843,
+              "LIVB_exact_f1": 0.5089141004862235,
+              "DISO_exact_f1": 0.44157242864835755,
+              "CHEM_exact_f1": 0.46891191709844565,
+              "OBJC_exact_f1": 0.0,
+              "DEVI_exact_f1": 0.038461538461538464,
+              "PHYS_exact_f1": 0.1807909604519774,
+              "PHEN_exact_f1": 0.0,
+              "seqeval_f1": 0.43328100470957615,
+              "seqeval_precision": 0.39330245814036335,
+              "seqeval_recall": 0.48230668414154654
+            },
+            "status": "success",
+            "error": null,
+            "seed": 44
+          },
+          "merged-ablation-dare-ties.seed45": {
+            "metrics": {
+              "exact_f1": 0.4096045197740113,
+              "exact_precision": 0.4503105590062112,
+              "exact_recall": 0.3756476683937824,
+              "partial_f1": 0.6414963630065812,
+              "partial_precision": 0.718944099378882,
+              "partial_recall": 0.5791119449656035,
+              "PROC_exact_f1": 0.4752981260647359,
+              "LIVB_exact_f1": 0.5497287522603977,
+              "ANAT_exact_f1": 0.2804878048780488,
+              "DISO_exact_f1": 0.4073506891271057,
+              "CHEM_exact_f1": 0.4966442953020134,
+              "OBJC_exact_f1": 0.0,
+              "DEVI_exact_f1": 0.0,
+              "PHYS_exact_f1": 0.11267605633802817,
+              "GEOG_exact_f1": 0.4736842105263158,
+              "PHEN_exact_f1": 0.0,
+              "seqeval_f1": 0.42548818088386436,
+              "seqeval_precision": 0.4017857142857143,
+              "seqeval_recall": 0.4521625163826999
+            },
+            "status": "success",
+            "error": null,
+            "seed": 45
+          },
+          "merged-ablation-dare-ties.seed46": {
+            "metrics": {
+              "exact_f1": 0.3721791849107443,
+              "exact_precision": 0.387719298245614,
+              "exact_recall": 0.35783678756476683,
+              "partial_f1": 0.6077493816982688,
+              "partial_precision": 0.6466666666666666,
+              "partial_recall": 0.5732503888024884,
+              "PROC_exact_f1": 0.39972621492128674,
+              "LIVB_exact_f1": 0.4416,
+              "DISO_exact_f1": 0.42281219272369713,
+              "ANAT_exact_f1": 0.1915184678522572,
+              "CHEM_exact_f1": 0.4611111111111111,
+              "OBJC_exact_f1": 0.0,
+              "DEVI_exact_f1": 0.0,
+              "PHYS_exact_f1": 0.06486486486486487,
+              "GEOG_exact_f1": 0.10909090909090909,
+              "PHEN_exact_f1": 0.0,
+              "seqeval_f1": 0.400077836154894,
+              "seqeval_precision": 0.3607017543859649,
+              "seqeval_recall": 0.4491044124071647
+            },
+            "status": "success",
+            "error": null,
+            "seed": 46
+          }
+        },
+        "mantragsc_medline": {
+          "merged-ablation-dare-ties.seed42": {
+            "metrics": {
+              "exact_f1": 0.0,
+              "exact_precision": 0.0,
+              "exact_recall": 0.0,
+              "partial_f1": 0.0,
+              "partial_precision": 0.0,
+              "partial_recall": 0.0,
+              "DISO_exact_f1": 0.0,
+              "DEVI_exact_f1": 0.0,
+              "PHEN_exact_f1": 0.0,
+              "LIVB_exact_f1": 0.0,
+              "CHEM_exact_f1": 0.0,
+              "ANAT_exact_f1": 0.0,
+              "GEOG_exact_f1": 0.0,
+              "seqeval_f1": 0.0,
+              "seqeval_precision": 0.0,
+              "seqeval_recall": 0.0
+            },
+            "status": "success",
+            "error": null,
+            "seed": 42
+          },
+          "merged-ablation-dare-ties.seed43": {
+            "metrics": {
+              "exact_f1": 0.0,
+              "exact_precision": 0.0,
+              "exact_recall": 0.0,
+              "partial_f1": 0.0,
+              "partial_precision": 0.0,
+              "partial_recall": 0.0,
+              "DISO_exact_f1": 0.0,
+              "DEVI_exact_f1": 0.0,
+              "PHEN_exact_f1": 0.0,
+              "LIVB_exact_f1": 0.0,
+              "CHEM_exact_f1": 0.0,
+              "ANAT_exact_f1": 0.0,
+              "GEOG_exact_f1": 0.0,
+              "seqeval_f1": 0.0,
+              "seqeval_precision": 0.0,
+              "seqeval_recall": 0.0
+            },
+            "status": "success",
+            "error": null,
+            "seed": 43
+          },
+          "merged-ablation-dare-ties.seed44": {
+            "metrics": {
+              "exact_f1": 0.0,
+              "exact_precision": 0.0,
+              "exact_recall": 0.0,
+              "partial_f1": 0.0,
+              "partial_precision": 0.0,
+              "partial_recall": 0.0,
+              "DISO_exact_f1": 0.0,
+              "DEVI_exact_f1": 0.0,
+              "PHEN_exact_f1": 0.0,
+              "LIVB_exact_f1": 0.0,
+              "CHEM_exact_f1": 0.0,
+              "ANAT_exact_f1": 0.0,
+              "GEOG_exact_f1": 0.0,
+              "seqeval_f1": 0.0,
+              "seqeval_precision": 0.0,
+              "seqeval_recall": 0.0
+            },
+            "status": "success",
+            "error": null,
+            "seed": 44
+          },
+          "merged-ablation-dare-ties.seed45": {
+            "metrics": {
+              "exact_f1": 0.0,
+              "exact_precision": 0.0,
+              "exact_recall": 0.0,
+              "partial_f1": 0.0,
+              "partial_precision": 0.0,
+              "partial_recall": 0.0,
+              "DISO_exact_f1": 0.0,
+              "DEVI_exact_f1": 0.0,
+              "PHEN_exact_f1": 0.0,
+              "LIVB_exact_f1": 0.0,
+              "CHEM_exact_f1": 0.0,
+              "ANAT_exact_f1": 0.0,
+              "GEOG_exact_f1": 0.0,
+              "seqeval_f1": 0.0,
+              "seqeval_precision": 0.0,
+              "seqeval_recall": 0.0
+            },
+            "status": "success",
+            "error": null,
+            "seed": 45
+          },
+          "merged-ablation-dare-ties.seed46": {
+            "metrics": {
+              "exact_f1": 0.0,
+              "exact_precision": 0.0,
+              "exact_recall": 0.0,
+              "partial_f1": 0.0,
+              "partial_precision": 0.0,
+              "partial_recall": 0.0,
+              "DISO_exact_f1": 0.0,
+              "DEVI_exact_f1": 0.0,
+              "PHEN_exact_f1": 0.0,
+              "LIVB_exact_f1": 0.0,
+              "CHEM_exact_f1": 0.0,
+              "ANAT_exact_f1": 0.0,
+              "GEOG_exact_f1": 0.0,
+              "seqeval_f1": 0.0,
+              "seqeval_precision": 0.0,
+              "seqeval_recall": 0.0
+            },
+            "status": "success",
+            "error": null,
+            "seed": 46
+          }
+        }
+      },
+      "cls": {
+        "diamed": {
+          "merged-ablation-dare-ties.seed42": {
+            "metrics": {
+              "accuracy": 0.5584415584415584,
+              "precision": 0.36791914682539684,
+              "recall": 0.33217351844583987,
+              "f1": 0.31072170422201517
+            },
+            "status": "success",
+            "error": null,
+            "seed": 42
+          },
+          "merged-ablation-dare-ties.seed43": {
+            "metrics": {
+              "accuracy": 0.5,
+              "precision": 0.23318537254707467,
+              "recall": 0.2769778584510727,
+              "f1": 0.24308741758954033
+            },
+            "status": "success",
+            "error": null,
+            "seed": 43
+          },
+          "merged-ablation-dare-ties.seed44": {
+            "metrics": {
+              "accuracy": 0.538961038961039,
+              "precision": 0.35872659914405647,
+              "recall": 0.33246760242558565,
+              "f1": 0.31245839406039655
+            },
+            "status": "success",
+            "error": null,
+            "seed": 44
+          },
+          "merged-ablation-dare-ties.seed45": {
+            "metrics": {
+              "accuracy": 0.551948051948052,
+              "precision": 0.38548248626373627,
+              "recall": 0.3432671866823652,
+              "f1": 0.3371693056696484
+            },
+            "status": "success",
+            "error": null,
+            "seed": 45
+          },
+          "merged-ablation-dare-ties.seed46": {
+            "metrics": {
+              "accuracy": 0.551948051948052,
+              "precision": 0.44580593861940915,
+              "recall": 0.3514934098639456,
+              "f1": 0.33493868549672123
+            },
+            "status": "success",
+            "error": null,
+            "seed": 46
+          }
+        },
+        "morfitt": {
+          "merged-ablation-dare-ties.seed42": {
+            "metrics": {
+              "accuracy": 0.6011029411764706,
+              "precision": 0.5356781994403896,
+              "recall": 0.503172120809315,
+              "f1": 0.49797264532641766
+            },
+            "status": "success",
+            "error": null,
+            "seed": 42
+          },
+          "merged-ablation-dare-ties.seed43": {
+            "metrics": {
+              "accuracy": 0.6314338235294118,
+              "precision": 0.5143813511377499,
+              "recall": 0.4987101568781107,
+              "f1": 0.49254050109240893
+            },
+            "status": "success",
+            "error": null,
+            "seed": 43
+          },
+          "merged-ablation-dare-ties.seed44": {
+            "metrics": {
+              "accuracy": 0.6130514705882353,
+              "precision": 0.5083805796725013,
+              "recall": 0.47532541797246614,
+              "f1": 0.4734850910960668
+            },
+            "status": "success",
+            "error": null,
+            "seed": 44
+          },
+          "merged-ablation-dare-ties.seed45": {
+            "metrics": {
+              "accuracy": 0.5762867647058824,
+              "precision": 0.5435403673505523,
+              "recall": 0.4245617636078965,
+              "f1": 0.41931549235728993
+            },
+            "status": "success",
+            "error": null,
+            "seed": 45
+          },
+          "merged-ablation-dare-ties.seed46": {
+            "metrics": {
+              "accuracy": 0.5670955882352942,
+              "precision": 0.5340864619528425,
+              "recall": 0.4251781947591109,
+              "f1": 0.4263159509693942
+            },
+            "status": "success",
+            "error": null,
+            "seed": 46
+          }
+        }
+      },
+      "sim": {
+        "clister": {
+          "merged-ablation-dare-ties.seed42": {
+            "metrics": {
+              "pearson": 0.9034819006919861,
+              "spearman": 0.905097814138018,
+              "mse": 0.5527140040091763
+            },
+            "status": "success",
+            "error": null,
+            "seed": 42
+          },
+          "merged-ablation-dare-ties.seed43": {
+            "metrics": {
+              "pearson": 0.9059955477714539,
+              "spearman": 0.9058437637695209,
+              "mse": 0.5368291204422713
+            },
+            "status": "success",
+            "error": null,
+            "seed": 43
+          },
+          "merged-ablation-dare-ties.seed44": {
+            "metrics": {
+              "pearson": 0.9025821685791016,
+              "spearman": 0.9019182285400371,
+              "mse": 0.5617029423132771
+            },
+            "status": "success",
+            "error": null,
+            "seed": 44
+          },
+          "merged-ablation-dare-ties.seed45": {
+            "metrics": {
+              "pearson": 0.89957195520401,
+              "spearman": 0.8974905286090513,
+              "mse": 0.5847765080071986
+            },
+            "status": "success",
+            "error": null,
+            "seed": 45
+          },
+          "merged-ablation-dare-ties.seed46": {
+            "metrics": {
+              "pearson": 0.9070965051651001,
+              "spearman": 0.9068378136375963,
+              "mse": 0.5317073511664057
+            },
+            "status": "success",
+            "error": null,
+            "seed": 46
+          }
+        }
+      }
+    }
+  },
+  "aggregated": {
+    "eval": {
+      "ner": {
+        "emea": {
+          "merged-ablation-dare-ties": {
+            "seeds": [
+              42,
+              43,
+              44,
+              45,
+              46
+            ],
+            "num_seeds": 5,
+            "metrics_mean": {
+              "exact_f1": 0.5354865404887514,
+              "exact_precision": 0.5049298631802183,
+              "exact_recall": 0.5705205479452055,
+              "partial_f1": 0.7530472194801128,
+              "partial_precision": 0.7331218537347343,
+              "partial_recall": 0.7743846103110877,
+              "CHEM_exact_f1": 0.598350308647506,
+              "PROC_exact_f1": 0.5189245280452577,
+              "DEVI_exact_f1": 0.10830153240870495,
+              "DISO_exact_f1": 0.4527022148630856,
+              "LIVB_exact_f1": 0.747666689524616,
+              "ANAT_exact_f1": 0.42563933042363516,
+              "PHYS_exact_f1": 0.4195458901910515,
+              "OBJC_exact_f1": 0.10788758200383373,
+              "PHEN_exact_f1": 0.0960573476702509,
+              "GEOG_exact_f1": 0.5860740740740741,
+              "seqeval_f1": 0.5160702380178231,
+              "seqeval_precision": 0.4772019396743352,
+              "seqeval_recall": 0.5623785020011435
+            },
+            "metrics_std": {
+              "exact_f1": 0.024380005631690137,
+              "exact_precision": 0.03132804114603649,
+              "exact_recall": 0.020798111841779054,
+              "partial_f1": 0.009990659276581677,
+              "partial_precision": 0.01589542503101855,
+              "partial_recall": 0.014460638140785577,
+              "CHEM_exact_f1": 0.05032591512956856,
+              "PROC_exact_f1": 0.031167590541995152,
+              "DEVI_exact_f1": 0.04983086000626497,
+              "DISO_exact_f1": 0.035195998892735586,
+              "LIVB_exact_f1": 0.02777587567419993,
+              "ANAT_exact_f1": 0.06774301945167742,
+              "PHYS_exact_f1": 0.0483195499272529,
+              "OBJC_exact_f1": 0.05167766221780755,
+              "PHEN_exact_f1": 0.09558542394714428,
+              "GEOG_exact_f1": 0.14193513656032392,
+              "seqeval_f1": 0.026219140567642872,
+              "seqeval_precision": 0.03323545017994593,
+              "seqeval_recall": 0.019676192154671895
+            }
+          }
+        },
+        "e3c": {
+          "merged-ablation-dare-ties": {
+            "seeds": [
+              42,
+              43,
+              44,
+              45,
+              46
+            ],
+            "num_seeds": 5,
+            "metrics_mean": {
+              "exact_f1": 0.12182465841919476,
+              "exact_precision": 0.1340337188558378,
+              "exact_recall": 0.11259968102073366,
+              "partial_f1": 0.34381793573133496,
+              "partial_precision": 0.38602756855444326,
+              "partial_recall": 0.3124337533724029,
+              "CLINENTITY_exact_f1": 0.12182465841919476,
+              "seqeval_f1": 0.3258673690103452,
+              "seqeval_precision": 0.3573966754963885,
+              "seqeval_recall": 0.3020048115477145
+            },
+            "metrics_std": {
+              "exact_f1": 0.029750572643362425,
+              "exact_precision": 0.027971568682469253,
+              "exact_recall": 0.03260480707021257,
+              "partial_f1": 0.016018350698834668,
+              "partial_precision": 0.01448241828752553,
+              "partial_recall": 0.035834999253411146,
+              "CLINENTITY_exact_f1": 0.029750572643362425,
+              "seqeval_f1": 0.07951542047645063,
+              "seqeval_precision": 0.07383239063457174,
+              "seqeval_recall": 0.08789145042844464
+            }
+          }
+        },
+        "medline": {
+          "merged-ablation-dare-ties": {
+            "seeds": [
+              42,
+              43,
+              44,
+              45,
+              46
+            ],
+            "num_seeds": 5,
+            "metrics_mean": {
+              "exact_f1": 0.4087107444424174,
+              "exact_precision": 0.4369755659965771,
+              "exact_recall": 0.38419689119170986,
+              "partial_f1": 0.6371578856710404,
+              "partial_precision": 0.6939725091839074,
+              "partial_recall": 0.5894114148125305,
+              "PROC_exact_f1": 0.4475801475816818,
+              "ANAT_exact_f1": 0.30597779366502087,
+              "LIVB_exact_f1": 0.514069975205708,
+              "DISO_exact_f1": 0.42827278699181964,
+              "CHEM_exact_f1": 0.4949897527516573,
+              "OBJC_exact_f1": 0.0,
+              "DEVI_exact_f1": 0.007692307692307693,
+              "PHYS_exact_f1": 0.11301784627393152,
+              "GEOG_exact_f1": 0.2866830466830467,
+              "PHEN_exact_f1": 0.0,
+              "seqeval_f1": 0.42239860183158234,
+              "seqeval_precision": 0.3892765892194753,
+              "seqeval_recall": 0.4621231979030144
+            },
+            "metrics_std": {
+              "exact_f1": 0.021014806470978288,
+              "exact_precision": 0.028762378357550772,
+              "exact_recall": 0.017860270663354254,
+              "partial_f1": 0.016976283496430235,
+              "partial_precision": 0.03198220901838696,
+              "partial_recall": 0.013267212889412613,
+              "PROC_exact_f1": 0.03280986864675457,
+              "ANAT_exact_f1": 0.07261728483719095,
+              "LIVB_exact_f1": 0.0432116643649738,
+              "DISO_exact_f1": 0.015012892784580395,
+              "CHEM_exact_f1": 0.03164984956940745,
+              "OBJC_exact_f1": 0.0,
+              "DEVI_exact_f1": 0.017200522903844537,
+              "PHYS_exact_f1": 0.05390420700964061,
+              "GEOG_exact_f1": 0.2277807548217076,
+              "PHEN_exact_f1": 0.0,
+              "seqeval_f1": 0.014459032942059287,
+              "seqeval_precision": 0.016379765341168764,
+              "seqeval_recall": 0.018613003060837192
+            }
+          }
+        },
+        "mantragsc_medline": {
+          "merged-ablation-dare-ties": {
+            "seeds": [
+              42,
+              43,
+              44,
+              45,
+              46
+            ],
+            "num_seeds": 5,
+            "metrics_mean": {
+              "exact_f1": 0.0,
+              "exact_precision": 0.0,
+              "exact_recall": 0.0,
+              "partial_f1": 0.0,
+              "partial_precision": 0.0,
+              "partial_recall": 0.0,
+              "DISO_exact_f1": 0.0,
+              "DEVI_exact_f1": 0.0,
+              "PHEN_exact_f1": 0.0,
+              "LIVB_exact_f1": 0.0,
+              "CHEM_exact_f1": 0.0,
+              "ANAT_exact_f1": 0.0,
+              "GEOG_exact_f1": 0.0,
+              "seqeval_f1": 0.0,
+              "seqeval_precision": 0.0,
+              "seqeval_recall": 0.0
+            },
+            "metrics_std": {
+              "exact_f1": 0.0,
+              "exact_precision": 0.0,
+              "exact_recall": 0.0,
+              "partial_f1": 0.0,
+              "partial_precision": 0.0,
+              "partial_recall": 0.0,
+              "DISO_exact_f1": 0.0,
+              "DEVI_exact_f1": 0.0,
+              "PHEN_exact_f1": 0.0,
+              "LIVB_exact_f1": 0.0,
+              "CHEM_exact_f1": 0.0,
+              "ANAT_exact_f1": 0.0,
+              "GEOG_exact_f1": 0.0,
+              "seqeval_f1": 0.0,
+              "seqeval_precision": 0.0,
+              "seqeval_recall": 0.0
+            }
+          }
+        }
+      },
+      "cls": {
+        "diamed": {
+          "merged-ablation-dare-ties": {
+            "seeds": [
+              42,
+              43,
+              44,
+              45,
+              46
+            ],
+            "num_seeds": 5,
+            "metrics_mean": {
+              "accuracy": 0.5402597402597402,
+              "precision": 0.3582239086799347,
+              "recall": 0.3272759151737618,
+              "f1": 0.30767510140766435
+            },
+            "metrics_std": {
+              "accuracy": 0.023592080681279153,
+              "precision": 0.07768932983180447,
+              "recall": 0.02925338637637198,
+              "f1": 0.03813443876841761
+            }
+          }
+        },
+        "morfitt": {
+          "merged-ablation-dare-ties": {
+            "seeds": [
+              42,
+              43,
+              44,
+              45,
+              46
+            ],
+            "num_seeds": 5,
+            "metrics_mean": {
+              "accuracy": 0.5977941176470588,
+              "precision": 0.5272133919108071,
+              "recall": 0.4653895308053798,
+              "f1": 0.4619259361683155
+            },
+            "metrics_std": {
+              "accuracy": 0.026364421491628355,
+              "precision": 0.015039932451064488,
+              "recall": 0.03847196448077205,
+              "f1": 0.03692543790161485
+            }
+          }
+        }
+      },
+      "sim": {
+        "clister": {
+          "merged-ablation-dare-ties": {
+            "seeds": [
+              42,
+              43,
+              44,
+              45,
+              46
+            ],
+            "num_seeds": 5,
+            "metrics_mean": {
+              "pearson": 0.9037456154823303,
+              "spearman": 0.9034376297388448,
+              "mse": 0.5535459851876657
+            },
+            "metrics_std": {
+              "pearson": 0.002963665436492507,
+              "spearman": 0.0038007741188175732,
+              "mse": 0.021207034214159558
+            }
+          }
+        }
+      }
+    }
+  }
+}

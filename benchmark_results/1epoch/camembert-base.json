@@ -1,0 +1,244 @@
+{
+  "metadata": {
+    "generated_at": "2025-12-12T10:37:28.406467+00:00",
+    "spec_path": "/tmp/eval_baseline_543480_2.yaml",
+    "description": "Evaluation of camembert-base (baseline)",
+    "num_runs": 35,
+    "dry_run": false
+  },
+  "results": {
+    "eval": {
+      "ner": {
+        "emea": {
+          "camembert-base.seed42": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 42
+          },
+          "camembert-base.seed43": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 43
+          },
+          "camembert-base.seed44": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 44
+          },
+          "camembert-base.seed45": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 45
+          },
+          "camembert-base.seed46": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 46
+          }
+        },
+        "e3c": {
+          "camembert-base.seed42": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 42
+          },
+          "camembert-base.seed43": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 43
+          },
+          "camembert-base.seed44": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 44
+          },
+          "camembert-base.seed45": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 45
+          },
+          "camembert-base.seed46": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 46
+          }
+        },
+        "medline": {
+          "camembert-base.seed42": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 42
+          },
+          "camembert-base.seed43": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 43
+          },
+          "camembert-base.seed44": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 44
+          },
+          "camembert-base.seed45": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 45
+          },
+          "camembert-base.seed46": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 46
+          }
+        },
+        "mantragsc_medline": {
+          "camembert-base.seed42": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 42
+          },
+          "camembert-base.seed43": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 43
+          },
+          "camembert-base.seed44": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 44
+          },
+          "camembert-base.seed45": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 45
+          },
+          "camembert-base.seed46": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 46
+          }
+        }
+      },
+      "cls": {
+        "diamed": {
+          "camembert-base.seed42": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 42
+          },
+          "camembert-base.seed43": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 43
+          },
+          "camembert-base.seed44": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 44
+          },
+          "camembert-base.seed45": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 45
+          },
+          "camembert-base.seed46": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 46
+          }
+        },
+        "morfitt": {
+          "camembert-base.seed42": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 42
+          },
+          "camembert-base.seed43": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 43
+          },
+          "camembert-base.seed44": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 44
+          },
+          "camembert-base.seed45": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 45
+          },
+          "camembert-base.seed46": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 46
+          }
+        }
+      },
+      "sim": {
+        "clister": {
+          "camembert-base.seed42": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 42
+          },
+          "camembert-base.seed43": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 43
+          },
+          "camembert-base.seed44": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 44
+          },
+          "camembert-base.seed45": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 45
+          },
+          "camembert-base.seed46": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 46
+          }
+        }
+      }
+    }
+  },
+  "aggregated": {}
+}

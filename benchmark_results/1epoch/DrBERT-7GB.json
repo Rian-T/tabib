@@ -1,0 +1,244 @@
+{
+  "metadata": {
+    "generated_at": "2025-12-12T10:37:28.405853+00:00",
+    "spec_path": "/tmp/eval_baseline_543487_0.yaml",
+    "description": "Evaluation of DrBERT-7GB (baseline)",
+    "num_runs": 35,
+    "dry_run": false
+  },
+  "results": {
+    "eval": {
+      "ner": {
+        "emea": {
+          "DrBERT-7GB.seed42": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 42
+          },
+          "DrBERT-7GB.seed43": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 43
+          },
+          "DrBERT-7GB.seed44": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 44
+          },
+          "DrBERT-7GB.seed45": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 45
+          },
+          "DrBERT-7GB.seed46": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 46
+          }
+        },
+        "e3c": {
+          "DrBERT-7GB.seed42": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 42
+          },
+          "DrBERT-7GB.seed43": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 43
+          },
+          "DrBERT-7GB.seed44": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 44
+          },
+          "DrBERT-7GB.seed45": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 45
+          },
+          "DrBERT-7GB.seed46": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 46
+          }
+        },
+        "medline": {
+          "DrBERT-7GB.seed42": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 42
+          },
+          "DrBERT-7GB.seed43": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 43
+          },
+          "DrBERT-7GB.seed44": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 44
+          },
+          "DrBERT-7GB.seed45": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 45
+          },
+          "DrBERT-7GB.seed46": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 46
+          }
+        },
+        "mantragsc_medline": {
+          "DrBERT-7GB.seed42": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 42
+          },
+          "DrBERT-7GB.seed43": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 43
+          },
+          "DrBERT-7GB.seed44": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 44
+          },
+          "DrBERT-7GB.seed45": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 45
+          },
+          "DrBERT-7GB.seed46": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 46
+          }
+        }
+      },
+      "cls": {
+        "diamed": {
+          "DrBERT-7GB.seed42": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 42
+          },
+          "DrBERT-7GB.seed43": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 43
+          },
+          "DrBERT-7GB.seed44": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 44
+          },
+          "DrBERT-7GB.seed45": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 45
+          },
+          "DrBERT-7GB.seed46": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 46
+          }
+        },
+        "morfitt": {
+          "DrBERT-7GB.seed42": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 42
+          },
+          "DrBERT-7GB.seed43": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 43
+          },
+          "DrBERT-7GB.seed44": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 44
+          },
+          "DrBERT-7GB.seed45": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 45
+          },
+          "DrBERT-7GB.seed46": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 46
+          }
+        }
+      },
+      "sim": {
+        "clister": {
+          "DrBERT-7GB.seed42": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 42
+          },
+          "DrBERT-7GB.seed43": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 43
+          },
+          "DrBERT-7GB.seed44": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 44
+          },
+          "DrBERT-7GB.seed45": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 45
+          },
+          "DrBERT-7GB.seed46": {
+            "metrics": {},
+            "status": "error",
+            "error": "We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+            "seed": 46
+          }
+        }
+      }
+    }
+  },
+  "aggregated": {}
+}

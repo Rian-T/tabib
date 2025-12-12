@@ -1,0 +1,925 @@
+{
+  "metadata": {
+    "generated_at": "2025-12-12T11:57:13.193369+00:00",
+    "spec_path": "/tmp/eval_546391_2.yaml",
+    "description": "Evaluation of merged-ablation-slerp",
+    "num_runs": 35,
+    "dry_run": false
+  },
+  "results": {
+    "eval": {
+      "ner": {
+        "emea": {
+          "merged-ablation-slerp.seed42": {
+            "metrics": {
+              "exact_f1": 0.5327004219409283,
+              "exact_precision": 0.5134722928317235,
+              "exact_recall": 0.5534246575342465,
+              "partial_f1": 0.7430038510911424,
+              "partial_precision": 0.735638027452974,
+              "partial_recall": 0.7505186721991701,
+              "CHEM_exact_f1": 0.6176853055916776,
+              "PROC_exact_f1": 0.48576850094876656,
+              "PHYS_exact_f1": 0.423841059602649,
+              "DEVI_exact_f1": 0.09999999999999999,
+              "LIVB_exact_f1": 0.7679324894514769,
+              "DISO_exact_f1": 0.4771241830065359,
+              "ANAT_exact_f1": 0.27149321266968324,
+              "OBJC_exact_f1": 0.06382978723404255,
+              "PHEN_exact_f1": 0.2285714285714286,
+              "GEOG_exact_f1": 0.4,
+              "seqeval_f1": 0.5193756727664155,
+              "seqeval_precision": 0.49059481443823083,
+              "seqeval_recall": 0.551743853630646
+            },
+            "status": "success",
+            "error": null,
+            "seed": 42
+          },
+          "merged-ablation-slerp.seed43": {
+            "metrics": {
+              "exact_f1": 0.5164247517188694,
+              "exact_precision": 0.48239771646051377,
+              "exact_recall": 0.5556164383561644,
+              "partial_f1": 0.7474797147774773,
+              "partial_precision": 0.7231208372978116,
+              "partial_recall": 0.7735368956743003,
+              "CHEM_exact_f1": 0.5692883895131086,
+              "PROC_exact_f1": 0.5255198487712666,
+              "DISO_exact_f1": 0.4280936454849498,
+              "DEVI_exact_f1": 0.11320754716981134,
+              "LIVB_exact_f1": 0.7689075630252099,
+              "ANAT_exact_f1": 0.3197026022304833,
+              "OBJC_exact_f1": 0.13793103448275862,
+              "PHYS_exact_f1": 0.45783132530120485,
+              "PHEN_exact_f1": 0.21052631578947367,
+              "GEOG_exact_f1": 0.6666666666666666,
+              "seqeval_f1": 0.5063619839002856,
+              "seqeval_precision": 0.4638439581351094,
+              "seqeval_recall": 0.5574614065180102
+            },
+            "status": "success",
+            "error": null,
+            "seed": 43
+          },
+          "merged-ablation-slerp.seed44": {
+            "metrics": {
+              "exact_f1": 0.5427339589145321,
+              "exact_precision": 0.5051935788479698,
+              "exact_recall": 0.5863013698630137,
+              "partial_f1": 0.749876421156698,
+              "partial_precision": 0.7162417374881964,
+              "partial_recall": 0.7868257261410788,
+              "CHEM_exact_f1": 0.6200256739409499,
+              "ANAT_exact_f1": 0.4031007751937985,
+              "DEVI_exact_f1": 0.17094017094017094,
+              "PROC_exact_f1": 0.5037593984962406,
+              "LIVB_exact_f1": 0.7883817427385892,
+              "DISO_exact_f1": 0.4451510333863275,
+              "OBJC_exact_f1": 0.09259259259259259,
+              "PHYS_exact_f1": 0.4598930481283423,
+              "PHEN_exact_f1": 0.22727272727272724,
+              "GEOG_exact_f1": 0.5714285714285714,
+              "seqeval_f1": 0.5290923196276183,
+              "seqeval_precision": 0.4830028328611898,
+              "seqeval_recall": 0.5849056603773585
+            },
+            "status": "success",
+            "error": null,
+            "seed": 44
+          },
+          "merged-ablation-slerp.seed45": {
+            "metrics": {
+              "exact_f1": 0.5314473351856529,
+              "exact_precision": 0.492970946579194,
+              "exact_recall": 0.5764383561643835,
+              "partial_f1": 0.7574718275355218,
+              "partial_precision": 0.7244611059044048,
+              "partial_recall": 0.7936344969199178,
+              "CHEM_exact_f1": 0.5869047619047619,
+              "PROC_exact_f1": 0.5075757575757576,
+              "DEVI_exact_f1": 0.125,
+              "DISO_exact_f1": 0.49589490968801314,
+              "LIVB_exact_f1": 0.733050847457627,
+              "ANAT_exact_f1": 0.4690265486725664,
+              "OBJC_exact_f1": 0.16901408450704222,
+              "PHYS_exact_f1": 0.35036496350364965,
+              "PHEN_exact_f1": 0.0,
+              "GEOG_exact_f1": 0.41666666666666663,
+              "seqeval_f1": 0.5202163275817667,
+              "seqeval_precision": 0.4732895970009372,
+              "seqeval_recall": 0.577472841623785
+            },
+            "status": "success",
+            "error": null,
+            "seed": 45
+          },
+          "merged-ablation-slerp.seed46": {
+            "metrics": {
+              "exact_f1": 0.47746159657516996,
+              "exact_precision": 0.44175209692451073,
+              "exact_recall": 0.5194520547945205,
+              "partial_f1": 0.7223168654173765,
+              "partial_precision": 0.6915191053122087,
+              "partial_recall": 0.7559857361181864,
+              "CHEM_exact_f1": 0.49662783568362967,
+              "DEVI_exact_f1": 0.12962962962962962,
+              "PROC_exact_f1": 0.4888888888888888,
+              "LIVB_exact_f1": 0.7675906183368869,
+              "DISO_exact_f1": 0.4330578512396694,
+              "ANAT_exact_f1": 0.3628318584070796,
+              "OBJC_exact_f1": 0.13333333333333336,
+              "PHYS_exact_f1": 0.36111111111111105,
+              "PHEN_exact_f1": 0.0,
+              "GEOG_exact_f1": 0.41666666666666663,
+              "seqeval_f1": 0.4677792041078305,
+              "seqeval_precision": 0.42451071761416587,
+              "seqeval_recall": 0.5208690680388793
+            },
+            "status": "success",
+            "error": null,
+            "seed": 46
+          }
+        },
+        "e3c": {
+          "merged-ablation-slerp.seed42": {
+            "metrics": {
+              "exact_f1": 0.09857328145265888,
+              "exact_precision": 0.1080568720379147,
+              "exact_recall": 0.09062003179650238,
+              "partial_f1": 0.34497444633730834,
+              "partial_precision": 0.38388625592417064,
+              "partial_recall": 0.31322505800464034,
+              "CLINENTITY_exact_f1": 0.09857328145265888,
+              "seqeval_f1": 0.26064291920069504,
+              "seqeval_precision": 0.2843601895734597,
+              "seqeval_recall": 0.24057738572574178
+            },
+            "status": "success",
+            "error": null,
+            "seed": 42
+          },
+          "merged-ablation-slerp.seed43": {
+            "metrics": {
+              "exact_f1": 0.161776367961935,
+              "exact_precision": 0.16139240506329114,
+              "exact_recall": 0.16216216216216217,
+              "partial_f1": 0.3612852664576802,
+              "partial_precision": 0.3647151898734177,
+              "partial_recall": 0.3579192546583851,
+              "CLINENTITY_exact_f1": 0.161776367961935,
+              "seqeval_f1": 0.43010752688172044,
+              "seqeval_precision": 0.4272151898734177,
+              "seqeval_recall": 0.4330392943063352
+            },
+            "status": "success",
+            "error": null,
+            "seed": 43
+          },
+          "merged-ablation-slerp.seed44": {
+            "metrics": {
+              "exact_f1": 0.11841491841491843,
+              "exact_precision": 0.14317925591882752,
+              "exact_recall": 0.10095389507154214,
+              "partial_f1": 0.31047265987025024,
+              "partial_precision": 0.37767756482525366,
+              "partial_recall": 0.26357199055861524,
+              "CLINENTITY_exact_f1": 0.11841491841491843,
+              "seqeval_f1": 0.32239925023430177,
+              "seqeval_precision": 0.3878241262683202,
+              "seqeval_recall": 0.27586206896551724
+            },
+            "status": "success",
+            "error": null,
+            "seed": 44
+          },
+          "merged-ablation-slerp.seed45": {
+            "metrics": {
+              "exact_f1": 0.10633946830265849,
+              "exact_precision": 0.10951979780960404,
+              "exact_recall": 0.10333863275039745,
+              "partial_f1": 0.3411290322580645,
+              "partial_precision": 0.35636057287278855,
+              "partial_recall": 0.3271461716937355,
+              "CLINENTITY_exact_f1": 0.10633946830265849,
+              "seqeval_f1": 0.27608874281018897,
+              "seqeval_precision": 0.2830665543386689,
+              "seqeval_recall": 0.2694466720128308
+            },
+            "status": "success",
+            "error": null,
+            "seed": 45
+          },
+          "merged-ablation-slerp.seed46": {
+            "metrics": {
+              "exact_f1": 0.13150926743159752,
+              "exact_precision": 0.14781746031746032,
+              "exact_recall": 0.11844197138314785,
+              "partial_f1": 0.3481675392670157,
+              "partial_precision": 0.3958333333333333,
+              "partial_recall": 0.3107476635514019,
+              "CLINENTITY_exact_f1": 0.13150926743159752,
+              "seqeval_f1": 0.35299334811529937,
+              "seqeval_precision": 0.3948412698412698,
+              "seqeval_recall": 0.3191659983961508
+            },
+            "status": "success",
+            "error": null,
+            "seed": 46
+          }
+        },
+        "medline": {
+          "merged-ablation-slerp.seed42": {
+            "metrics": {
+              "exact_f1": 0.40428234440210487,
+              "exact_precision": 0.45976062732150225,
+              "exact_recall": 0.36075129533678757,
+              "partial_f1": 0.6377632277473014,
+              "partial_precision": 0.7437061494015683,
+              "partial_recall": 0.5582403965303594,
+              "PROC_exact_f1": 0.3945205479452055,
+              "ANAT_exact_f1": 0.3488888888888889,
+              "LIVB_exact_f1": 0.5085910652920962,
+              "DISO_exact_f1": 0.44143167028199565,
+              "CHEM_exact_f1": 0.49863760217983644,
+              "OBJC_exact_f1": 0.0,
+              "DEVI_exact_f1": 0.0,
+              "GEOG_exact_f1": 0.0,
+              "PHYS_exact_f1": 0.03278688524590164,
+              "PHEN_exact_f1": 0.0,
+              "seqeval_f1": 0.39558573853989815,
+              "seqeval_precision": 0.38464713165497316,
+              "seqeval_recall": 0.4071647007426824
+            },
+            "status": "success",
+            "error": null,
+            "seed": 42
+          },
+          "merged-ablation-slerp.seed43": {
+            "metrics": {
+              "exact_f1": 0.4206023271731691,
+              "exact_precision": 0.44593613933236576,
+              "exact_recall": 0.39799222797927464,
+              "partial_f1": 0.6437710437710437,
+              "partial_precision": 0.6937590711175616,
+              "partial_recall": 0.6005025125628141,
+              "PROC_exact_f1": 0.4375484871993794,
+              "LIVB_exact_f1": 0.5363636363636363,
+              "ANAT_exact_f1": 0.3441108545034642,
+              "DISO_exact_f1": 0.42770475227502525,
+              "CHEM_exact_f1": 0.5246913580246914,
+              "OBJC_exact_f1": 0.0,
+              "DEVI_exact_f1": 0.0,
+              "PHYS_exact_f1": 0.12807881773399013,
+              "GEOG_exact_f1": 0.4,
+              "PHEN_exact_f1": 0.0,
+              "seqeval_f1": 0.4380574826560952,
+              "seqeval_precision": 0.4009433962264151,
+              "seqeval_recall": 0.48274355613805153
+            },
+            "status": "success",
+            "error": null,
+            "seed": 43
+          },
+          "merged-ablation-slerp.seed44": {
+            "metrics": {
+              "exact_f1": 0.4200169635284139,
+              "exact_precision": 0.4410402565016031,
+              "exact_recall": 0.4009067357512953,
+              "partial_f1": 0.646020646020646,
+              "partial_precision": 0.6911293195582472,
+              "partial_recall": 0.6064395123476086,
+              "PROC_exact_f1": 0.479394449116905,
+              "ANAT_exact_f1": 0.35736677115987464,
+              "GEOG_exact_f1": 0.5434782608695652,
+              "LIVB_exact_f1": 0.53125,
+              "CHEM_exact_f1": 0.465,
+              "DISO_exact_f1": 0.42825112107623314,
+              "OBJC_exact_f1": 0.0,
+              "DEVI_exact_f1": 0.07272727272727272,
+              "PHYS_exact_f1": 0.1942857142857143,
+              "PHEN_exact_f1": 0.0,
+              "seqeval_f1": 0.42543171114599687,
+              "seqeval_precision": 0.38617741360883506,
+              "seqeval_recall": 0.473569244211446
+            },
+            "status": "success",
+            "error": null,
+            "seed": 44
+          },
+          "merged-ablation-slerp.seed45": {
+            "metrics": {
+              "exact_f1": 0.40963431786216603,
+              "exact_precision": 0.4480769230769231,
+              "exact_recall": 0.37726683937823835,
+              "partial_f1": 0.6474347901191916,
+              "partial_precision": 0.7207692307692307,
+              "partial_recall": 0.5876450297899027,
+              "PROC_exact_f1": 0.46580086580086577,
+              "LIVB_exact_f1": 0.5432098765432098,
+              "ANAT_exact_f1": 0.3161512027491409,
+              "CHEM_exact_f1": 0.4794520547945205,
+              "DISO_exact_f1": 0.4082687338501292,
+              "OBJC_exact_f1": 0.0,
+              "DEVI_exact_f1": 0.0,
+              "PHYS_exact_f1": 0.1222707423580786,
+              "PHEN_exact_f1": 0.0,
+              "GEOG_exact_f1": 0.5333333333333333,
+              "seqeval_f1": 0.4180814072407445,
+              "seqeval_precision": 0.3930769230769231,
+              "seqeval_recall": 0.44648318042813456
+            },
+            "status": "success",
+            "error": null,
+            "seed": 45
+          },
+          "merged-ablation-slerp.seed46": {
+            "metrics": {
+              "exact_f1": 0.4141396638364234,
+              "exact_precision": 0.4453969437197167,
+              "exact_recall": 0.3869818652849741,
+              "partial_f1": 0.628980078324536,
+              "partial_precision": 0.6884084979500559,
+              "partial_recall": 0.5789968652037617,
+              "PROC_exact_f1": 0.43758967001434723,
+              "LIVB_exact_f1": 0.5511551155115512,
+              "DISO_exact_f1": 0.4478685156651258,
+              "CHEM_exact_f1": 0.4910836762688614,
+              "OBJC_exact_f1": 0.0,
+              "ANAT_exact_f1": 0.22159090909090906,
+              "DEVI_exact_f1": 0.0,
+              "GEOG_exact_f1": 0.39999999999999997,
+              "PHYS_exact_f1": 0.16748768472906406,
+              "PHEN_exact_f1": 0.0,
+              "seqeval_f1": 0.44529364440868857,
+              "seqeval_precision": 0.4125978382407752,
+              "seqeval_recall": 0.4836173001310616
+            },
+            "status": "success",
+            "error": null,
+            "seed": 46
+          }
+        },
+        "mantragsc_medline": {
+          "merged-ablation-slerp.seed42": {
+            "metrics": {
+              "exact_f1": 0.0,
+              "exact_precision": 0.0,
+              "exact_recall": 0.0,
+              "partial_f1": 0.0,
+              "partial_precision": 0.0,
+              "partial_recall": 0.0,
+              "DISO_exact_f1": 0.0,
+              "PHEN_exact_f1": 0.0,
+              "DEVI_exact_f1": 0.0,
+              "LIVB_exact_f1": 0.0,
+              "CHEM_exact_f1": 0.0,
+              "ANAT_exact_f1": 0.0,
+              "GEOG_exact_f1": 0.0,
+              "seqeval_f1": 0.0,
+              "seqeval_precision": 0.0,
+              "seqeval_recall": 0.0
+            },
+            "status": "success",
+            "error": null,
+            "seed": 42
+          },
+          "merged-ablation-slerp.seed43": {
+            "metrics": {
+              "exact_f1": 0.0,
+              "exact_precision": 0.0,
+              "exact_recall": 0.0,
+              "partial_f1": 0.0,
+              "partial_precision": 0.0,
+              "partial_recall": 0.0,
+              "DISO_exact_f1": 0.0,
+              "PHEN_exact_f1": 0.0,
+              "DEVI_exact_f1": 0.0,
+              "LIVB_exact_f1": 0.0,
+              "CHEM_exact_f1": 0.0,
+              "ANAT_exact_f1": 0.0,
+              "GEOG_exact_f1": 0.0,
+              "seqeval_f1": 0.0,
+              "seqeval_precision": 0.0,
+              "seqeval_recall": 0.0
+            },
+            "status": "success",
+            "error": null,
+            "seed": 43
+          },
+          "merged-ablation-slerp.seed44": {
+            "metrics": {
+              "exact_f1": 0.0,
+              "exact_precision": 0.0,
+              "exact_recall": 0.0,
+              "partial_f1": 0.0,
+              "partial_precision": 0.0,
+              "partial_recall": 0.0,
+              "DISO_exact_f1": 0.0,
+              "PHEN_exact_f1": 0.0,
+              "DEVI_exact_f1": 0.0,
+              "LIVB_exact_f1": 0.0,
+              "CHEM_exact_f1": 0.0,
+              "ANAT_exact_f1": 0.0,
+              "GEOG_exact_f1": 0.0,
+              "seqeval_f1": 0.0,
+              "seqeval_precision": 0.0,
+              "seqeval_recall": 0.0
+            },
+            "status": "success",
+            "error": null,
+            "seed": 44
+          },
+          "merged-ablation-slerp.seed45": {
+            "metrics": {
+              "exact_f1": 0.0,
+              "exact_precision": 0.0,
+              "exact_recall": 0.0,
+              "partial_f1": 0.0,
+              "partial_precision": 0.0,
+              "partial_recall": 0.0,
+              "DISO_exact_f1": 0.0,
+              "PHEN_exact_f1": 0.0,
+              "DEVI_exact_f1": 0.0,
+              "LIVB_exact_f1": 0.0,
+              "CHEM_exact_f1": 0.0,
+              "ANAT_exact_f1": 0.0,
+              "GEOG_exact_f1": 0.0,
+              "seqeval_f1": 0.0,
+              "seqeval_precision": 0.0,
+              "seqeval_recall": 0.0
+            },
+            "status": "success",
+            "error": null,
+            "seed": 45
+          },
+          "merged-ablation-slerp.seed46": {
+            "metrics": {
+              "exact_f1": 0.0,
+              "exact_precision": 0.0,
+              "exact_recall": 0.0,
+              "partial_f1": 0.0,
+              "partial_precision": 0.0,
+              "partial_recall": 0.0,
+              "DISO_exact_f1": 0.0,
+              "PHEN_exact_f1": 0.0,
+              "DEVI_exact_f1": 0.0,
+              "LIVB_exact_f1": 0.0,
+              "CHEM_exact_f1": 0.0,
+              "ANAT_exact_f1": 0.0,
+              "GEOG_exact_f1": 0.0,
+              "seqeval_f1": 0.0,
+              "seqeval_precision": 0.0,
+              "seqeval_recall": 0.0
+            },
+            "status": "success",
+            "error": null,
+            "seed": 46
+          }
+        }
+      },
+      "cls": {
+        "diamed": {
+          "merged-ablation-slerp.seed42": {
+            "metrics": {
+              "accuracy": 0.577922077922078,
+              "precision": 0.42250180375180374,
+              "recall": 0.35973189756671897,
+              "f1": 0.3526008657587605
+            },
+            "status": "success",
+            "error": null,
+            "seed": 42
+          },
+          "merged-ablation-slerp.seed43": {
+            "metrics": {
+              "accuracy": 0.42857142857142855,
+              "precision": 0.1319844470046083,
+              "recall": 0.1933011185243328,
+              "f1": 0.15087163653340124
+            },
+            "status": "success",
+            "error": null,
+            "seed": 43
+          },
+          "merged-ablation-slerp.seed44": {
+            "metrics": {
+              "accuracy": 0.5064935064935064,
+              "precision": 0.26672250599586234,
+              "recall": 0.2969857173638686,
+              "f1": 0.2546306487802886
+            },
+            "status": "success",
+            "error": null,
+            "seed": 44
+          },
+          "merged-ablation-slerp.seed45": {
+            "metrics": {
+              "accuracy": 0.512987012987013,
+              "precision": 0.33231007996633,
+              "recall": 0.3006949895342752,
+              "f1": 0.2728894149102133
+            },
+            "status": "success",
+            "error": null,
+            "seed": 45
+          },
+          "merged-ablation-slerp.seed46": {
+            "metrics": {
+              "accuracy": 0.538961038961039,
+              "precision": 0.2940822561081849,
+              "recall": 0.36209159144427,
+              "f1": 0.3136090772869211
+            },
+            "status": "success",
+            "error": null,
+            "seed": 46
+          }
+        },
+        "morfitt": {
+          "merged-ablation-slerp.seed42": {
+            "metrics": {
+              "accuracy": 0.5818014705882353,
+              "precision": 0.5090730866113233,
+              "recall": 0.489114262391907,
+              "f1": 0.4877183576593007
+            },
+            "status": "success",
+            "error": null,
+            "seed": 42
+          },
+          "merged-ablation-slerp.seed43": {
+            "metrics": {
+              "accuracy": 0.578125,
+              "precision": 0.4009046146441164,
+              "recall": 0.4185826053596909,
+              "f1": 0.40425968317491257
+            },
+            "status": "success",
+            "error": null,
+            "seed": 43
+          },
+          "merged-ablation-slerp.seed44": {
+            "metrics": {
+              "accuracy": 0.6222426470588235,
+              "precision": 0.554418126764132,
+              "recall": 0.48550974273319847,
+              "f1": 0.4903787979472045
+            },
+            "status": "success",
+            "error": null,
+            "seed": 44
+          },
+          "merged-ablation-slerp.seed45": {
+            "metrics": {
+              "accuracy": 0.5707720588235294,
+              "precision": 0.5041033038883892,
+              "recall": 0.4141659396733541,
+              "f1": 0.40460374452426967
+            },
+            "status": "success",
+            "error": null,
+            "seed": 45
+          },
+          "merged-ablation-slerp.seed46": {
+            "metrics": {
+              "accuracy": 0.5891544117647058,
+              "precision": 0.5259730648979556,
+              "recall": 0.4398391976961491,
+              "f1": 0.44451175566105117
+            },
+            "status": "success",
+            "error": null,
+            "seed": 46
+          }
+        }
+      },
+      "sim": {
+        "clister": {
+          "merged-ablation-slerp.seed42": {
+            "metrics": {
+              "pearson": 0.9008922576904297,
+              "spearman": 0.9009071790751866,
+              "mse": 0.565509220380336
+            },
+            "status": "success",
+            "error": null,
+            "seed": 42
+          },
+          "merged-ablation-slerp.seed43": {
+            "metrics": {
+              "pearson": 0.9027244448661804,
+              "spearman": 0.9034519621429596,
+              "mse": 0.5551603311672807
+            },
+            "status": "success",
+            "error": null,
+            "seed": 43
+          },
+          "merged-ablation-slerp.seed44": {
+            "metrics": {
+              "pearson": 0.8972569704055786,
+              "spearman": 0.8945872791661645,
+              "mse": 0.5886153079662472
+            },
+            "status": "success",
+            "error": null,
+            "seed": 44
+          },
+          "merged-ablation-slerp.seed45": {
+            "metrics": {
+              "pearson": 0.8898138403892517,
+              "spearman": 0.8871518307753044,
+              "mse": 0.6251055886462563
+            },
+            "status": "success",
+            "error": null,
+            "seed": 45
+          },
+          "merged-ablation-slerp.seed46": {
+            "metrics": {
+              "pearson": 0.895060122013092,
+              "spearman": 0.8956636296357785,
+              "mse": 0.5999070603586734
+            },
+            "status": "success",
+            "error": null,
+            "seed": 46
+          }
+        }
+      }
+    }
+  },
+  "aggregated": {
+    "eval": {
+      "ner": {
+        "emea": {
+          "merged-ablation-slerp": {
+            "seeds": [
+              42,
+              43,
+              44,
+              45,
+              46
+            ],
+            "num_seeds": 5,
+            "metrics_mean": {
+              "exact_f1": 0.5201536128670305,
+              "exact_precision": 0.48715732632878234,
+              "exact_recall": 0.5582465753424657,
+              "partial_f1": 0.7440297359956431,
+              "partial_precision": 0.7181961626911191,
+              "partial_recall": 0.7721003054105307,
+              "CHEM_exact_f1": 0.5781063933268256,
+              "PROC_exact_f1": 0.5023024789361841,
+              "PHYS_exact_f1": 0.4106083015293914,
+              "DEVI_exact_f1": 0.12775546954792238,
+              "LIVB_exact_f1": 0.765172652201958,
+              "DISO_exact_f1": 0.45586432456109915,
+              "ANAT_exact_f1": 0.3652309994347222,
+              "OBJC_exact_f1": 0.11934016642995386,
+              "PHEN_exact_f1": 0.1332740943267259,
+              "GEOG_exact_f1": 0.4942857142857143,
+              "seqeval_f1": 0.5085651015967834,
+              "seqeval_precision": 0.4670483840099266,
+              "seqeval_recall": 0.5584905660377358
+            },
+            "metrics_std": {
+              "exact_f1": 0.025648368709815968,
+              "exact_precision": 0.02799942316707371,
+              "exact_recall": 0.02575459047200976,
+              "partial_f1": 0.013221923976108026,
+              "partial_precision": 0.01645604560708487,
+              "partial_recall": 0.018762125724368504,
+              "CHEM_exact_f1": 0.050293240648674874,
+              "PROC_exact_f1": 0.01598650345071868,
+              "PHYS_exact_f1": 0.0522334608835388,
+              "DEVI_exact_f1": 0.02673028085395035,
+              "LIVB_exact_f1": 0.019986777155794805,
+              "DISO_exact_f1": 0.02941321886597131,
+              "ANAT_exact_f1": 0.07594899514623916,
+              "OBJC_exact_f1": 0.04124852159996427,
+              "PHEN_exact_f1": 0.12187001176254474,
+              "GEOG_exact_f1": 0.11895949119014289,
+              "seqeval_f1": 0.024198808636047855,
+              "seqeval_precision": 0.025824663459791366,
+              "seqeval_recall": 0.02509999205525206
+            }
+          }
+        },
+        "e3c": {
+          "merged-ablation-slerp": {
+            "seeds": [
+              42,
+              43,
+              44,
+              45,
+              46
+            ],
+            "num_seeds": 5,
+            "metrics_mean": {
+              "exact_f1": 0.12332266071275366,
+              "exact_precision": 0.13399315822941954,
+              "exact_recall": 0.1151033386327504,
+              "partial_f1": 0.3412057888380638,
+              "partial_precision": 0.37569458336579276,
+              "partial_recall": 0.31452202769335563,
+              "CLINENTITY_exact_f1": 0.12332266071275366,
+              "seqeval_f1": 0.32844635744844114,
+              "seqeval_precision": 0.3554614659790273,
+              "seqeval_recall": 0.3076182838813152
+            },
+            "metrics_std": {
+              "exact_f1": 0.024853343152557196,
+              "exact_precision": 0.023967951297983393,
+              "exact_recall": 0.02812350756859065,
+              "partial_f1": 0.018777548279681873,
+              "partial_precision": 0.015580083506125423,
+              "partial_recall": 0.034112030718932373,
+              "CLINENTITY_exact_f1": 0.024853343152557196,
+              "seqeval_f1": 0.06766228948946318,
+              "seqeval_precision": 0.06716234503770975,
+              "seqeval_recall": 0.07553772357317842
+            }
+          }
+        },
+        "medline": {
+          "merged-ablation-slerp": {
+            "seeds": [
+              42,
+              43,
+              44,
+              45,
+              46
+            ],
+            "num_seeds": 5,
+            "metrics_mean": {
+              "exact_f1": 0.4137351233604555,
+              "exact_precision": 0.4480421779904222,
+              "exact_recall": 0.384779792746114,
+              "partial_f1": 0.6407939571965438,
+              "partial_precision": 0.7075544537593328,
+              "partial_recall": 0.5863648632868893,
+              "PROC_exact_f1": 0.44297080401534056,
+              "ANAT_exact_f1": 0.31762172527845556,
+              "LIVB_exact_f1": 0.5341139387420987,
+              "DISO_exact_f1": 0.4307049586297018,
+              "CHEM_exact_f1": 0.4917729382535819,
+              "OBJC_exact_f1": 0.0,
+              "DEVI_exact_f1": 0.014545454545454545,
+              "GEOG_exact_f1": 0.3753623188405797,
+              "PHYS_exact_f1": 0.12898196887054975,
+              "PHEN_exact_f1": 0.0,
+              "seqeval_f1": 0.42448999679828464,
+              "seqeval_precision": 0.39548854056158433,
+              "seqeval_recall": 0.4587155963302752
+            },
+            "metrics_std": {
+              "exact_f1": 0.006945417425685398,
+              "exact_precision": 0.007031764175117362,
+              "exact_recall": 0.016380697596615916,
+              "partial_f1": 0.007566951787866158,
+              "partial_precision": 0.024022076663131643,
+              "partial_recall": 0.019037965452797605,
+              "PROC_exact_f1": 0.032610117600472464,
+              "ANAT_exact_f1": 0.055863803696160196,
+              "LIVB_exact_f1": 0.01610759249407789,
+              "DISO_exact_f1": 0.015232012114693454,
+              "CHEM_exact_f1": 0.022359648057789568,
+              "OBJC_exact_f1": 0.0,
+              "DEVI_exact_f1": 0.03252462512726967,
+              "GEOG_exact_f1": 0.2209800400801883,
+              "PHYS_exact_f1": 0.06133233175873773,
+              "PHEN_exact_f1": 0.0,
+              "seqeval_f1": 0.019327968193119507,
+              "seqeval_precision": 0.011538334460638037,
+              "seqeval_recall": 0.0325007515096569
+            }
+          }
+        },
+        "mantragsc_medline": {
+          "merged-ablation-slerp": {
+            "seeds": [
+              42,
+              43,
+              44,
+              45,
+              46
+            ],
+            "num_seeds": 5,
+            "metrics_mean": {
+              "exact_f1": 0.0,
+              "exact_precision": 0.0,
+              "exact_recall": 0.0,
+              "partial_f1": 0.0,
+              "partial_precision": 0.0,
+              "partial_recall": 0.0,
+              "DISO_exact_f1": 0.0,
+              "PHEN_exact_f1": 0.0,
+              "DEVI_exact_f1": 0.0,
+              "LIVB_exact_f1": 0.0,
+              "CHEM_exact_f1": 0.0,
+              "ANAT_exact_f1": 0.0,
+              "GEOG_exact_f1": 0.0,
+              "seqeval_f1": 0.0,
+              "seqeval_precision": 0.0,
+              "seqeval_recall": 0.0
+            },
+            "metrics_std": {
+              "exact_f1": 0.0,
+              "exact_precision": 0.0,
+              "exact_recall": 0.0,
+              "partial_f1": 0.0,
+              "partial_precision": 0.0,
+              "partial_recall": 0.0,
+              "DISO_exact_f1": 0.0,
+              "PHEN_exact_f1": 0.0,
+              "DEVI_exact_f1": 0.0,
+              "LIVB_exact_f1": 0.0,
+              "CHEM_exact_f1": 0.0,
+              "ANAT_exact_f1": 0.0,
+              "GEOG_exact_f1": 0.0,
+              "seqeval_f1": 0.0,
+              "seqeval_precision": 0.0,
+              "seqeval_recall": 0.0
+            }
+          }
+        }
+      },
+      "cls": {
+        "diamed": {
+          "merged-ablation-slerp": {
+            "seeds": [
+              42,
+              43,
+              44,
+              45,
+              46
+            ],
+            "num_seeds": 5,
+            "metrics_mean": {
+              "accuracy": 0.512987012987013,
+              "precision": 0.28952021856535787,
+              "recall": 0.3025610628866931,
+              "f1": 0.26892032865391696
+            },
+            "metrics_std": {
+              "accuracy": 0.05490757962755769,
+              "precision": 0.10591640742066186,
+              "recall": 0.0685286259855633,
+              "f1": 0.07608376773744834
+            }
+          }
+        },
+        "morfitt": {
+          "merged-ablation-slerp": {
+            "seeds": [
+              42,
+              43,
+              44,
+              45,
+              46
+            ],
+            "num_seeds": 5,
+            "metrics_mean": {
+              "accuracy": 0.5884191176470588,
+              "precision": 0.49889443936118333,
+              "recall": 0.4494423495708599,
+              "f1": 0.44629446779334775
+            },
+            "metrics_std": {
+              "accuracy": 0.020035921460939257,
+              "precision": 0.0581998167981828,
+              "recall": 0.03592939934918149,
+              "f1": 0.04233079376737627
+            }
+          }
+        }
+      },
+      "sim": {
+        "clister": {
+          "merged-ablation-slerp": {
+            "seeds": [
+              42,
+              43,
+              44,
+              45,
+              46
+            ],
+            "num_seeds": 5,
+            "metrics_mean": {
+              "pearson": 0.8971495270729065,
+              "spearman": 0.8963523761590787,
+              "mse": 0.5868595017037587
+            },
+            "metrics_std": {
+              "pearson": 0.005081269466668045,
+              "spearman": 0.006312494064823899,
+              "mse": 0.0278242553098368
+            }
+          }
+        }
+      }
+    }
+  }
+}
