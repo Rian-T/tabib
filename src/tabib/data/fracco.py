@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import math
+import os
 import random
 import re
 from dataclasses import dataclass
@@ -17,10 +18,35 @@ from tabib.tasks.classification import ClassificationTask
 from tabib.tasks.ner_token import NERTokenTask
 
 
+# Support $SCRATCH/tabib/data/ paths for HuggingFace datasets (offline mode on compute nodes)
+SCRATCH = os.environ.get("SCRATCH", "")
+SCRATCH_DATA = Path(SCRATCH) / "tabib" / "data" if SCRATCH else None
+
+# HuggingFace dataset paths in SCRATCH
+FRACCO_ICD_HF_DIR = SCRATCH_DATA / "rntc--tabib-fracco-icd" if SCRATCH_DATA else None
+FRACCO_NER_HF_DIR = SCRATCH_DATA / "rntc--tabib-fracco-ner" if SCRATCH_DATA else None
+
+# Fallback to local PROJECT_ROOT paths
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
-FRACCO_DIR = PROJECT_ROOT / "FRACCO"
-ANN_DIR = FRACCO_DIR / "ann_txt_files"
-DETECT_ONCO_CSV = FRACCO_DIR / "DetectOnco_Final.csv"
+FRACCO_DIR_LOCAL = PROJECT_ROOT / "FRACCO"
+
+# Select directories based on availability
+if FRACCO_ICD_HF_DIR and FRACCO_ICD_HF_DIR.exists():
+    FRACCO_ICD_DIR = FRACCO_ICD_HF_DIR
+    DETECT_ONCO_CSV = FRACCO_ICD_DIR / "DetectOnco_Final.csv"
+else:
+    FRACCO_ICD_DIR = FRACCO_DIR_LOCAL
+    DETECT_ONCO_CSV = FRACCO_DIR_LOCAL / "DetectOnco_Final.csv"
+
+if FRACCO_NER_HF_DIR and FRACCO_NER_HF_DIR.exists():
+    FRACCO_NER_DIR = FRACCO_NER_HF_DIR
+    ANN_DIR = FRACCO_NER_DIR / "ann_txt_files"
+else:
+    FRACCO_NER_DIR = FRACCO_DIR_LOCAL
+    ANN_DIR = FRACCO_DIR_LOCAL / "ann_txt_files"
+
+# Keep FRACCO_DIR for backward compatibility
+FRACCO_DIR = FRACCO_DIR_LOCAL
 
 
 @dataclass(frozen=True)
@@ -39,15 +65,34 @@ class SplitRatios:
         return self.train, self.val, test
 
 
-def _ensure_paths() -> None:
-    if not FRACCO_DIR.exists():
+def _ensure_icd_paths() -> None:
+    """Ensure ICD classification data paths exist."""
+    if not FRACCO_ICD_DIR.exists():
         raise FileNotFoundError(
-            "FRACCO directory not found. Expected at " f"{FRACCO_DIR}."
+            f"FRACCO ICD directory not found. Expected at {FRACCO_ICD_DIR} "
+            f"or {FRACCO_DIR_LOCAL}. Download with: "
+            "huggingface-cli download rntc/tabib-fracco-icd --local-dir $SCRATCH/tabib/data/rntc--tabib-fracco-icd --repo-type dataset"
+        )
+    if not DETECT_ONCO_CSV.exists():
+        raise FileNotFoundError(f"DetectOnco_Final.csv not found at {DETECT_ONCO_CSV}")
+
+
+def _ensure_ner_paths() -> None:
+    """Ensure NER data paths exist."""
+    if not FRACCO_NER_DIR.exists():
+        raise FileNotFoundError(
+            f"FRACCO NER directory not found. Expected at {FRACCO_NER_DIR} "
+            f"or {FRACCO_DIR_LOCAL}. Download with: "
+            "huggingface-cli download rntc/tabib-fracco-ner --local-dir $SCRATCH/tabib/data/rntc--tabib-fracco-ner --repo-type dataset"
         )
     if not ANN_DIR.exists():
-        raise FileNotFoundError("FRACCO ann_txt_files directory is missing")
-    if not DETECT_ONCO_CSV.exists():
-        raise FileNotFoundError("DetectOnco_Final.csv not found in FRACCO directory")
+        raise FileNotFoundError(f"FRACCO ann_txt_files directory not found at {ANN_DIR}")
+
+
+def _ensure_paths() -> None:
+    """Ensure all FRACCO paths exist (backward compatibility)."""
+    _ensure_icd_paths()
+    _ensure_ner_paths()
 
 
 def _split_counts(total: int, ratios: Iterable[float]) -> list[int]:
@@ -224,6 +269,23 @@ def _chunk_tokens(
         i = end
 
 
+def _load_hf_parquet_splits(data_dir: Path) -> dict[str, Dataset] | None:
+    """Load splits from HuggingFace parquet files if available."""
+    train_path = data_dir / "data" / "train-00000-of-00001.parquet"
+    val_path = data_dir / "data" / "val-00000-of-00001.parquet"
+    test_path = data_dir / "data" / "test-00000-of-00001.parquet"
+
+    if not all(p.exists() for p in [train_path, val_path, test_path]):
+        return None
+
+    import pandas as pd
+    return {
+        "train": Dataset.from_pandas(pd.read_parquet(train_path)),
+        "val": Dataset.from_pandas(pd.read_parquet(val_path)),
+        "test": Dataset.from_pandas(pd.read_parquet(test_path)),
+    }
+
+
 class FRACCOICDClassificationAdapter(DatasetAdapter):
     """Adapter for mention-level ICD code classification from FRACCO."""
 
@@ -253,8 +315,54 @@ class FRACCOICDClassificationAdapter(DatasetAdapter):
     def name(self) -> str:
         return "fracco_icd_classification"
 
+    def _load_from_hf_parquet(self) -> dict[str, Dataset] | None:
+        """Try loading from HuggingFace parquet files in SCRATCH."""
+        if FRACCO_ICD_HF_DIR is None or not FRACCO_ICD_HF_DIR.exists():
+            return None
+
+        splits = _load_hf_parquet_splits(FRACCO_ICD_HF_DIR)
+        if splits is None:
+            return None
+
+        # Apply top_k filtering if needed
+        if self.top_k is not None:
+            # Count code frequencies across all splits
+            code_counts: dict[str, int] = {}
+            for split in splits.values():
+                for code in split["code"]:
+                    code_counts[code] = code_counts.get(code, 0) + 1
+
+            # Get top_k most frequent codes
+            sorted_codes = sorted(code_counts.items(), key=lambda x: x[1], reverse=True)
+            top_k_codes = {code for code, _ in sorted_codes[:self.top_k]}
+
+            # Filter each split
+            for split_name, dataset in splits.items():
+                # Filter to keep only top_k codes
+                filtered_indices = [
+                    i for i, code in enumerate(dataset["code"])
+                    if code in top_k_codes
+                ]
+                splits[split_name] = dataset.select(filtered_indices)
+
+            self._label_vocab = sorted(top_k_codes)
+        else:
+            # Get all codes
+            all_codes: set[str] = set()
+            for split in splits.values():
+                all_codes.update(split["code"])
+            self._label_vocab = sorted(all_codes)
+
+        return splits
+
     def load_splits(self) -> dict[str, Dataset]:
-        _ensure_paths()
+        # Try HuggingFace parquet first (pre-processed data)
+        hf_splits = self._load_from_hf_parquet()
+        if hf_splits is not None:
+            return hf_splits
+
+        # Fallback to original CSV-based loading
+        _ensure_icd_paths()
 
         records_by_doc: dict[str, list[dict[str, Any]]] = {}
         with self.csv_path.open(encoding="utf-8-sig", newline="") as f:
@@ -413,8 +521,21 @@ class FRACCOExpressionNERAdapter(DatasetAdapter):
     def name(self) -> str:
         return "fracco_expression_ner"
 
+    def _load_from_hf_parquet(self) -> dict[str, Dataset] | None:
+        """Try loading from HuggingFace parquet files in SCRATCH."""
+        if FRACCO_NER_HF_DIR is None or not FRACCO_NER_HF_DIR.exists():
+            return None
+
+        return _load_hf_parquet_splits(FRACCO_NER_HF_DIR)
+
     def load_splits(self) -> dict[str, Dataset]:
-        _ensure_paths()
+        # Try HuggingFace parquet first (pre-processed data)
+        hf_splits = self._load_from_hf_parquet()
+        if hf_splits is not None:
+            return hf_splits
+
+        # Fallback to original ann-file-based loading
+        _ensure_ner_paths()
 
         doc_chunks: dict[str, list[dict[str, Any]]] = {}
         doc_names = sorted(path.name for path in ANN_DIR.glob("*.ann"))

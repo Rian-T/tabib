@@ -1,0 +1,47 @@
+description: French Biomedical ModernCamembert 3-Epoch Evaluation - 5 seed averaging
+seeds: [42, 43, 44, 45, 46]
+
+datasets:
+  ner: [emea, medline, cas1, cas2, fracco_expression_ner]
+  cls: [diamed, morfitt, fracco_icd_classification, fracco_icd_top100, meddialog_women]
+  sim: [clister]
+
+model_groups:
+  biomed:
+    configs:
+      ner: base/ner_bert.yaml
+      cls: base/cls_bert.yaml
+      sim: base/sim_bert.yaml
+    models:
+      # Baseline (no CPT)
+      moderncamembert-base: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/almanach--moderncamembert-base
+      # HAL Style Ablation
+      hal-original: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-hal-original
+      hal-scientific: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-hal-scientific
+      hal-textbook: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-hal-textbook
+      # ISTEX Style Ablation
+      istex-abstract: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-istex-abstract
+      istex-original: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-istex-original
+      istex-scientific: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-istex-scientific
+      istex-textbook: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-istex-textbook
+      # EMEA Style Ablation
+      emea-original: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-emea-original
+      emea-notice: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-emea-notice
+      # Source Ablation
+      cim10: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-cim10
+      ccam: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-ccam
+      atc: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-atc
+      synthetic-clinical: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-synthetic-clinical
+      pmc-patients: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-pmc-patients
+      code-mix: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-code-mix
+      # Baselines
+      fineweb2-only: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-fineweb2-only
+      full-mix-equal: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-full-mix-equal
+      full-mix-proportional: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-full-mix-proportional
+
+output:
+  json: results/3epoch_5seed_results.json
+  markdown: results/3epoch_5seed_results.md
+  wandb:
+    project: tabib-biomed-3epoch
+    table: results_3epoch

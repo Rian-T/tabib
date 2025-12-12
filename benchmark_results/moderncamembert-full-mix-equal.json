@@ -1,0 +1,637 @@
+{
+  "metadata": {
+    "generated_at": "2025-12-12T16:39:05.734839+00:00",
+    "spec_path": "/tmp/bench_moderncamembert-full-mix-equal_2882027.yaml",
+    "description": "3-epoch eval: moderncamembert-full-mix-equal",
+    "num_runs": 25,
+    "dry_run": false
+  },
+  "results": {
+    "eval": {
+      "ner": {
+        "emea": {
+          "moderncamembert-full-mix-equal.seed42": {
+            "metrics": {
+              "exact_f1": 0.5973333333333334,
+              "exact_precision": 0.5818181818181818,
+              "exact_recall": 0.6136986301369863,
+              "partial_f1": 0.7743119266055045,
+              "partial_precision": 0.7672727272727272,
+              "partial_recall": 0.7814814814814814,
+              "CHEM_exact_f1": 0.6738170347003154,
+              "ANAT_exact_f1": 0.48927038626609437,
+              "DEVI_exact_f1": 0.18803418803418803,
+              "PROC_exact_f1": 0.5778781038374717,
+              "DISO_exact_f1": 0.5328947368421053,
+              "LIVB_exact_f1": 0.771186440677966,
+              "OBJC_exact_f1": 0.09876543209876544,
+              "PHYS_exact_f1": 0.4025974025974026,
+              "PHEN_exact_f1": 0.17647058823529413,
+              "GEOG_exact_f1": 0.6956521739130435,
+              "seqeval_f1": 0.5639629831246599,
+              "seqeval_precision": 0.5381818181818182,
+              "seqeval_recall": 0.592338479130932
+            },
+            "status": "success",
+            "error": null,
+            "seed": 42
+          },
+          "moderncamembert-full-mix-equal.seed43": {
+            "metrics": {
+              "exact_f1": 0.5731804852039457,
+              "exact_precision": 0.5581516095534788,
+              "exact_recall": 0.589041095890411,
+              "partial_f1": 0.7639395518499219,
+              "partial_precision": 0.7611630321910696,
+              "partial_recall": 0.7667364016736402,
+              "CHEM_exact_f1": 0.6563307493540051,
+              "PHYS_exact_f1": 0.423841059602649,
+              "PROC_exact_f1": 0.5514223194748359,
+              "ANAT_exact_f1": 0.4444444444444445,
+              "DISO_exact_f1": 0.4807692307692308,
+              "DEVI_exact_f1": 0.16666666666666666,
+              "LIVB_exact_f1": 0.7733887733887734,
+              "OBJC_exact_f1": 0.051948051948051945,
+              "PHEN_exact_f1": 0.18181818181818182,
+              "GEOG_exact_f1": 0.4615384615384615,
+              "seqeval_f1": 0.5594557823129251,
+              "seqeval_precision": 0.5337487019730011,
+              "seqeval_recall": 0.5877644368210406
+            },
+            "status": "success",
+            "error": null,
+            "seed": 43
+          },
+          "moderncamembert-full-mix-equal.seed44": {
+            "metrics": {
+              "exact_f1": 0.5686065136145222,
+              "exact_precision": 0.5543987506507028,
+              "exact_recall": 0.5835616438356165,
+              "partial_f1": 0.7669953295277633,
+              "partial_precision": 0.769390942217595,
+              "partial_recall": 0.7646145887221935,
+              "CHEM_exact_f1": 0.6407147415443523,
+              "ANAT_exact_f1": 0.42201834862385323,
+              "PROC_exact_f1": 0.5679513184584177,
+              "DEVI_exact_f1": 0.11538461538461539,
+              "LIVB_exact_f1": 0.7552742616033754,
+              "DISO_exact_f1": 0.4691780821917808,
+              "OBJC_exact_f1": 0.1081081081081081,
+              "PHYS_exact_f1": 0.5611510791366907,
+              "PHEN_exact_f1": 0.0625,
+              "GEOG_exact_f1": 0.75,
+              "seqeval_f1": 0.5591280653950954,
+              "seqeval_precision": 0.5340968245705362,
+              "seqeval_recall": 0.5866209262435678
+            },
+            "status": "success",
+            "error": null,
+            "seed": 44
+          },
+          "moderncamembert-full-mix-equal.seed45": {
+            "metrics": {
+              "exact_f1": 0.5855227882037533,
+              "exact_precision": 0.573228346456693,
+              "exact_recall": 0.5983561643835617,
+              "partial_f1": 0.7708059858230507,
+              "partial_precision": 0.7706036745406825,
+              "partial_recall": 0.7710084033613446,
+              "CHEM_exact_f1": 0.6675191815856777,
+              "PROC_exact_f1": 0.559322033898305,
+              "PHYS_exact_f1": 0.3973509933774835,
+              "ANAT_exact_f1": 0.41379310344827586,
+              "DEVI_exact_f1": 0.11864406779661017,
+              "DISO_exact_f1": 0.5248713550600342,
+              "LIVB_exact_f1": 0.7705263157894736,
+              "OBJC_exact_f1": 0.1388888888888889,
+              "PHEN_exact_f1": 0.21052631578947367,
+              "GEOG_exact_f1": 0.64,
+              "seqeval_f1": 0.5752599890530925,
+              "seqeval_precision": 0.5517060367454069,
+              "seqeval_recall": 0.6009148084619783
+            },
+            "status": "success",
+            "error": null,
+            "seed": 45
+          },
+          "moderncamembert-full-mix-equal.seed46": {
+            "metrics": {
+              "exact_f1": 0.5783641160949868,
+              "exact_precision": 0.5577608142493639,
+              "exact_recall": 0.6005479452054795,
+              "partial_f1": 0.7622014537902388,
+              "partial_precision": 0.7470737913486005,
+              "partial_recall": 0.7779544250132485,
+              "CHEM_exact_f1": 0.6751269035532995,
+              "DEVI_exact_f1": 0.15,
+              "PROC_exact_f1": 0.5470459518599563,
+              "ANAT_exact_f1": 0.3585657370517929,
+              "DISO_exact_f1": 0.4859504132231405,
+              "LIVB_exact_f1": 0.7743271221532091,
+              "OBJC_exact_f1": 0.08602150537634408,
+              "PHYS_exact_f1": 0.4729729729729729,
+              "PHEN_exact_f1": 0.28571428571428575,
+              "GEOG_exact_f1": 0.6363636363636364,
+              "seqeval_f1": 0.5686591276252019,
+              "seqeval_precision": 0.5374045801526718,
+              "seqeval_recall": 0.6037735849056604
+            },
+            "status": "success",
+            "error": null,
+            "seed": 46
+          }
+        },
+        "medline": {
+          "moderncamembert-full-mix-equal.seed42": {
+            "metrics": {
+              "exact_f1": 0.4903268845897265,
+              "exact_precision": 0.5055020632737276,
+              "exact_recall": 0.47603626943005184,
+              "partial_f1": 0.7004926108374384,
+              "partial_precision": 0.7334938101788171,
+              "partial_recall": 0.6703331238214959,
+              "PROC_exact_f1": 0.5198983911939035,
+              "LIVB_exact_f1": 0.6050156739811912,
+              "DISO_exact_f1": 0.4213362068965517,
+              "CHEM_exact_f1": 0.5735294117647058,
+              "OBJC_exact_f1": 0.1568627450980392,
+              "ANAT_exact_f1": 0.5758157389635317,
+              "DEVI_exact_f1": 0.10344827586206898,
+              "PHYS_exact_f1": 0.2738853503184714,
+              "GEOG_exact_f1": 0.5360824742268041,
+              "PHEN_exact_f1": 0.20253164556962022,
+              "seqeval_f1": 0.5250866630176976,
+              "seqeval_precision": 0.4948418156808803,
+              "seqeval_recall": 0.5592693354061407
+            },
+            "status": "success",
+            "error": null,
+            "seed": 42
+          },
+          "moderncamembert-full-mix-equal.seed43": {
+            "metrics": {
+              "exact_f1": 0.49505945402780105,
+              "exact_precision": 0.5126604231703087,
+              "exact_recall": 0.4786269430051813,
+              "partial_f1": 0.6951340615690169,
+              "partial_precision": 0.72840790842872,
+              "partial_recall": 0.6647673314339981,
+              "PROC_exact_f1": 0.5099667774086378,
+              "LIVB_exact_f1": 0.622432859399684,
+              "DISO_exact_f1": 0.42574257425742573,
+              "CHEM_exact_f1": 0.5599999999999999,
+              "OBJC_exact_f1": 0.17391304347826086,
+              "ANAT_exact_f1": 0.6071085494716618,
+              "DEVI_exact_f1": 0.16666666666666666,
+              "GEOG_exact_f1": 0.5647058823529412,
+              "PHYS_exact_f1": 0.2678571428571429,
+              "PHEN_exact_f1": 0.10958904109589039,
+              "seqeval_f1": 0.5282258064516129,
+              "seqeval_precision": 0.4998265695456122,
+              "seqeval_recall": 0.5600466381655654
+            },
+            "status": "success",
+            "error": null,
+            "seed": 43
+          },
+          "moderncamembert-full-mix-equal.seed44": {
+            "metrics": {
+              "exact_f1": 0.4873417721518987,
+              "exact_precision": 0.5017146776406035,
+              "exact_recall": 0.4737694300518135,
+              "partial_f1": 0.6934426229508197,
+              "partial_precision": 0.7253086419753086,
+              "partial_recall": 0.6642587939698492,
+              "PROC_exact_f1": 0.5189456342668862,
+              "LIVB_exact_f1": 0.586046511627907,
+              "DISO_exact_f1": 0.4272274488101826,
+              "ANAT_exact_f1": 0.5613382899628253,
+              "CHEM_exact_f1": 0.5685425685425686,
+              "OBJC_exact_f1": 0.25,
+              "DEVI_exact_f1": 0.0,
+              "PHEN_exact_f1": 0.18666666666666665,
+              "PHYS_exact_f1": 0.24281150159744408,
+              "GEOG_exact_f1": 0.5227272727272727,
+              "seqeval_f1": 0.5130260521042084,
+              "seqeval_precision": 0.4828532235939643,
+              "seqeval_recall": 0.5472211426350564
+            },
+            "status": "success",
+            "error": null,
+            "seed": 44
+          },
+          "moderncamembert-full-mix-equal.seed45": {
+            "metrics": {
+              "exact_f1": 0.48635904344897274,
+              "exact_precision": 0.5066666666666667,
+              "exact_recall": 0.4676165803108808,
+              "partial_f1": 0.687624750499002,
+              "partial_precision": 0.7252631578947368,
+              "partial_recall": 0.6537001897533207,
+              "PROC_exact_f1": 0.480865224625624,
+              "LIVB_exact_f1": 0.6195826645264848,
+              "DISO_exact_f1": 0.4306326304106548,
+              "CHEM_exact_f1": 0.5830903790087464,
+              "OBJC_exact_f1": 0.17777777777777778,
+              "ANAT_exact_f1": 0.5781544256120527,
+              "DEVI_exact_f1": 0.18867924528301885,
+              "GEOG_exact_f1": 0.5569620253164557,
+              "PHYS_exact_f1": 0.20689655172413793,
+              "PHEN_exact_f1": 0.08955223880597016,
+              "seqeval_f1": 0.5192697768762677,
+              "seqeval_precision": 0.49403508771929827,
+              "seqeval_recall": 0.5472211426350564
+            },
+            "status": "success",
+            "error": null,
+            "seed": 45
+          },
+          "moderncamembert-full-mix-equal.seed46": {
+            "metrics": {
+              "exact_f1": 0.4957063478700118,
+              "exact_precision": 0.516310066643283,
+              "exact_recall": 0.47668393782383417,
+              "partial_f1": 0.6919368246051538,
+              "partial_precision": 0.729919326552087,
+              "partial_recall": 0.6577117572692794,
+              "PROC_exact_f1": 0.5095753538717736,
+              "LIVB_exact_f1": 0.6035313001605136,
+              "ANAT_exact_f1": 0.6115537848605578,
+              "DISO_exact_f1": 0.4304347826086956,
+              "CHEM_exact_f1": 0.5918367346938777,
+              "OBJC_exact_f1": 0.13333333333333333,
+              "DEVI_exact_f1": 0.196078431372549,
+              "PHEN_exact_f1": 0.12658227848101267,
+              "GEOG_exact_f1": 0.558139534883721,
+              "PHYS_exact_f1": 0.21604938271604937,
+              "seqeval_f1": 0.5291297935103245,
+              "seqeval_precision": 0.5033321641529288,
+              "seqeval_recall": 0.5577147298872911
+            },
+            "status": "success",
+            "error": null,
+            "seed": 46
+          }
+        }
+      },
+      "cls": {
+        "diamed": {
+          "moderncamembert-full-mix-equal.seed42": {
+            "metrics": {
+              "accuracy": 0.6038961038961039,
+              "precision": 0.4977651637578108,
+              "recall": 0.5060627616431188,
+              "f1": 0.48765551730135803
+            },
+            "status": "success",
+            "error": null,
+            "seed": 42
+          },
+          "moderncamembert-full-mix-equal.seed43": {
+            "metrics": {
+              "accuracy": 0.5714285714285714,
+              "precision": 0.3693165672065928,
+              "recall": 0.36189167974882264,
+              "f1": 0.32524462223059925
+            },
+            "status": "success",
+            "error": null,
+            "seed": 43
+          },
+          "moderncamembert-full-mix-equal.seed44": {
+            "metrics": {
+              "accuracy": 0.5909090909090909,
+              "precision": 0.4230132641291811,
+              "recall": 0.39756787330316745,
+              "f1": 0.38088978015448605
+            },
+            "status": "success",
+            "error": null,
+            "seed": 44
+          },
+          "moderncamembert-full-mix-equal.seed45": {
+            "metrics": {
+              "accuracy": 0.577922077922078,
+              "precision": 0.4275307566208302,
+              "recall": 0.4163804945054945,
+              "f1": 0.3849662885847096
+            },
+            "status": "success",
+            "error": null,
+            "seed": 45
+          },
+          "moderncamembert-full-mix-equal.seed46": {
+            "metrics": {
+              "accuracy": 0.5909090909090909,
+              "precision": 0.4199770204615365,
+              "recall": 0.41055239403453686,
+              "f1": 0.38211360073572354
+            },
+            "status": "success",
+            "error": null,
+            "seed": 46
+          }
+        },
+        "morfitt": {
+          "moderncamembert-full-mix-equal.seed42": {
+            "metrics": {
+              "accuracy": 0.6185661764705882,
+              "precision": 0.5279384503753766,
+              "recall": 0.5386634891285698,
+              "f1": 0.5256373592220983
+            },
+            "status": "success",
+            "error": null,
+            "seed": 42
+          },
+          "moderncamembert-full-mix-equal.seed43": {
+            "metrics": {
+              "accuracy": 0.6332720588235294,
+              "precision": 0.5522955386169683,
+              "recall": 0.5347457685007453,
+              "f1": 0.5377690353868632
+            },
+            "status": "success",
+            "error": null,
+            "seed": 43
+          },
+          "moderncamembert-full-mix-equal.seed44": {
+            "metrics": {
+              "accuracy": 0.6240808823529411,
+              "precision": 0.5397233051829414,
+              "recall": 0.5299363803796401,
+              "f1": 0.5303540894034565
+            },
+            "status": "success",
+            "error": null,
+            "seed": 44
+          },
+          "moderncamembert-full-mix-equal.seed45": {
+            "metrics": {
+              "accuracy": 0.6121323529411765,
+              "precision": 0.5324403654792537,
+              "recall": 0.5257496401217054,
+              "f1": 0.5174893377261081
+            },
+            "status": "success",
+            "error": null,
+            "seed": 45
+          },
+          "moderncamembert-full-mix-equal.seed46": {
+            "metrics": {
+              "accuracy": 0.6158088235294118,
+              "precision": 0.5351269506130822,
+              "recall": 0.5238403176981142,
+              "f1": 0.5239045492675379
+            },
+            "status": "success",
+            "error": null,
+            "seed": 46
+          }
+        }
+      },
+      "sim": {
+        "clister": {
+          "moderncamembert-full-mix-equal.seed42": {
+            "metrics": {
+              "pearson": 0.8993113040924072,
+              "spearman": 0.9006138115292133,
+              "mse": 0.5854796766419895
+            },
+            "status": "success",
+            "error": null,
+            "seed": 42
+          },
+          "moderncamembert-full-mix-equal.seed43": {
+            "metrics": {
+              "pearson": 0.8942986130714417,
+              "spearman": 0.8939208657988239,
+              "mse": 0.6031500269286334
+            },
+            "status": "success",
+            "error": null,
+            "seed": 43
+          },
+          "moderncamembert-full-mix-equal.seed44": {
+            "metrics": {
+              "pearson": 0.8910598158836365,
+              "spearman": 0.8904094208458887,
+              "mse": 0.6380436084698886
+            },
+            "status": "success",
+            "error": null,
+            "seed": 44
+          },
+          "moderncamembert-full-mix-equal.seed45": {
+            "metrics": {
+              "pearson": 0.8957300782203674,
+              "spearman": 0.8953633840015423,
+              "mse": 0.6018308653874556
+            },
+            "status": "success",
+            "error": null,
+            "seed": 45
+          },
+          "moderncamembert-full-mix-equal.seed46": {
+            "metrics": {
+              "pearson": 0.8937188386917114,
+              "spearman": 0.8931416339944309,
+              "mse": 0.6038735292572528
+            },
+            "status": "success",
+            "error": null,
+            "seed": 46
+          }
+        }
+      }
+    }
+  },
+  "aggregated": {
+    "eval": {
+      "ner": {
+        "emea": {
+          "moderncamembert-full-mix-equal": {
+            "seeds": [
+              42,
+              43,
+              44,
+              45,
+              46
+            ],
+            "num_seeds": 5,
+            "metrics_mean": {
+              "exact_f1": 0.5806014472901083,
+              "exact_precision": 0.565071540545684,
+              "exact_recall": 0.597041095890411,
+              "partial_f1": 0.7676508495192959,
+              "partial_precision": 0.7631008335141349,
+              "partial_recall": 0.7723590600503817,
+              "CHEM_exact_f1": 0.66270172214753,
+              "ANAT_exact_f1": 0.42561840396689216,
+              "DEVI_exact_f1": 0.14774590757641604,
+              "PROC_exact_f1": 0.5607239455057973,
+              "DISO_exact_f1": 0.4987327636172583,
+              "LIVB_exact_f1": 0.7689405827225595,
+              "OBJC_exact_f1": 0.0967463972840317,
+              "PHYS_exact_f1": 0.45158270153743973,
+              "PHEN_exact_f1": 0.1834058743114471,
+              "GEOG_exact_f1": 0.6367108543630282,
+              "seqeval_f1": 0.565293189502195,
+              "seqeval_precision": 0.5390275923246868,
+              "seqeval_recall": 0.5942824471126358
+            },
+            "metrics_std": {
+              "exact_f1": 0.011270873635109459,
+              "exact_precision": 0.01185563246561102,
+              "exact_recall": 0.011588749632009577,
+              "partial_f1": 0.004955405727726794,
+              "partial_precision": 0.009668039395961588,
+              "partial_recall": 0.007210098451140894,
+              "CHEM_exact_f1": 0.01436279770736655,
+              "ANAT_exact_f1": 0.04757849546259362,
+              "DEVI_exact_f1": 0.03114639590041696,
+              "PROC_exact_f1": 0.012470697464608506,
+              "DISO_exact_f1": 0.02832764800230137,
+              "LIVB_exact_f1": 0.007796280643501753,
+              "OBJC_exact_f1": 0.031745352511713364,
+              "PHYS_exact_f1": 0.0681414144651537,
+              "PHEN_exact_f1": 0.08042291152582429,
+              "GEOG_exact_f1": 0.10840297034294843,
+              "seqeval_f1": 0.0067919098877229815,
+              "seqeval_precision": 0.007353087945398071,
+              "seqeval_recall": 0.007730334491094592
+            }
+          }
+        },
+        "medline": {
+          "moderncamembert-full-mix-equal": {
+            "seeds": [
+              42,
+              43,
+              44,
+              45,
+              46
+            ],
+            "num_seeds": 5,
+            "metrics_mean": {
+              "exact_f1": 0.49095870041768214,
+              "exact_precision": 0.5085707794789179,
+              "exact_recall": 0.47454663212435233,
+              "partial_f1": 0.6937261740922862,
+              "partial_precision": 0.7284785690059339,
+              "partial_recall": 0.6621542392495887,
+              "PROC_exact_f1": 0.507850276273365,
+              "LIVB_exact_f1": 0.6073218019391561,
+              "DISO_exact_f1": 0.4270747285967021,
+              "CHEM_exact_f1": 0.5753998188019797,
+              "OBJC_exact_f1": 0.17837737993748223,
+              "ANAT_exact_f1": 0.5867941577741258,
+              "DEVI_exact_f1": 0.1309745238368607,
+              "PHYS_exact_f1": 0.24149998584264915,
+              "GEOG_exact_f1": 0.547723437901439,
+              "PHEN_exact_f1": 0.14298437412383203,
+              "seqeval_f1": 0.5229476183920222,
+              "seqeval_precision": 0.4949777721385368,
+              "seqeval_recall": 0.554294597745822
+            },
+            "metrics_std": {
+              "exact_f1": 0.004301004012221757,
+              "exact_precision": 0.0058453089846079625,
+              "exact_recall": 0.004244575745546871,
+              "partial_f1": 0.004697774900814605,
+              "partial_precision": 0.0034503885737569616,
+              "partial_recall": 0.006506883916401466,
+              "PROC_exact_f1": 0.015842289325964615,
+              "LIVB_exact_f1": 0.014585925722087893,
+              "DISO_exact_f1": 0.003830052813983017,
+              "CHEM_exact_f1": 0.012419658238759203,
+              "OBJC_exact_f1": 0.04370908136229284,
+              "ANAT_exact_f1": 0.021615304190200916,
+              "DEVI_exact_f1": 0.08178371313293305,
+              "PHYS_exact_f1": 0.029959816771783828,
+              "GEOG_exact_f1": 0.017625055333288595,
+              "PHEN_exact_f1": 0.049227254424215536,
+              "seqeval_f1": 0.0067568126012729456,
+              "seqeval_precision": 0.007765605541542567,
+              "seqeval_recall": 0.006511505625669404
+            }
+          }
+        }
+      },
+      "cls": {
+        "diamed": {
+          "moderncamembert-full-mix-equal": {
+            "seeds": [
+              42,
+              43,
+              44,
+              45,
+              46
+            ],
+            "num_seeds": 5,
+            "metrics_mean": {
+              "accuracy": 0.587012987012987,
+              "precision": 0.42752055443519027,
+              "recall": 0.4184910406470281,
+              "f1": 0.3921739618013753
+            },
+            "metrics_std": {
+              "accuracy": 0.012658174473777897,
+              "precision": 0.045823656398723885,
+              "recall": 0.05333279811489179,
+              "f1": 0.058899826208330286
+            }
+          }
+        },
+        "morfitt": {
+          "moderncamembert-full-mix-equal": {
+            "seeds": [
+              42,
+              43,
+              44,
+              45,
+              46
+            ],
+            "num_seeds": 5,
+            "metrics_mean": {
+              "accuracy": 0.6207720588235294,
+              "precision": 0.5375049220535244,
+              "recall": 0.530587119165755,
+              "f1": 0.5270308742012128
+            },
+            "metrics_std": {
+              "accuracy": 0.008236237800448465,
+              "precision": 0.009307328078858836,
+              "recall": 0.00616169843835294,
+              "f1": 0.007568166469216959
+            }
+          }
+        }
+      },
+      "sim": {
+        "clister": {
+          "moderncamembert-full-mix-equal": {
+            "seeds": [
+              42,
+              43,
+              44,
+              45,
+              46
+            ],
+            "num_seeds": 5,
+            "metrics_mean": {
+              "pearson": 0.8948237299919128,
+              "spearman": 0.8946898232339798,
+              "mse": 0.606475541337044
+            },
+            "metrics_std": {
+              "pearson": 0.0030258622902636597,
+              "spearman": 0.0037701906945198063,
+              "mse": 0.01921439385211924
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import ast
 import csv
+import os
 from pathlib import Path
 from typing import Any
 
@@ -13,8 +14,39 @@ from tabib.data.base import DatasetAdapter
 from tabib.tasks.classification import ClassificationTask
 
 
+# Support $SCRATCH/tabib/data/ paths for HuggingFace datasets (offline mode on compute nodes)
+SCRATCH = os.environ.get("SCRATCH", "")
+SCRATCH_DATA = Path(SCRATCH) / "tabib" / "data" if SCRATCH else None
+
+# HuggingFace dataset path in SCRATCH
+MEDDIALOG_HF_DIR = SCRATCH_DATA / "rntc--tabib-meddialog-fr" if SCRATCH_DATA else None
+
+# Fallback to local PROJECT_ROOT paths
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
-DATA_DIR = PROJECT_ROOT / "data" / "MedDialog-FR" / "MedDialog-FR-women"
+LOCAL_DATA_DIR = PROJECT_ROOT / "data" / "MedDialog-FR" / "MedDialog-FR-women"
+
+# Select directory based on availability
+if MEDDIALOG_HF_DIR and MEDDIALOG_HF_DIR.exists():
+    DATA_DIR = MEDDIALOG_HF_DIR
+else:
+    DATA_DIR = LOCAL_DATA_DIR
+
+
+def _load_hf_parquet_splits(data_dir: Path) -> dict[str, Dataset] | None:
+    """Load splits from HuggingFace parquet files if available."""
+    train_path = data_dir / "data" / "train-00000-of-00001.parquet"
+    val_path = data_dir / "data" / "val-00000-of-00001.parquet"
+    test_path = data_dir / "data" / "test-00000-of-00001.parquet"
+
+    if not all(p.exists() for p in [train_path, val_path, test_path]):
+        return None
+
+    import pandas as pd
+    return {
+        "train": Dataset.from_pandas(pd.read_parquet(train_path)),
+        "val": Dataset.from_pandas(pd.read_parquet(val_path)),
+        "test": Dataset.from_pandas(pd.read_parquet(test_path)),
+    }
 
 
 class MedDialogWomenAdapter(DatasetAdapter):
@@ -32,19 +64,44 @@ class MedDialogWomenAdapter(DatasetAdapter):
     def name(self) -> str:
         return "meddialog_women"
 
+    def _load_from_hf_parquet(self) -> dict[str, Dataset] | None:
+        """Try loading from HuggingFace parquet files in SCRATCH."""
+        if MEDDIALOG_HF_DIR is None or not MEDDIALOG_HF_DIR.exists():
+            return None
+
+        splits = _load_hf_parquet_splits(MEDDIALOG_HF_DIR)
+        if splits is None:
+            return None
+
+        # Extract label vocab from all splits
+        all_labels: set[str] = set()
+        for split in splits.values():
+            all_labels.update(split["label"])
+        self._label_vocab = sorted(all_labels)
+
+        return splits
+
     def load_splits(self) -> dict[str, Dataset]:
+        # Try HuggingFace parquet first (pre-processed data)
+        hf_splits = self._load_from_hf_parquet()
+        if hf_splits is not None:
+            return hf_splits
+
+        # Fallback to original CSV-based loading
         multilabel_path = DATA_DIR / "multilabel_annotation" / "dataset_multilabel_meddialog_22labels.csv"
         text_path = DATA_DIR / "post-editing" / "meddialog-fr-women_post-editing.csv"
 
         if not multilabel_path.exists():
             raise FileNotFoundError(
                 f"MedDialog multilabel data not found at {multilabel_path}. "
-                "Extract meddialog_fr.zip to data/ folder."
+                "Download with: huggingface-cli download rntc/tabib-meddialog-fr "
+                "--local-dir $SCRATCH/tabib/data/rntc--tabib-meddialog-fr --repo-type dataset"
             )
         if not text_path.exists():
             raise FileNotFoundError(
                 f"MedDialog text data not found at {text_path}. "
-                "Extract meddialog_fr.zip to data/ folder."
+                "Download with: huggingface-cli download rntc/tabib-meddialog-fr "
+                "--local-dir $SCRATCH/tabib/data/rntc--tabib-meddialog-fr --repo-type dataset"
             )
 
         # Load text data (Q&A pairs)
