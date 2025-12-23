@@ -83,11 +83,12 @@ class NERSpanTask(Task):
         """
         try:
             from seqeval.metrics import f1_score, precision_score, recall_score
+            from seqeval.scheme import IOB2
 
-            # seqeval expects list of list of strings
-            f1 = f1_score(references, predictions)
-            precision = precision_score(references, predictions)
-            recall = recall_score(references, predictions)
+            # seqeval expects list of list of strings - use strict mode with IOB2 scheme
+            f1 = f1_score(references, predictions, mode='strict', scheme=IOB2)
+            precision = precision_score(references, predictions, mode='strict', scheme=IOB2)
+            recall = recall_score(references, predictions, mode='strict', scheme=IOB2)
 
             return {
                 'seqeval_f1': f1,

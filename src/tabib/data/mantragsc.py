@@ -2,40 +2,38 @@
 
 from __future__ import annotations
 
-import xml.etree.ElementTree as ET
-from pathlib import Path
 from typing import Any
 
-from datasets import Dataset
+from datasets import Dataset, load_dataset
 
 from tabib.data.base import DatasetAdapter
 from tabib.tasks.ner_span import NERSpanTask
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-DATA_DIR = PROJECT_ROOT / "data" / "drbenchmark" / "data" / "drbenchmark" / "mantragsc" / "GSC-v1.1"
-
-# Entity group mapping (from UMLS semantic types)
-ENTITY_GROUPS = {
-    "ANAT": "anatomy",
-    "CHEM": "chemical",
-    "DEVI": "device",
-    "DISO": "disorder",
-    "GEOG": "geography",
-    "LIVB": "living_being",
-    "OBJC": "object",
-    "PHEN": "phenomenon",
-    "PHYS": "physiology",
-    "PROC": "procedure",
-}
+# BIO tag mapping for MANTRAGSC (from HuggingFace dataset)
+# Tags are: O, B-ANAT, I-ANAT, B-CHEM, I-CHEM, B-DEVI, I-DEVI, B-DISO, I-DISO,
+#           B-GEOG, I-GEOG, B-LIVB, I-LIVB, B-OBJC, I-OBJC, B-PHEN, I-PHEN,
+#           B-PHYS, I-PHYS, B-PROC, I-PROC
+NER_TAG_NAMES = [
+    "O",
+    "B-ANAT", "I-ANAT",
+    "B-CHEM", "I-CHEM",
+    "B-DEVI", "I-DEVI",
+    "B-DISO", "I-DISO",
+    "B-GEOG", "I-GEOG",
+    "B-LIVB", "I-LIVB",
+    "B-OBJC", "I-OBJC",
+    "B-PHEN", "I-PHEN",
+    "B-PHYS", "I-PHYS",
+    "B-PROC", "I-PROC",
+]
 
 
 class MANTRAGSCAdapter(DatasetAdapter):
     """Adapter for MANTRAGSC French biomedical NER dataset.
 
     Uses the Medline French manually annotated gold standard corpus.
-    Entity types: anatomy, chemical, device, disorder, geography,
-    living_being, object, phenomenon, physiology, procedure.
+    Entity types: ANAT, CHEM, DEVI, DISO, GEOG, LIVB, OBJC, PHEN, PHYS, PROC.
     """
 
     def __init__(self, source: str = "medline") -> None:
@@ -51,82 +49,96 @@ class MANTRAGSCAdapter(DatasetAdapter):
         return f"mantragsc_{self._source}"
 
     def load_splits(self) -> dict[str, Dataset]:
-        if not DATA_DIR.exists():
-            raise FileNotFoundError(
-                f"MANTRAGSC data not found. Expected at {DATA_DIR}. "
-                "Download and extract GSC-v1.1.zip from DrBenchmark/MANTRAGSC."
-            )
+        """Load train/val/test splits from HuggingFace."""
+        hf_config = f"fr_{self._source}"
+        hf_ds = load_dataset("DrBenchmark/MANTRAGSC", hf_config, trust_remote_code=True)
 
-        # Map source to filename
-        source_files = {
-            "medline": "Medline_GSC_fr_man.xml",
-            "emea": "EMEA_GSC_fr_man.xml",
-            "patent": "Patent_GSC_fr_man.xml",
-        }
+        splits: dict[str, Dataset] = {}
+        split_map = {"train": "train", "validation": "val", "test": "test"}
 
-        filename = source_files.get(self._source)
-        if not filename:
-            raise ValueError(f"Unknown source: {self._source}. Use 'medline', 'emea', or 'patent'")
+        for hf_split, local_split in split_map.items():
+            if hf_split not in hf_ds:
+                continue
 
-        xml_path = DATA_DIR / filename
-        if not xml_path.exists():
-            raise FileNotFoundError(f"XML file not found: {xml_path}")
+            records = []
+            for item in hf_ds[hf_split]:
+                doc_id = item.get("id", "")
+                tokens = item.get("tokens", [])
+                ner_tags = item.get("ner_tags", [])
 
-        # Parse XML and extract documents
-        records = self._parse_xml(xml_path)
+                # Convert tokens/tags to text and character-offset spans
+                text, entities = self._convert_bio_to_spans(tokens, ner_tags)
 
-        # No predefined train/val/test split in MANTRAGSC
-        # Use 80/10/10 split
-        n = len(records)
-        train_end = int(n * 0.8)
-        val_end = int(n * 0.9)
-
-        return {
-            "train": Dataset.from_list(records[:train_end]),
-            "val": Dataset.from_list(records[train_end:val_end]),
-            "test": Dataset.from_list(records[val_end:]),
-        }
-
-    def _parse_xml(self, xml_path: Path) -> list[dict[str, Any]]:
-        """Parse MANTRAGSC XML format."""
-        tree = ET.parse(xml_path)
-        root = tree.getroot()
-
-        records = []
-        for doc in root.findall("document"):
-            doc_id = doc.get("id", "")
-
-            for unit in doc.findall("unit"):
-                text_elem = unit.find("text")
-                if text_elem is None or text_elem.text is None:
-                    continue
-
-                text = text_elem.text
-                entities = []
-
-                for ent in unit.findall("e"):
-                    offset = int(ent.get("offset", 0))
-                    length = int(ent.get("len", 0))
-                    grp = ent.get("grp", "")
-                    ent_text = ent.text or ""
-
-                    # Map group to entity type
-                    entity_type = ENTITY_GROUPS.get(grp, grp.lower())
-
-                    entities.append({
-                        "start": offset,
-                        "end": offset + length,
-                        "label": entity_type,
-                        "text": ent_text,
+                if text:
+                    records.append({
+                        "doc_id": doc_id,
+                        "text": text,
+                        "entities": entities,
                     })
 
-                records.append({
-                    "doc_id": doc_id,
-                    "text": text,
-                    "entities": entities,
-                })
+            if records:
+                splits[local_split] = Dataset.from_list(records)
 
-        return records
+        return splits
+
+    def _convert_bio_to_spans(
+        self, tokens: list[str], ner_tags: list[int]
+    ) -> tuple[str, list[dict[str, Any]]]:
+        """Convert token-level BIO tags to character-offset spans."""
+        # Reconstruct text with spaces between tokens
+        text_parts = []
+        char_offsets = []
+        current_pos = 0
+
+        for token in tokens:
+            char_offsets.append(current_pos)
+            text_parts.append(token)
+            current_pos += len(token) + 1  # +1 for space
+
+        text = " ".join(text_parts)
+
+        # Extract entities from BIO tags
+        entities = []
+        current_entity = None
+
+        for i, (token, tag_id) in enumerate(zip(tokens, ner_tags)):
+            if tag_id >= len(NER_TAG_NAMES):
+                tag = "O"
+            else:
+                tag = NER_TAG_NAMES[tag_id]
+
+            if tag.startswith("B-"):
+                # Save previous entity
+                if current_entity is not None:
+                    entities.append(current_entity)
+
+                # Start new entity
+                label = tag[2:]
+                start = char_offsets[i]
+                end = start + len(token)
+                current_entity = {
+                    "start": start,
+                    "end": end,
+                    "label": label,
+                    "text": token,
+                }
+            elif tag.startswith("I-") and current_entity is not None:
+                # Extend current entity
+                label = tag[2:]
+                if label == current_entity["label"]:
+                    current_entity["end"] = char_offsets[i] + len(token)
+                    current_entity["text"] = text[current_entity["start"]:current_entity["end"]]
+            else:
+                # O tag - save entity if exists
+                if current_entity is not None:
+                    entities.append(current_entity)
+                    current_entity = None
+
+        # Don't forget last entity
+        if current_entity is not None:
+            entities.append(current_entity)
+
+        return text, entities
 
     def preprocess(self, dataset: Dataset, task: Any) -> Dataset:
         if not isinstance(task, NERSpanTask):

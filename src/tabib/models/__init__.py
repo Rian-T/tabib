@@ -1,6 +1,7 @@
 """Model adapter abstractions."""
 
 from tabib.models.base import ModelAdapter
+from tabib.models.bert_multilabel_cls import BERTMultiLabelAdapter
 from tabib.models.bert_similarity import BERTSimilarityAdapter
 from tabib.models.bert_text_cls import BERTTextClassificationAdapter
 from tabib.models.bert_token_ner import BERTTokenNERAdapter
@@ -14,6 +15,7 @@ __all__ = [
     "ModelAdapter",
     "BERTTokenNERAdapter",
     "BERTTextClassificationAdapter",
+    "BERTMultiLabelAdapter",
     "BERTSimilarityAdapter",
     "VLLMClassificationAdapter",
     "VLLMNERAdapter",

@@ -1,98 +1,84 @@
-"""MORFITT dataset adapter for medical speciality classification."""
+"""MORFITT multi-label dataset adapter for medical speciality classification."""
 
 from __future__ import annotations
 
-import csv
-from pathlib import Path
 from typing import Any
 
-from datasets import Dataset
+from datasets import Dataset, load_dataset
 
 from tabib.data.base import DatasetAdapter
-from tabib.tasks.classification import ClassificationTask
+from tabib.tasks.multilabel import MultiLabelTask
 
-
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-DATA_DIR = PROJECT_ROOT / "data" / "drbenchmark" / "data" / "drbenchmark" / "clister_morfitt"
+# Medical specialties from MORFITT dataset (12 classes)
+MORFITT_SPECIALTIES = [
+    'microbiology', 'etiology', 'virology', 'physiology', 'immunology',
+    'parasitology', 'genetics', 'chemistry', 'veterinary', 'surgery',
+    'pharmacology', 'psychology'
+]
 
 
 class MORFITTAdapter(DatasetAdapter):
-    """Adapter for MORFITT medical speciality classification.
+    """Multi-label adapter for MORFITT medical speciality classification.
 
-    Note: Original dataset is multi-label, but we use single-label (primary
-    specialty) for compatibility with standard classification task.
+    This is a multi-label task where each abstract can have multiple
+    medical specialties assigned. Uses specialities_one_hot from the
+    HuggingFace dataset for proper multi-label classification.
+
+    Reference:
+        Labrak et al. (2023) "MORFITT: A multi-label corpus of French
+        scientific articles in the biomedical domain" (TALN 2023)
     """
 
     def __init__(self) -> None:
-        self._label_vocab: list[str] | None = None
+        self._label_vocab: list[str] = MORFITT_SPECIALTIES
 
     @property
     def name(self) -> str:
         return "morfitt"
 
     def load_splits(self) -> dict[str, Dataset]:
-        if not DATA_DIR.exists():
-            raise FileNotFoundError(
-                f"MORFITT data not found. Expected at {DATA_DIR}. "
-                "Download from DrBenchmark/MORFITT on HuggingFace."
-            )
+        """Load train/val/test splits from HuggingFace with multi-hot labels."""
+        hf_ds = load_dataset("DrBenchmark/MORFITT", "source", trust_remote_code=True)
 
         splits: dict[str, Dataset] = {}
-        all_labels: set[str] = set()
+        split_map = {"train": "train", "validation": "val", "test": "test"}
 
-        for split_name, filename in [("train", "train.tsv"), ("val", "dev.tsv"), ("test", "test.tsv")]:
-            filepath = DATA_DIR / filename
-            if not filepath.exists():
+        for hf_split, local_split in split_map.items():
+            if hf_split not in hf_ds:
                 continue
 
             records = []
-            with filepath.open(encoding="utf-8") as f:
-                reader = csv.DictReader(f, delimiter="\t")
-                for row in reader:
-                    text = row.get("abstract", "").strip()
-                    labels_str = row.get("specialities", "").strip()
+            for item in hf_ds[hf_split]:
+                text = (item.get("abstract") or "").strip()
+                # Use specialities_one_hot directly from HF dataset
+                one_hot = item.get("specialities_one_hot")
 
-                    if not text or not labels_str:
-                        continue
+                if not text or one_hot is None:
+                    continue
 
-                    # Use first (primary) label for single-label classification
-                    labels = [l.strip() for l in labels_str.split("|") if l.strip()]
-                    if not labels:
-                        continue
-
-                    primary_label = labels[0]
-                    all_labels.add(primary_label)
-
-                    records.append({
-                        "text": text,
-                        "label": primary_label,
-                    })
+                # Convert to float for BCE loss
+                records.append({
+                    "text": text,
+                    "labels": [float(x) for x in one_hot],
+                })
 
             if records:
-                splits[split_name] = Dataset.from_list(records)
+                splits[local_split] = Dataset.from_list(records)
 
-        # Sort labels for consistency
-        self._label_vocab = sorted(all_labels)
         return splits
 
     def preprocess(self, dataset: Dataset, task: Any) -> Dataset:
-        if not isinstance(task, ClassificationTask):
+        """Preprocess dataset for multi-label classification.
+
+        Labels are already in multi-hot format from load_splits().
+        """
+        if not isinstance(task, MultiLabelTask):
             raise ValueError(
-                f"MORFITT expects ClassificationTask, got {type(task)}"
+                f"MORFITT expects MultiLabelTask, got {type(task)}"
             )
 
-        if self._label_vocab:
-            task.ensure_labels(self._label_vocab)
+        # Set label vocabulary
+        task.ensure_labels(self._label_vocab)
 
-        label_map = task.label_space
-
-        def map_example(example: dict[str, Any]) -> dict[str, Any]:
-            label_id = label_map.get(example["label"], 0)
-            return {
-                "text": example["text"],
-                "labels": label_id,
-            }
-
-        processed = dataset.map(map_example)
-        processed.set_format(type="python")
-        return processed
+        # Labels already preprocessed in load_splits
+        return dataset

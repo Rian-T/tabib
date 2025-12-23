@@ -11,7 +11,6 @@ from typing import Any
 from datasets import Dataset
 
 from tabib.data.base import DatasetAdapter
-from tabib.tasks.classification import ClassificationTask
 
 
 # Support $SCRATCH/tabib/data/ paths for HuggingFace datasets (offline mode on compute nodes)
@@ -53,8 +52,7 @@ class MedDialogWomenAdapter(DatasetAdapter):
     """Adapter for MedDialog-FR Women multilabel classification.
 
     Dataset has 900 medical Q&A samples with 22 UMLS CUI labels.
-    Labels are treated as combo-as-single-class (each unique combination
-    of labels becomes a distinct class).
+    Each sample can have multiple labels (true multi-label classification).
     """
 
     def __init__(self) -> None:
@@ -73,10 +71,15 @@ class MedDialogWomenAdapter(DatasetAdapter):
         if splits is None:
             return None
 
-        # Extract label vocab from all splits
+        # Extract individual CUI labels from labels_raw (not combo classes)
         all_labels: set[str] = set()
         for split in splits.values():
-            all_labels.update(split["label"])
+            for labels_raw in split["labels_raw"]:
+                # labels_raw is a numpy array of CUI strings
+                if hasattr(labels_raw, "tolist"):
+                    all_labels.update(labels_raw.tolist())
+                elif isinstance(labels_raw, list):
+                    all_labels.update(labels_raw)
         self._label_vocab = sorted(all_labels)
 
         return splits
@@ -116,7 +119,7 @@ class MedDialogWomenAdapter(DatasetAdapter):
 
         # Load multilabel annotations and match with text
         splits: dict[str, list[dict]] = {"train": [], "val": [], "test": []}
-        all_label_combos: set[str] = set()
+        all_labels: set[str] = set()
 
         with multilabel_path.open(encoding="utf-8") as f:
             reader = csv.DictReader(f, delimiter="\t")
@@ -151,16 +154,14 @@ class MedDialogWomenAdapter(DatasetAdapter):
                 else:
                     text = f"Question: {q_text}"
 
-                # Create label combo (sorted for consistency)
-                label_combo = " ".join(sorted(labels))
-                all_label_combos.add(label_combo)
+                # Collect individual labels (not combos)
+                all_labels.update(labels)
 
                 # Map split names
                 split_name = "val" if split == "dev" else split
                 splits[split_name].append({
                     "text": text,
-                    "label": label_combo,
-                    "labels_raw": labels,  # Keep original for reference
+                    "labels_raw": labels,  # Keep original for multi-label
                 })
 
         # Convert to Dataset
@@ -169,26 +170,41 @@ class MedDialogWomenAdapter(DatasetAdapter):
             if records:
                 result[split_name] = Dataset.from_list(records)
 
-        self._label_vocab = sorted(all_label_combos)
+        self._label_vocab = sorted(all_labels)
         return result
 
     def preprocess(self, dataset: Dataset, task: Any) -> Dataset:
-        if not isinstance(task, ClassificationTask):
+        from tabib.tasks.multilabel import MultiLabelTask
+
+        if not isinstance(task, MultiLabelTask):
             raise ValueError(
-                f"MedDialogWomen expects ClassificationTask, got {type(task)}"
+                f"MedDialogWomen requires MultiLabelTask, got {type(task)}. "
+                "Use task: multilabel in your config."
             )
 
+        # Set up 22 individual CUI labels
         if self._label_vocab:
             task.ensure_labels(self._label_vocab)
 
         label_map = task.label_space
+        num_labels = task.num_labels
 
         def map_example(example: dict[str, Any]) -> dict[str, Any]:
-            label_id = label_map.get(example["label"], 0)
+            # Create multi-hot vector
+            labels = [0.0] * num_labels
+            labels_raw = example["labels_raw"]
+
+            # Handle numpy arrays from parquet
+            if hasattr(labels_raw, "tolist"):
+                labels_raw = labels_raw.tolist()
+
+            for cui in labels_raw:
+                if cui in label_map:
+                    labels[label_map[cui]] = 1.0
+
             return {
                 "text": example["text"],
-                "labels": label_id,
-                "label_text": example["label"],  # Keep for few-shot examples
+                "labels": labels,
             }
 
         processed = dataset.map(map_example)

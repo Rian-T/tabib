@@ -532,10 +532,12 @@ class BenchmarkResults:
     def _get_primary_metric(self, task: str) -> str:
         """Get the primary metric for a task."""
         metric_map = {
-            "ner": "exact_f1",
-            "ner_span": "exact_f1",
+            "ner": "seqeval_f1",
+            "ner_span": "seqeval_f1",
+            "ner_token": "f1",  # NERTokenTask uses f1 directly from seqeval compute_metrics
             "cls": "f1",
             "classification": "f1",
+            "multilabel": "f1_micro",  # Multi-label uses micro-averaged F1
             "mcqa": "accuracy",
             "sim": "spearman",
             "similarity": "spearman",

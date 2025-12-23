@@ -26,6 +26,13 @@ from tabib.data.mediqal import (
 )
 from tabib.data.mixed_mcqa import MixedMCQAAdapter
 from tabib.data.morfitt import MORFITTAdapter
+from tabib.data.quaero_emea_hf import QuaeroEMEAHFAdapter
+from tabib.data.quaero_emea_token import QuaeroEMEATokenAdapter
+from tabib.data.quaero_medline_hf import QuaeroMEDLINEHFAdapter
+from tabib.data.quaero_medline_token import QuaeroMEDLINETokenAdapter
+from tabib.data.e3c_token import E3CTokenAdapter
+from tabib.data.cas1_token import CAS1TokenAdapter
+from tabib.data.cas2_token import CAS2TokenAdapter
 from tabib.data.sts import STSAdapter
 from tabib.data.wikiann import WikiAnnAdapter
 
@@ -55,5 +62,12 @@ __all__ = [
     "MediQAlOEQAdapter",
     "MedDialogWomenAdapter",
     "MixedMCQAAdapter",
+    "QuaeroEMEAHFAdapter",
+    "QuaeroEMEATokenAdapter",
+    "QuaeroMEDLINEHFAdapter",
+    "QuaeroMEDLINETokenAdapter",
+    "E3CTokenAdapter",
+    "CAS1TokenAdapter",
+    "CAS2TokenAdapter",
 ]
 

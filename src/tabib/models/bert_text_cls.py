@@ -86,6 +86,22 @@ class BERTTextClassificationAdapter(ModelAdapter):
         )
         return tokenized
 
+    def _create_compute_metrics_fn(self):
+        """Create compute_metrics function for Trainer."""
+        import numpy as np
+        from sklearn.metrics import f1_score, accuracy_score
+
+        def compute_metrics(eval_pred):
+            predictions, labels = eval_pred
+            preds = np.argmax(predictions, axis=-1) if len(predictions.shape) > 1 else predictions
+
+            return {
+                "accuracy": accuracy_score(labels, preds),
+                "f1": f1_score(labels, preds, average="weighted", zero_division=0),
+            }
+
+        return compute_metrics
+
     def get_trainer(
         self,
         model: Any,
@@ -164,6 +180,7 @@ class BERTTextClassificationAdapter(ModelAdapter):
             train_dataset=tokenized_train,
             eval_dataset=tokenized_eval,
             data_collator=data_collator,
+            compute_metrics=self._create_compute_metrics_fn(),
             callbacks=(
                 [
                     EarlyStoppingCallback(

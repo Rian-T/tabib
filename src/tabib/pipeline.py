@@ -55,8 +55,12 @@ class Pipeline:
             Summary dictionary with config metadata, training details, and
             evaluation metrics.
         """
-        # Initialize Weave for tracing
-        weave.init(f"tabib-french-biomedical-ner")
+        # Initialize Weave for tracing (skip in offline mode)
+        if os.environ.get("HF_HUB_OFFLINE", "0") != "1":
+            try:
+                weave.init(f"tabib-french-biomedical-ner")
+            except Exception:
+                pass  # Skip weave in offline/error cases
 
         # Load dataset splits
         splits = self.dataset_adapter.load_splits()

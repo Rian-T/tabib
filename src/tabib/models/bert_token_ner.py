@@ -64,6 +64,9 @@ class BERTTokenNERAdapter(ModelAdapter):
             num_labels = task.num_labels
             label_list = task.label_list
             label_space = task.label_space
+            # Store for compute_metrics
+            self._label_list = label_list
+            self._label_space = label_space
         elif isinstance(task, NERSpanTask):
             # For span task, create BIO labels from entity types
             entity_types = task.label_space
@@ -191,19 +194,26 @@ class BERTTokenNERAdapter(ModelAdapter):
         )
     
     def _spans_to_iob2_labels(self, entities: list[dict], offset_mapping: list) -> list[int]:
-        """Convert character-offset spans to IOB2 labels aligned with tokens."""
+        """Convert character-offset spans to IOB2 labels aligned with tokens.
+
+        For nested entities, we keep the coarsest granularity by sorting entities
+        by span length (largest first) before assignment. This matches CamemBERT-bio methodology.
+        """
         # Initialize all as O
         o_id = self._label_space['O']
         labels = [o_id] * len(offset_mapping)
-        
+
+        # Sort entities by span length (largest first) to prefer coarse-grained entities
+        sorted_entities = sorted(entities, key=lambda e: -(e['end'] - e['start']))
+
         # For each token, check if it overlaps with any entity
         for token_idx, (start, end) in enumerate(offset_mapping):
             if start == end:  # Special token
                 labels[token_idx] = -100
                 continue
             
-            # Find entities that overlap with this token
-            for entity in entities:
+            # Find entities that overlap with this token (smallest first for nested)
+            for entity in sorted_entities:
                 ent_start = entity['start']
                 ent_end = entity['end']
                 ent_label = entity['label']
@@ -231,42 +241,71 @@ class BERTTokenNERAdapter(ModelAdapter):
     
     def _create_compute_metrics_fn(self):
         """Create compute_metrics function for Trainer."""
+        import numpy as np
         from tabib.tasks.ner_span import NERSpanTask
-        
+        from seqeval.metrics import f1_score, precision_score, recall_score
+        from seqeval.scheme import IOB2
+
+        # Get label list for both span and token tasks
+        label_list = self._label_list
+
         if isinstance(self._task, NERSpanTask):
-            # For span task, we can't compute span metrics during training
-            # because we don't have the original documents
-            # Just return empty dict, metrics computed at end
-            return None
-        else:
-            # For token task, use seqeval
+            # For span task, compute seqeval metrics using IOB2 labels
             def compute_metrics(eval_pred):
                 predictions, labels = eval_pred
                 predictions = np.argmax(predictions, axis=-1)
-                
+
                 # Remove ignored index (special tokens)
                 true_predictions = []
                 true_labels = []
-                
+
                 for prediction, label in zip(predictions, labels):
                     pred_list = []
-                    label_list = []
+                    label_list_seq = []
+                    for p, l in zip(prediction, label):
+                        if l != -100:
+                            pred_list.append(label_list[p])
+                            label_list_seq.append(label_list[l])
+                    true_predictions.append(pred_list)
+                    true_labels.append(label_list_seq)
+
+                return {
+                    "f1": f1_score(true_labels, true_predictions, mode='strict', scheme=IOB2),
+                    "precision": precision_score(true_labels, true_predictions, mode='strict', scheme=IOB2),
+                    "recall": recall_score(true_labels, true_predictions, mode='strict', scheme=IOB2),
+                }
+
+            return compute_metrics
+        else:
+            # For token task, use seqeval with task's id_to_label
+            # Use strict mode with IOB2 scheme to match CamemBERT-bio methodology
+            def compute_metrics(eval_pred):
+                predictions, labels = eval_pred
+                predictions = np.argmax(predictions, axis=-1)
+
+                # Remove ignored index (special tokens)
+                true_predictions = []
+                true_labels = []
+
+                for prediction, label in zip(predictions, labels):
+                    pred_list = []
+                    label_list_inner = []
                     for p, l in zip(prediction, label):
                         if l != -100:
                             pred_list.append(self._task.id_to_label(p))
-                            label_list.append(self._task.id_to_label(l))
+                            label_list_inner.append(self._task.id_to_label(l))
                     true_predictions.append(pred_list)
-                    true_labels.append(label_list)
-                
-                from seqeval.metrics import f1_score, precision_score, recall_score
+                    true_labels.append(label_list_inner)
+
+                # Use strict mode with IOB2 scheme (CamemBERT-bio methodology)
                 return {
-                    "f1": f1_score(true_labels, true_predictions),
-                    "precision": precision_score(true_labels, true_predictions),
-                    "recall": recall_score(true_labels, true_predictions),
+                    "f1": f1_score(true_labels, true_predictions, mode='strict', scheme=IOB2),
+                    "precision": precision_score(true_labels, true_predictions, mode='strict', scheme=IOB2),
+                    "recall": recall_score(true_labels, true_predictions, mode='strict', scheme=IOB2),
                 }
-            
+
             return compute_metrics
-    
+
     def get_trainer(
         self,
         model: Any,
@@ -309,9 +348,9 @@ class BERTTokenNERAdapter(ModelAdapter):
         # Data collator
         data_collator = DataCollatorForTokenClassification(tokenizer=tokenizer)
         
-        # Training arguments
-        eval_strategy_value = "steps" if eval_dataset else "no"
-        save_strategy_value = "steps" if save_steps else "epoch"
+        # Training arguments - use kwargs if provided, otherwise defaults
+        eval_strategy_value = kwargs.pop("eval_strategy", kwargs.pop("evaluation_strategy", "steps" if eval_dataset else "no"))
+        save_strategy_value = kwargs.pop("save_strategy", "steps" if save_steps else "epoch")
 
         training_args_kwargs = dict(
             output_dir=output_dir,
@@ -349,8 +388,8 @@ class BERTTokenNERAdapter(ModelAdapter):
             training_args_kwargs["load_best_model_at_end"] = bool(eval_dataset)
 
         if eval_dataset:
-            training_args_kwargs.setdefault("metric_for_best_model", "eval_loss")
-            training_args_kwargs.setdefault("greater_is_better", False)
+            training_args_kwargs.setdefault("metric_for_best_model", "eval_f1")
+            training_args_kwargs.setdefault("greater_is_better", True)
 
         training_args_kwargs = {k: v for k, v in training_args_kwargs.items() if v is not None}
 

@@ -2,18 +2,12 @@
 
 from __future__ import annotations
 
-import json
-from pathlib import Path
 from typing import Any
 
-from datasets import Dataset
+from datasets import Dataset, load_dataset
 
 from tabib.data.base import DatasetAdapter
 from tabib.tasks.classification import ClassificationTask
-
-
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-DATA_DIR = PROJECT_ROOT / "data" / "drbenchmark" / "data" / "drbenchmark" / "diamed" / "splits"
 
 # ICD-10 chapters (22 classes)
 ICD10_CHAPTERS = [
@@ -56,37 +50,41 @@ class DiaMEDAdapter(DatasetAdapter):
         return "diamed"
 
     def load_splits(self) -> dict[str, Dataset]:
-        if not DATA_DIR.exists():
-            raise FileNotFoundError(
-                f"DiaMED data not found. Expected at {DATA_DIR}. "
-                "Download from DrBenchmark/DiaMED on HuggingFace."
-            )
+        """Load train/val/test splits from HuggingFace."""
+        hf_ds = load_dataset("DrBenchmark/DiaMED", trust_remote_code=True)
 
         splits: dict[str, Dataset] = {}
+        split_map = {"train": "train", "validation": "val", "test": "test"}
 
-        for split_name, filename in [("train", "train.json"), ("val", "validation.json"), ("test", "test.json")]:
-            filepath = DATA_DIR / filename
-            if not filepath.exists():
+        for hf_split, local_split in split_map.items():
+            if hf_split not in hf_ds:
                 continue
 
-            with filepath.open(encoding="utf-8") as f:
-                data = json.load(f)
-
             records = []
-            for item in data:
+            for item in hf_ds[hf_split]:
                 text = item.get("clinical_case", "")
-                label = item.get("icd-10", "")
+                label_idx = item.get("icd-10")
 
-                # Handle None or non-string values
+                # Handle None text
                 if text is None:
                     text = ""
-                if label is None or not isinstance(label, str):
+                text = text.strip()
+                if not text:
                     continue
 
-                text = text.strip()
-                label = label.strip()
-
-                if not text or not label:
+                # Convert integer label index to chapter name
+                if label_idx is None:
+                    continue
+                if isinstance(label_idx, int):
+                    if 0 <= label_idx < len(ICD10_CHAPTERS):
+                        label = ICD10_CHAPTERS[label_idx]
+                    else:
+                        continue
+                elif isinstance(label_idx, str):
+                    label = label_idx.strip()
+                    if not label:
+                        continue
+                else:
                     continue
 
                 records.append({
@@ -95,7 +93,7 @@ class DiaMEDAdapter(DatasetAdapter):
                 })
 
             if records:
-                splits[split_name] = Dataset.from_list(records)
+                splits[local_split] = Dataset.from_list(records)
 
         return splits
 

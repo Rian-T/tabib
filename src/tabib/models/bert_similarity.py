@@ -86,6 +86,26 @@ class BERTSimilarityAdapter(ModelAdapter):
         )
         return tokenized
 
+    def _create_compute_metrics_fn(self):
+        """Create compute_metrics function for Trainer."""
+        import numpy as np
+        from scipy.stats import pearsonr, spearmanr
+
+        def compute_metrics(eval_pred):
+            predictions, labels = eval_pred
+            preds = predictions.squeeze() if predictions.ndim > 1 else predictions
+
+            pearson_corr, _ = pearsonr(preds, labels)
+            spearman_corr, _ = spearmanr(preds, labels)
+
+            return {
+                "pearson": pearson_corr,
+                "spearman": spearman_corr,
+                "mse": np.mean((preds - labels) ** 2),
+            }
+
+        return compute_metrics
+
     def get_trainer(
         self,
         model: Any,
@@ -136,8 +156,9 @@ class BERTSimilarityAdapter(ModelAdapter):
             training_args_kwargs["save_steps"] = save_steps
 
         params = inspect.signature(TrainingArguments.__init__).parameters
-        eval_strategy_value = "steps" if eval_dataset else "no"
-        save_strategy_value = "steps" if save_steps else "epoch"
+        # Use kwargs if provided, otherwise defaults
+        eval_strategy_value = training_args_kwargs.pop("eval_strategy", training_args_kwargs.pop("evaluation_strategy", "steps" if eval_dataset else "no"))
+        save_strategy_value = training_args_kwargs.pop("save_strategy", "steps" if save_steps else "epoch")
 
         if "evaluation_strategy" in params:
             training_args_kwargs["evaluation_strategy"] = eval_strategy_value
@@ -145,7 +166,7 @@ class BERTSimilarityAdapter(ModelAdapter):
             training_args_kwargs["eval_strategy"] = eval_strategy_value
 
         if "save_strategy" in params:
-            training_args_kwargs.setdefault("save_strategy", save_strategy_value)
+            training_args_kwargs["save_strategy"] = save_strategy_value
 
         if "load_best_model_at_end" in params:
             training_args_kwargs["load_best_model_at_end"] = bool(eval_dataset)
@@ -164,6 +185,7 @@ class BERTSimilarityAdapter(ModelAdapter):
             train_dataset=tokenized_train,
             eval_dataset=tokenized_eval,
             data_collator=data_collator,
+            compute_metrics=self._create_compute_metrics_fn(),
             callbacks=(
                 [
                     EarlyStoppingCallback(

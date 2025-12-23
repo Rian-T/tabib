@@ -69,9 +69,9 @@ class ClassificationTask(Task):
 
         results = {
             "accuracy": self._metrics.accuracy.compute(predictions=pred_ids, references=label_ids)["accuracy"],
-            "precision": self._metrics.precision.compute(predictions=pred_ids, references=label_ids, average="macro")["precision"],
-            "recall": self._metrics.recall.compute(predictions=pred_ids, references=label_ids, average="macro")["recall"],
-            "f1": self._metrics.f1.compute(predictions=pred_ids, references=label_ids, average="macro")["f1"],
+            "precision": self._metrics.precision.compute(predictions=pred_ids, references=label_ids, average="weighted")["precision"],
+            "recall": self._metrics.recall.compute(predictions=pred_ids, references=label_ids, average="weighted")["recall"],
+            "f1": self._metrics.f1.compute(predictions=pred_ids, references=label_ids, average="weighted")["f1"],
         }
         return results
 
