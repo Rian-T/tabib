@@ -23,11 +23,13 @@ src/tabib/
 │   ├── bert_token_ner.py     # BERT NER (token classification)
 │   ├── bert_text_cls.py      # BERT classification
 │   ├── bert_similarity.py    # BERT sentence similarity
+│   ├── bert_multilabel_cls.py # BERT multilabel classification
 │   ├── vllm_classification.py # LLM MCQA
 │   └── lora_sft.py           # LoRA fine-tuning
 ├── tasks/                    # Task definitions + metrics
 │   ├── ner_span.py           # NER span evaluation
 │   ├── classification.py     # Classification metrics
+│   ├── multilabel.py         # Multilabel classification
 │   └── ...
 └── comparison/
     └── benchmark.py          # Multi-model benchmark system
@@ -48,6 +50,9 @@ poetry run tabib benchmark configs/benchmark.yaml --seeds 42,43,44,45,46
 # Single model train/eval
 poetry run tabib train configs/your_config.yaml
 poetry run tabib eval configs/your_config.yaml
+
+# Download models for offline use
+tabib download configs/benchmark.yaml -o /scratch/tabib
 ```
 
 ## Benchmark Config Format
@@ -83,20 +88,20 @@ output:
 
 - **Multi-model benchmarking**: Compare BERT/LLM across tasks in single run
 - **Multi-seed averaging**: `--seeds 42,43,44` for variance reduction (mean +/- std)
-- **Task support**: NER, Classification, Similarity, MCQA
+- **Task support**: NER, Classification, Multilabel, Similarity, MCQA
 - **Output formats**: JSON, Markdown tables, W&B upload
 - **Nested entity filtering**: BRAT adapters filter to coarsest granularity
 - **Base configs**: `configs/base/` for reusable task configs
+- **Offline mode**: `offline_dir` config option for HPC clusters without internet
 
 ## Tutorial: Offline Benchmark with ModernBERT
 
-Example: benchmark 3 ModernBERT models on NER (EMEA, CAS1) and CLS (ESSAI, DiaMED) on an HPC cluster without internet.
+Example: benchmark ModernBERT models on NER and CLS on an HPC cluster without internet.
 
 ### Step 1: Create benchmark config
 
-Create `configs/benchmark_modernbert_offline.yaml`:
-
 ```yaml
+# configs/benchmark_modernbert_offline.yaml
 description: ModernBERT Offline Benchmark
 
 datasets:
@@ -110,7 +115,6 @@ model_groups:
       cls: base/cls_bert.yaml
     models:
       modernbert-base: almanach/moderncamembert-base
-      modernbert-large: almanach/moderncamembert-large
       modernbert-bio: rntc/moderncamembert-bio-base
 
 output:
@@ -124,10 +128,7 @@ output:
 # On login node with internet access
 tabib download configs/benchmark_modernbert_offline.yaml
 
-# Models saved to $SCRATCH/tabib/models/:
-# - almanach--moderncamembert-base/
-# - almanach--moderncamembert-large/
-# - rntc--moderncamembert-bio-base/
+# Models saved to $SCRATCH/tabib/models/
 ```
 
 ### Step 3: Run benchmark (offline)
@@ -137,23 +138,26 @@ tabib download configs/benchmark_modernbert_offline.yaml
 tabib benchmark configs/benchmark_modernbert_offline.yaml
 ```
 
-The pipeline automatically resolves `almanach/moderncamembert-base` to `$SCRATCH/tabib/models/almanach--moderncamembert-base`.
+The pipeline automatically resolves model paths from `$SCRATCH/tabib/models/`.
 
-### Step 4: Check results
+## Datasets
 
-```bash
-# View markdown table
-cat results/modernbert_offline.md
+### NER
+- `emea`, `cas1`, `cas2` - BRAT format medical NER
+- `e3c` - E3C clinical NER
+- `medline`, `mantragsc_medline` - MEDLINE abstracts
+- `quaero_emea`, `quaero_medline` - QUAERO corpus
 
-# JSON for programmatic access
-cat results/modernbert_offline.json
-```
+### Classification
+- `essai`, `diamed` - Clinical trial classification
+- `morfitt` - Medical text classification
+- `meddialog` - Multilabel medical dialog classification
 
-### Notes
+### Similarity
+- `clister` - Clinical sentence similarity
 
-- `$SCRATCH` is usually pre-defined on HPC clusters - no need to set it
-- Models are cached with `--` replacing `/` in path (e.g., `almanach/x` → `almanach--x`)
-- Use `--dry-run` to preview runs before launching
+### MCQA
+- `mediqal_mcqm`, `mediqal_mcqu` - Medical QA
 
 ## Golden Rules
 
@@ -161,24 +165,19 @@ cat results/modernbert_offline.json
 - Update this file after significant changes
 - Use `--dry-run` before long benchmarks
 
-## Changelog (2025-12-11)
-- **Offline mode**: Added `offline_dir` config option for HPC clusters without internet
-- **New CLI command**: `tabib download` - downloads models for offline use
-  ```bash
-  tabib download configs/benchmark_bert_drbenchmark.yaml -o /scratch/tabib
-  ```
-- **Automatic cache**: Uses `$SCRATCH/tabib/models/` by default if SCRATCH is set
-- **Model path format**: `almanach/camembert-bio-base` -> `almanach--camembert-bio-base`
-- **Files added**:
-  - `src/tabib/offline.py` - offline path utilities
-  - `src/tabib/download.py` - model download logic
-  - `scripts/upload_datasets_to_hf.py` - upload local datasets to HF
+## HPC Best Practices (Jean Zay)
 
-## Changelog (2025-12-02)
-- Added MedDialog-FR Women adapter (`meddialog_women`) - 80 multilabel classes (UMLS CUI combos)
-- Registered `fracco_icd_top50` dataset variant with pre-configured top_k=50
-- Updated benchmark to 70 runs (14 datasets × 5 models):
-  - NER: emea, cas1, cas2, **fracco_expression_ner**
-  - CLS: essai, diamed, morfitt, **fracco_icd_classification**, **fracco_icd_top50**, **meddialog_women**
-  - SIM: clister
-  - MCQA: mediqal_mcqm, mediqal_mcqu, **french_med_mcqa_extended**
+```bash
+# Direct Python path (always works in sbatch)
+TABIB_VENV=/lustre/fsn1/projects/rech/rua/uvb79kr/envs/tabib-C39hfyYp-py3.12
+$TABIB_VENV/bin/python -m tabib.cli benchmark config.yaml
+
+# Set offline mode for HF
+export HF_DATASETS_OFFLINE=1
+export HF_HUB_OFFLINE=1
+export WANDB_MODE=offline
+
+# Download models (use partition compil for internet access)
+HF_TRANSFER=1 huggingface-cli download almanach/camembert-bio-base \
+    --local-dir $SCRATCH/tabib/models/almanach--camembert-bio-base
+```
