@@ -1,17 +1,18 @@
 description: DrBenchmark - French Biomedical NLP with BERT Models
 
 datasets:
-  # fracco_expression_ner removed: requires ner_token task, incompatible with ner_span
-  ner: [emea, cas1, cas2]
-  cls: [essai, diamed, morfitt, fracco_icd_classification, fracco_icd_top50, meddialog_women]
+  ner_token: [quaero_emea_token, quaero_medline_token, e3c_token, cas1_token, cas2_token]
+  cls: [essai, diamed, fracco_icd_classification]
+  multilabel: [morfitt, meddialog_women]
   sim: [clister]
   mcqa: [mediqal_mcqm, mediqal_mcqu, french_med_mcqa_extended]
 
 model_groups:
   bert:
     configs:
-      ner: base/ner_bert.yaml
+      ner_token: base/ner_token_bert.yaml
       cls: base/cls_bert.yaml
+      multilabel: base/multilabel_bert.yaml
       sim: base/sim_bert.yaml
       mcqa: base/mcqa_bert.yaml
     models:
