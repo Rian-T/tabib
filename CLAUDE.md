@@ -20,7 +20,8 @@ src/tabib/
 │   ├── essai.py, diamed.py   # Classification datasets
 │   └── ...
 ├── models/                   # Model adapters
-│   ├── bert_token_ner.py     # BERT NER (token classification)
+│   ├── bert_span_ner.py      # BERT span NER (nested entities, nlstruct)
+│   ├── bert_token_ner.py     # BERT token NER (IOB2 tagging)
 │   ├── bert_text_cls.py      # BERT classification
 │   ├── bert_similarity.py    # BERT sentence similarity
 │   ├── bert_multilabel_cls.py # BERT multilabel classification
@@ -140,13 +141,67 @@ tabib benchmark configs/benchmark_modernbert_offline.yaml
 
 The pipeline automatically resolves model paths from `$SCRATCH/tabib/models/`.
 
+## NER Models
+
+Two NER approaches are available:
+
+### Span NER (`bert_span_ner`) - For nested entities
+- **Use for**: `emea`, `cas1`, `cas2`, `medline` (BRAT format with nested entities)
+- **Architecture**: BERT + BiLSTM + BIOUL CRF + Biaffine (nlstruct-inspired)
+- **Config**: `base/ner_span_bert.yaml`
+- **Metrics**: `exact_f1` (~65%), `partial_f1` (~80%)
+
+```yaml
+# Example: configs/ner_span_emea.yaml
+task: ner_span
+dataset: emea
+model: bert_span_ner
+model_name_or_path: almanach/camembert-bio-base
+
+backend_args:
+  max_span_length: 40      # Max entity length in tokens
+  use_crf: true            # CRF for boundary detection
+  lstm_hidden_size: 400    # BiLSTM hidden size
+  dropout: 0.4
+
+training:
+  max_steps: 4000
+  per_device_train_batch_size: 16
+  learning_rate: 0.001           # For BiLSTM/CRF layers
+  bert_learning_rate: 0.00005    # For BERT (lower)
+  gradient_clip: 10.0
+```
+
+### Token NER (`bert_token_ner`) - For flat IOB2 tagging
+- **Use for**: `quaero_emea_token`, `quaero_medline_token` (IOB2 format, no nesting)
+- **Architecture**: BERT + linear classifier (standard token classification)
+- **Config**: `base/ner_token_bert.yaml`
+- **Metrics**: seqeval `f1` (strict IOB2 evaluation)
+
+```yaml
+# Example: configs/ner_token_quaero.yaml
+task: ner_token
+dataset: quaero_emea_token
+model: bert_token_ner
+model_name_or_path: almanach/camembert-bio-base
+
+training:
+  max_steps: 2000
+  learning_rate: 5e-5
+```
+
+### When to use which?
+| Dataset | Format | Nested? | Model | Task |
+|---------|--------|---------|-------|------|
+| emea, cas1, cas2, medline | BRAT | Yes | `bert_span_ner` | `ner_span` |
+| quaero_*_token | IOB2 | No | `bert_token_ner` | `ner_token` |
+
 ## Datasets
 
 ### NER
-- `emea`, `cas1`, `cas2` - BRAT format medical NER
-- `e3c` - E3C clinical NER
-- `medline`, `mantragsc_medline` - MEDLINE abstracts
-- `quaero_emea`, `quaero_medline` - QUAERO corpus
+- `emea`, `cas1`, `cas2` - BRAT format medical NER (nested entities)
+- `medline`, `mantragsc_medline` - MEDLINE abstracts (nested entities)
+- `quaero_emea_token`, `quaero_medline_token` - QUAERO IOB2 (flat, no nesting)
 
 ### Classification
 - `essai`, `diamed` - Clinical trial classification

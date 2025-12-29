@@ -4,6 +4,7 @@ from tabib.models.base import ModelAdapter
 from tabib.models.bert_multilabel_cls import BERTMultiLabelAdapter
 from tabib.models.bert_similarity import BERTSimilarityAdapter
 from tabib.models.bert_text_cls import BERTTextClassificationAdapter
+from tabib.models.bert_span_ner import BERTSpanNERAdapter
 from tabib.models.bert_token_ner import BERTTokenNERAdapter
 from tabib.models.gliner_ner import GLiNERZeroShotNERAdapter
 from tabib.models.vllm_classification import VLLMClassificationAdapter
@@ -13,6 +14,7 @@ from tabib.models.lora_sft import LoRASFTAdapter
 
 __all__ = [
     "ModelAdapter",
+    "BERTSpanNERAdapter",
     "BERTTokenNERAdapter",
     "BERTTextClassificationAdapter",
     "BERTMultiLabelAdapter",
