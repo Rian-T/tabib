@@ -6,6 +6,7 @@ from tabib.data.brat import BRATDatasetAdapter
 
 
 DEFAULT_DATA_DIR = Path(__file__).resolve().parents[3] / "data" / "EMEA"
+HF_REPO = "rntc/tabib-emea"
 
 
 class EMEAAdapter(BRATDatasetAdapter):
@@ -14,6 +15,9 @@ class EMEAAdapter(BRATDatasetAdapter):
     Uses line-by-line splitting by default since EMEA documents are very long
     (25K+ chars) but there are only 11 train / 15 test documents.
     Each line becomes one sample for better NER performance.
+
+    Data is loaded from HuggingFace cache if available, otherwise from local BRAT files.
+    Download with: huggingface-cli download rntc/tabib-emea --local-dir $SCRATCH/tabib/data/rntc--tabib-emea --repo-type dataset
     """
 
     def __init__(
@@ -36,5 +40,6 @@ class EMEAAdapter(BRATDatasetAdapter):
             name="emea",
             chunk_size=chunk_size,
             filter_nested=filter_nested,
+            hf_repo=HF_REPO,
         )
 

@@ -1,12 +1,20 @@
 """Generic BRAT format dataset adapter."""
 
+import logging
+import os
 import re
 from pathlib import Path
 from typing import Any
 
-from datasets import Dataset
+from datasets import Dataset, load_dataset
 
 from tabib.data.base import DatasetAdapter
+
+logger = logging.getLogger(__name__)
+
+# HuggingFace cache directory (set via $SCRATCH)
+SCRATCH = os.environ.get("SCRATCH", "")
+SCRATCH_DATA = Path(SCRATCH) / "tabib" / "data" if SCRATCH else None
 
 
 class BRATDatasetAdapter(DatasetAdapter):
@@ -23,6 +31,7 @@ class BRATDatasetAdapter(DatasetAdapter):
         name: str = "brat",
         chunk_size: int = 0,
         filter_nested: bool = False,
+        hf_repo: str | None = None,
     ):
         """Initialize BRAT adapter.
 
@@ -36,12 +45,22 @@ class BRATDatasetAdapter(DatasetAdapter):
             filter_nested: If True, keep only coarsest granularity entities
                           (remove nested entities, keeping outermost spans).
                           This matches CamemBERT-bio paper methodology.
+            hf_repo: HuggingFace repo ID (e.g., "rntc/tabib-emea"). If set,
+                    tries to load from HF cache before falling back to BRAT.
         """
         self.data_dir = Path(data_dir)
         self._name = name
         self._entity_types: set[str] = set()
         self.chunk_size = chunk_size
         self.filter_nested = filter_nested
+        self.hf_repo = hf_repo
+
+        # Compute HF cache path
+        if hf_repo and SCRATCH_DATA:
+            cache_name = hf_repo.replace("/", "--")
+            self._hf_cache_dir = SCRATCH_DATA / cache_name
+        else:
+            self._hf_cache_dir = None
     
     @property
     def name(self) -> str:
@@ -53,18 +72,45 @@ class BRATDatasetAdapter(DatasetAdapter):
         return sorted(self._entity_types)
     
     def load_splits(self) -> dict[str, Dataset]:
-        """Load train/dev/test splits from BRAT format."""
+        """Load train/dev/test splits from HF cache or BRAT format."""
+        # Try HF cache first
+        if self._hf_cache_dir and (self._hf_cache_dir / "data").exists():
+            try:
+                return self._load_from_hf()
+            except Exception as e:
+                logger.warning(f"Failed to load from HF cache, falling back to BRAT: {e}")
+
+        # Fallback to BRAT files
+        return self._load_from_brat()
+
+    def _load_from_hf(self) -> dict[str, Dataset]:
+        """Load from HuggingFace parquet cache."""
+        logger.info(f"Loading {self._name} from HF cache: {self._hf_cache_dir}")
+        ds = load_dataset("parquet", data_dir=str(self._hf_cache_dir / "data"))
+
+        # Rename 'validation' -> 'val' for consistency
         splits = {}
-        
+        for split_name in ds.keys():
+            out_name = "val" if split_name == "validation" else split_name
+            splits[out_name] = ds[split_name]
+
+        return splits
+
+    def _load_from_brat(self) -> dict[str, Dataset]:
+        """Load from local BRAT format files."""
+        splits = {}
+
         for split_name in ['train', 'dev', 'test']:
             split_dir = self.data_dir / split_name
             if not split_dir.exists():
                 continue
-            
+
             documents = self._load_split_documents(split_dir)
             if documents:
-                splits[split_name] = Dataset.from_list(documents)
-        
+                # Rename 'dev' -> 'val' for consistency
+                out_name = "val" if split_name == "dev" else split_name
+                splits[out_name] = Dataset.from_list(documents)
+
         return splits
     
     def _load_split_documents(self, split_dir: Path) -> list[dict[str, Any]]:
