@@ -123,6 +123,42 @@ def upload_meddialog(private: bool = False) -> None:
     upload_dataset("meddialog-fr", splits, private)
 
 
+def upload_frasimed_cantemist(private: bool = False) -> None:
+    """Upload FRASIMED-CANTEMIST NER dataset."""
+    from tabib.data.frasimed import FRASIMEDCANTEMISTAdapter
+
+    adapter = FRASIMEDCANTEMISTAdapter()
+    splits = adapter.load_splits()
+    upload_dataset("frasimed-cantemist", splits, private)
+
+
+def upload_frasimed_distemist(private: bool = False) -> None:
+    """Upload FRASIMED-DISTEMIST NER dataset."""
+    from tabib.data.frasimed import FRASIMEDDISTEMISTAdapter
+
+    adapter = FRASIMEDDISTEMISTAdapter()
+    splits = adapter.load_splits()
+    upload_dataset("frasimed-distemist", splits, private)
+
+
+def upload_frasimed_cantemist_doc(private: bool = False) -> None:
+    """Upload FRASIMED-CANTEMIST document-level multilabel dataset."""
+    from tabib.data.frasimed import FRASIMEDDocumentMultilabelAdapter
+
+    adapter = FRASIMEDDocumentMultilabelAdapter(subset="cantemist", top_k=100)
+    splits = adapter.load_splits()
+    upload_dataset("frasimed-cantemist-doc", splits, private)
+
+
+def upload_frasimed_distemist_doc(private: bool = False) -> None:
+    """Upload FRASIMED-DISTEMIST document-level multilabel dataset."""
+    from tabib.data.frasimed import FRASIMEDDocumentMultilabelAdapter
+
+    adapter = FRASIMEDDocumentMultilabelAdapter(subset="distemist", top_k=100)
+    splits = adapter.load_splits()
+    upload_dataset("frasimed-distemist-doc", splits, private)
+
+
 DATASETS = {
     "cas1": upload_cas1,
     "cas2": upload_cas2,
@@ -131,6 +167,10 @@ DATASETS = {
     "mantragsc": upload_mantragsc,
     "fracco": upload_fracco,
     "meddialog": upload_meddialog,
+    "frasimed_cantemist": upload_frasimed_cantemist,
+    "frasimed_distemist": upload_frasimed_distemist,
+    "frasimed_cantemist_doc": upload_frasimed_cantemist_doc,
+    "frasimed_distemist_doc": upload_frasimed_distemist_doc,
 }
 
 
