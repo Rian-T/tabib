@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 import csv
+import io
 import math
 import os
 import random
 import re
+import zipfile
+from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable, Iterator, Sequence
@@ -29,6 +32,9 @@ FRACCO_NER_HF_DIR = SCRATCH_DATA / "rntc--tabib-fracco-ner" if SCRATCH_DATA else
 # Fallback to local PROJECT_ROOT paths
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 FRACCO_DIR_LOCAL = PROJECT_ROOT / "FRACCO"
+
+# FRACCO zip file path (for document-level ICD classification)
+FRACCO_ZIP_PATH = SCRATCH_DATA / "FRACCO.zip" if SCRATCH_DATA else None
 
 # Select directories based on availability
 if FRACCO_ICD_HF_DIR and FRACCO_ICD_HF_DIR.exists():
@@ -629,6 +635,242 @@ class FRACCOExpressionNERAdapter(DatasetAdapter):
         ])
         if "ner_tags" in keep_columns:
             processed = processed.remove_columns("ner_tags")
+        processed.set_format(type="python")
+        return processed
+
+
+class FRACCODocumentICDAdapter(DatasetAdapter):
+    """Document-level multilabel ICD classification from FRACCO.
+
+    Input: Full document text (from .txt files in FRACCO.zip)
+    Output: Multi-hot vector of all ICD codes in the document
+
+    This adapter aggregates all ICD codes (expression_CIM annotations)
+    per document for multilabel classification.
+    """
+
+    def __init__(
+        self,
+        top_k: int | None = None,
+        min_samples: int = 1,
+        ratios: SplitRatios | None = None,
+        seed: int = 42,
+    ) -> None:
+        """Initialize adapter.
+
+        Args:
+            top_k: Keep only top-k most frequent codes (None = all codes)
+            min_samples: Minimum documents per code to include
+            ratios: Train/val/test split ratios
+            seed: Random seed for splitting
+        """
+        self.top_k = top_k
+        self.min_samples = min_samples
+        self.ratios = ratios or SplitRatios()
+        self.seed = seed
+        self._label_vocab: list[str] | None = None
+
+    @property
+    def name(self) -> str:
+        return "fracco_icd_doc"
+
+    def _find_data_path(self) -> tuple[Path | None, Path | None]:
+        """Find FRACCO data path (directory or zip).
+
+        Returns:
+            Tuple of (fracco_dir, zip_path) - one will be set, other None
+        """
+        # Check for extracted directory first (faster)
+        if SCRATCH_DATA:
+            extracted_dir = SCRATCH_DATA / "FRACCO"
+            if extracted_dir.exists() and (extracted_dir / "ann_txt_files").exists():
+                return extracted_dir, None
+            zip_path = SCRATCH_DATA / "FRACCO.zip"
+            if zip_path.exists():
+                return None, zip_path
+
+        # Fallback to local paths
+        if FRACCO_DIR_LOCAL.exists() and (FRACCO_DIR_LOCAL / "ann_txt_files").exists():
+            return FRACCO_DIR_LOCAL, None
+        local_zip = FRACCO_DIR_LOCAL.parent / "FRACCO.zip"
+        if local_zip.exists():
+            return None, local_zip
+
+        raise FileNotFoundError(
+            "FRACCO data not found. Expected extracted FRACCO/ directory or FRACCO.zip "
+            f"at {SCRATCH_DATA or 'PROJECT_ROOT'}. "
+            "Decompress with: unzip FRACCO.zip -d $SCRATCH/tabib/data/"
+        )
+
+    def _load_from_dir(self, fracco_dir: Path) -> tuple[dict[str, str], dict[str, set[str]]]:
+        """Load from extracted FRACCO directory."""
+        doc_texts: dict[str, str] = {}
+        doc_codes: dict[str, set[str]] = defaultdict(set)
+
+        # Read document texts from .txt files
+        ann_dir = fracco_dir / "ann_txt_files"
+        for txt_path in ann_dir.glob("*.txt"):
+            doc_name = f"{txt_path.stem}.ann"
+            doc_texts[doc_name] = txt_path.read_text(encoding="utf-8", errors="replace")
+
+        # Read ICD codes from CSV
+        csv_path = fracco_dir / "DetectOnco_Final.csv"
+        with csv_path.open(encoding="utf-8-sig", newline="") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                label = (row.get("label") or "").strip()
+                if label != "expression_CIM":
+                    continue
+                code = (row.get("code") or "").strip()
+                if not code:
+                    continue
+                doc_name = (row.get("doc_name") or "").strip()
+                if doc_name:
+                    doc_codes[doc_name].add(code)
+
+        return doc_texts, dict(doc_codes)
+
+    def _load_from_zip(self, zip_path: Path) -> tuple[dict[str, str], dict[str, set[str]]]:
+        """Load from FRACCO.zip file."""
+        doc_texts: dict[str, str] = {}
+        doc_codes: dict[str, set[str]] = defaultdict(set)
+
+        with zipfile.ZipFile(zip_path, "r") as z:
+            # Read document texts from .txt files
+            for name in z.namelist():
+                if name.endswith(".txt") and "ann_txt_files/" in name:
+                    base_name = Path(name).stem
+                    doc_name = f"{base_name}.ann"
+                    with z.open(name) as f:
+                        text = f.read().decode("utf-8", errors="replace")
+                        doc_texts[doc_name] = text
+
+            # Read ICD codes from CSV
+            csv_path = "FRACCO/DetectOnco_Final.csv"
+            with z.open(csv_path) as f:
+                reader = csv.DictReader(
+                    io.TextIOWrapper(f, encoding="utf-8-sig")
+                )
+                for row in reader:
+                    label = (row.get("label") or "").strip()
+                    if label != "expression_CIM":
+                        continue
+                    code = (row.get("code") or "").strip()
+                    if not code:
+                        continue
+                    doc_name = (row.get("doc_name") or "").strip()
+                    if doc_name:
+                        doc_codes[doc_name].add(code)
+
+        return doc_texts, dict(doc_codes)
+
+    def _load_data(self) -> tuple[dict[str, str], dict[str, set[str]]]:
+        """Load document texts and ICD codes.
+
+        Returns:
+            Tuple of (doc_texts, doc_codes) where:
+            - doc_texts: {doc_name: full_text}
+            - doc_codes: {doc_name: set of ICD codes}
+        """
+        fracco_dir, zip_path = self._find_data_path()
+        if fracco_dir:
+            return self._load_from_dir(fracco_dir)
+        else:
+            return self._load_from_zip(zip_path)
+
+    def load_splits(self) -> dict[str, Dataset]:
+        doc_texts, doc_codes = self._load_data()
+
+        # Find documents that have both text and codes
+        valid_docs = sorted(
+            doc for doc in doc_texts
+            if doc in doc_codes and doc_codes[doc]
+        )
+
+        if not valid_docs:
+            raise ValueError("No valid documents found with both text and ICD codes")
+
+        # Count code frequencies across all documents
+        code_freq: dict[str, int] = defaultdict(int)
+        for doc in valid_docs:
+            for code in doc_codes[doc]:
+                code_freq[code] += 1
+
+        # Filter codes by min_samples
+        valid_codes = {
+            code for code, count in code_freq.items()
+            if count >= self.min_samples
+        }
+
+        # Apply top_k filtering
+        if self.top_k is not None:
+            sorted_codes = sorted(
+                code_freq.items(), key=lambda x: x[1], reverse=True
+            )
+            top_k_codes = {code for code, _ in sorted_codes[: self.top_k]}
+            valid_codes = valid_codes & top_k_codes
+
+        self._label_vocab = sorted(valid_codes)
+
+        # Filter documents to only include those with at least one valid code
+        filtered_docs = [
+            doc for doc in valid_docs
+            if any(code in valid_codes for code in doc_codes[doc])
+        ]
+
+        # Split documents into train/val/test
+        splits = _compute_doc_splits(filtered_docs, self.ratios, self.seed)
+
+        # Build datasets
+        datasets: dict[str, Dataset] = {}
+        for split_name, doc_subset in splits.items():
+            records = []
+            for doc in doc_subset:
+                codes = [c for c in doc_codes[doc] if c in valid_codes]
+                if codes:
+                    records.append({
+                        "text": doc_texts[doc],
+                        "codes": codes,
+                        "doc_name": doc,
+                    })
+            if records:
+                datasets[split_name] = Dataset.from_list(records)
+            else:
+                datasets[split_name] = Dataset.from_dict({
+                    "text": [],
+                    "codes": [],
+                    "doc_name": [],
+                })
+
+        return datasets
+
+    def preprocess(self, dataset: Dataset, task: Any) -> Dataset:
+        from tabib.tasks.multilabel import MultiLabelTask
+
+        if not isinstance(task, MultiLabelTask):
+            raise ValueError(
+                f"FRACCODocumentICD requires MultiLabelTask, got {type(task)}. "
+                "Use task: multilabel in your config."
+            )
+
+        if self._label_vocab:
+            task.ensure_labels(self._label_vocab)
+
+        label_map = task.label_space
+        num_labels = task.num_labels
+
+        def map_example(example: dict[str, Any]) -> dict[str, Any]:
+            # Create multi-hot vector
+            labels = [0.0] * num_labels
+            for code in example["codes"]:
+                if code in label_map:
+                    labels[label_map[code]] = 1.0
+            return {
+                "text": example["text"],
+                "labels": labels,
+            }
+
+        processed = dataset.map(map_example)
         processed.set_format(type="python")
         return processed
 

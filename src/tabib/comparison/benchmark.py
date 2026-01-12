@@ -29,6 +29,7 @@ import copy
 import json
 import statistics
 from collections import defaultdict
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -38,6 +39,13 @@ import yaml
 
 from tabib.config import RunConfig
 from tabib.pipeline import Pipeline
+
+
+def _run_single_config(config_dict: dict[str, Any]) -> dict[str, Any]:
+    """Run a single config in a subprocess. Must be at module level for pickling."""
+    run_config = RunConfig(**config_dict)
+    pipeline = Pipeline(run_config)
+    return pipeline.run()
 
 
 def _load_yaml(path: Path) -> dict[str, Any]:
@@ -103,6 +111,7 @@ class BenchmarkSpec:
     model_groups: dict[str, ModelGroupSpec]
     output: OutputSpec
     seeds: list[int] | None = None  # None = single run with base config seed
+    parallel_seeds: int = 1  # Number of seeds to run in parallel (1 = sequential)
 
     def expand_runs(self) -> list[BenchmarkRun]:
         """Expand spec into individual run configurations.
@@ -217,6 +226,11 @@ def load_benchmark_spec(path: str | Path) -> BenchmarkSpec:
         else:
             raise ValueError(f"'seeds' must be a list or int, got {type(raw_seeds)}")
 
+    # Parse parallel_seeds (default: 1 = sequential)
+    parallel_seeds = int(raw.get("parallel_seeds", 1))
+    if parallel_seeds < 1:
+        raise ValueError(f"'parallel_seeds' must be >= 1, got {parallel_seeds}")
+
     # Parse datasets
     raw_datasets = raw.get("datasets", {})
     if not isinstance(raw_datasets, dict):
@@ -246,6 +260,7 @@ def load_benchmark_spec(path: str | Path) -> BenchmarkSpec:
         model_groups=model_groups,
         output=output,
         seeds=seeds,
+        parallel_seeds=parallel_seeds,
     )
 
 
@@ -616,7 +631,11 @@ def run_benchmark(
     dry_run: bool = False,
     verbose: bool = True,
 ) -> BenchmarkResults:
-    """Execute a benchmark specification."""
+    """Execute a benchmark specification.
+
+    If parallel_seeds > 1, runs multiple seeds for the same config in parallel
+    before moving to the next config. This allows efficient GPU utilization.
+    """
     runs = spec.expand_runs()
 
     results = BenchmarkResults(
@@ -627,46 +646,101 @@ def run_benchmark(
             "description": spec.description,
             "num_runs": len(runs),
             "dry_run": dry_run,
+            "parallel_seeds": spec.parallel_seeds,
         },
     )
 
     if dry_run:
         if verbose:
-            print(f"Dry run: {len(runs)} runs planned")
+            print(f"Dry run: {len(runs)} runs planned (parallel_seeds={spec.parallel_seeds})")
             for run in runs:
                 print(f"  - {run.run_id}")
         return results
 
-    for i, run in enumerate(runs, 1):
+    # Group runs by base_run_id (same config, different seeds)
+    grouped: dict[str, list[BenchmarkRun]] = defaultdict(list)
+    for run in runs:
+        grouped[run.base_run_id].append(run)
+
+    parallel_seeds = spec.parallel_seeds
+    total_configs = len(grouped)
+    config_idx = 0
+
+    for base_id, seed_runs in grouped.items():
+        config_idx += 1
+        num_seeds = len(seed_runs)
+
         if verbose:
-            print(f"\n[{i}/{len(runs)}] Running {run.run_id}...")
+            print(f"\n[Config {config_idx}/{total_configs}] {base_id} ({num_seeds} seeds)")
 
-        try:
-            run_config = RunConfig(**run.config)
-            pipeline = Pipeline(run_config)
-            summary = pipeline.run()
-
-            metrics = summary.get("evaluation", {}).get("metrics", {})
-            results.add_result(BenchmarkResult(
-                run=run,
-                metrics=metrics,
-                status="success",
-            ))
-
+        if parallel_seeds == 1:
+            # Sequential execution (original behavior)
+            for run in seed_runs:
+                if verbose:
+                    print(f"  Running seed {run.seed}...")
+                try:
+                    summary = _run_single_config(run.config)
+                    metrics = summary.get("evaluation", {}).get("metrics", {})
+                    results.add_result(BenchmarkResult(
+                        run=run,
+                        metrics=metrics,
+                        status="success",
+                    ))
+                    if verbose:
+                        primary = results._get_primary_metric(run.task)
+                        if primary in metrics:
+                            print(f"    {primary}: {metrics[primary]:.4f}")
+                except Exception as e:
+                    if verbose:
+                        print(f"    ERROR: {e}")
+                    results.add_result(BenchmarkResult(
+                        run=run,
+                        metrics={},
+                        status="error",
+                        error=str(e),
+                    ))
+        else:
+            # Parallel execution using ProcessPoolExecutor
             if verbose:
-                primary = results._get_primary_metric(run.task)
-                if primary in metrics:
-                    print(f"  {primary}: {metrics[primary]:.4f}")
+                print(f"  Running {num_seeds} seeds in parallel (max {parallel_seeds})...")
 
-        except Exception as e:
-            if verbose:
-                print(f"  ERROR: {e}")
-            results.add_result(BenchmarkResult(
-                run=run,
-                metrics={},
-                status="error",
-                error=str(e),
-            ))
+            # Process in batches of parallel_seeds
+            for batch_start in range(0, num_seeds, parallel_seeds):
+                batch = seed_runs[batch_start:batch_start + parallel_seeds]
+                batch_seeds = [r.seed for r in batch]
+
+                if verbose and len(seed_runs) > parallel_seeds:
+                    print(f"  Batch: seeds {batch_seeds}")
+
+                with ProcessPoolExecutor(max_workers=len(batch)) as executor:
+                    futures = {
+                        executor.submit(_run_single_config, run.config): run
+                        for run in batch
+                    }
+
+                    for future in as_completed(futures):
+                        run = futures[future]
+                        try:
+                            summary = future.result()
+                            metrics = summary.get("evaluation", {}).get("metrics", {})
+                            results.add_result(BenchmarkResult(
+                                run=run,
+                                metrics=metrics,
+                                status="success",
+                            ))
+                            if verbose:
+                                primary = results._get_primary_metric(run.task)
+                                if primary in metrics:
+                                    print(f"    seed {run.seed}: {primary}={metrics[primary]:.4f}")
+                        except Exception as e:
+                            if verbose:
+                                print(f"    seed {run.seed} ERROR: {e}")
+                            results.add_result(BenchmarkResult(
+                                run=run,
+                                metrics={},
+                                status="error",
+                                error=str(e),
+                            ))
 
     # Write outputs
     if spec.output.json_path:

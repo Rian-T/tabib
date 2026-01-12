@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
 from dataclasses import dataclass
 from typing import Any, Sequence
 
 from tabib.evaluation.base import Evaluator
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -159,8 +162,8 @@ class LLMJudgeEvaluator(Evaluator):
                     justification=str(data.get("justification", "")),
                     raw_output=raw,
                 )
-        except (json.JSONDecodeError, ValueError, KeyError):
-            pass
+        except (json.JSONDecodeError, ValueError, KeyError) as e:
+            logger.debug(f"Failed to parse LLM judgment: {e}")
         return JudgmentResult(correct=0, score=0, justification="Parse error", raw_output=raw)
 
     def _compute_metrics(self, judgments: list[JudgmentResult]) -> dict[str, float]:

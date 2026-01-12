@@ -206,7 +206,8 @@ class BRATDatasetAdapter(DatasetAdapter):
         with open(txt_path, 'r', encoding='utf-8') as f:
             text = f.read()
 
-        entities = self._parse_annotations(ann_path)
+        # Pass text for fragment merging (BRAT auto-splits at line boundaries)
+        entities = self._parse_annotations(ann_path, text=text)
 
         # Filter nested entities if requested (keep coarsest granularity)
         if self.filter_nested:
@@ -251,38 +252,83 @@ class BRATDatasetAdapter(DatasetAdapter):
         # Sort back by start position for consistent ordering
         return sorted(kept, key=lambda e: e['start'])
     
-    def _parse_annotations(self, ann_path: Path) -> list[dict[str, Any]]:
-        """Parse BRAT .ann file and extract entities."""
+    def _parse_annotations(
+        self, ann_path: Path, text: str | None = None, merge_spaced_fragments: bool = True
+    ) -> list[dict[str, Any]]:
+        """Parse BRAT .ann file and extract entities.
+
+        Args:
+            ann_path: Path to .ann file
+            text: Document text (needed for fragment merging)
+            merge_spaced_fragments: If True, merge fragments separated only by whitespace
+                                   (BRAT auto-splits entities at line boundaries)
+        """
         entities = []
-        
+
         with open(ann_path, 'r', encoding='utf-8') as f:
             for line in f:
                 line = line.strip()
                 if not line or not line.startswith('T'):
                     continue
-                
+
                 parts = line.split('\t')
                 if len(parts) < 3:
                     continue
-                
+
+                # Parse entity type and span info
+                # Format: "LABEL start1 end1;start2 end2;..." or "LABEL start end"
                 type_info = parts[1].split()
                 entity_type = type_info[0]
-                
+
                 # Track entity type
                 self._entity_types.add(entity_type)
-                
-                # Handle discontinuous spans - use first span only
-                start = int(type_info[1].split(';')[0])
-                end = int(type_info[2].split(';')[0])
-                text = parts[2]
-                
+
+                # Parse ALL fragments (not just the first one)
+                # Remaining parts after entity type contain the span coordinates
+                span_str = ' '.join(type_info[1:])
+                fragments = []
+
+                # Parse each fragment (semicolon-separated)
+                for span_part in span_str.split(';'):
+                    coords = span_part.strip().split()
+                    if len(coords) >= 2:
+                        begin = int(coords[0])
+                        end = int(coords[1])
+                        fragments.append({'begin': begin, 'end': end})
+
+                # Sort fragments by begin position
+                fragments.sort(key=lambda f: f['begin'])
+
+                # Merge fragments separated only by whitespace (like nlstruct)
+                # This handles BRAT's automatic splitting at line boundaries
+                if merge_spaced_fragments and text is not None and len(fragments) > 1:
+                    merged_fragments = [fragments[0]]
+                    for frag in fragments[1:]:
+                        last_frag = merged_fragments[-1]
+                        # Check if only whitespace between fragments
+                        between = text[last_frag['end']:frag['begin']]
+                        if between.strip() == '':
+                            # Merge: extend last fragment
+                            last_frag['end'] = frag['end']
+                        else:
+                            merged_fragments.append(frag)
+                    fragments = merged_fragments
+
+                entity_text = parts[2]
+
+                # Use first and last fragment for overall span (backwards compat)
+                # but also store all fragments for models that support discontinuous spans
+                start = fragments[0]['begin']
+                end = fragments[-1]['end']
+
                 entities.append({
                     'start': start,
                     'end': end,
                     'label': entity_type,
-                    'text': text
+                    'text': entity_text,
+                    'fragments': fragments,  # NEW: store all fragments
                 })
-        
+
         return entities
     
     def preprocess(self, dataset: Dataset, task: Any) -> Dataset:

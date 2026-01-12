@@ -3,7 +3,7 @@
 from tabib.data.base import DatasetAdapter
 from tabib.data.agnews import AGNewsAdapter
 from tabib.data.brat import BRATDatasetAdapter
-from tabib.data.cas import CAS1Adapter, CAS2Adapter
+from tabib.data.cas import CASAdapter, CAS1Adapter, CAS2Adapter
 from tabib.data.cim10_mcqa import CIM10MCQAAdapter
 from tabib.data.clister import CLISTERAdapter
 from tabib.data.diamed import DiaMEDAdapter
@@ -12,8 +12,16 @@ from tabib.data.essai import ESSAIAdapter
 from tabib.data.emea import EMEAAdapter
 from tabib.data.medline import MEDLINEAdapter
 from tabib.data.fracco import (
+    FRACCODocumentICDAdapter,
     FRACCOExpressionNERAdapter,
     FRACCOICDClassificationAdapter,
+)
+from tabib.data.frasimed import (
+    FRASIMEDCANTEMISTAdapter,
+    FRASIMEDDISTEMISTAdapter,
+    FRASIMEDDocumentMultilabelAdapter,
+    FRASIMEDMentionClassificationAdapter,
+    FRASIMEDNERAdapter,
 )
 from tabib.data.french_med_mcqa_extended import FrenchMedMCQAExtendedAdapter
 from tabib.data.jnlpba import JNLPBAAdapter
@@ -44,6 +52,7 @@ __all__ = [
     "CLISTERAdapter",
     "DiaMEDAdapter",
     "ESSAIAdapter",
+    "FRACCODocumentICDAdapter",
     "FRACCOICDClassificationAdapter",
     "FRACCOExpressionNERAdapter",
     "JNLPBAAdapter",
@@ -53,6 +62,7 @@ __all__ = [
     "MEDLINEAdapter",
     "MORFITTAdapter",
     "FrenchMedMCQAExtendedAdapter",
+    "CASAdapter",
     "CAS1Adapter",
     "CAS2Adapter",
     "CIM10MCQAAdapter",
@@ -69,5 +79,10 @@ __all__ = [
     "E3CTokenAdapter",
     "CAS1TokenAdapter",
     "CAS2TokenAdapter",
+    "FRASIMEDNERAdapter",
+    "FRASIMEDCANTEMISTAdapter",
+    "FRASIMEDDISTEMISTAdapter",
+    "FRASIMEDMentionClassificationAdapter",
+    "FRASIMEDDocumentMultilabelAdapter",
 ]
 

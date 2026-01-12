@@ -8,7 +8,7 @@ do_eval: true
 backend_args:
   max_span_length: 40
   negative_ratio: -1
-  max_length: 256
+  max_length: 1024  # CAS1/CAS2 max ~692 tokens
   max_spans: 512
   lstm_hidden_size: 400
   lstm_num_layers: 3

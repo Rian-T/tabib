@@ -20,7 +20,7 @@ class EMEAAdapter(BRATDatasetAdapter):
         self,
         data_dir: str | Path | None = None,
         chunk_size: int = -1,
-        filter_nested: bool = True,
+        filter_nested: bool = False,
     ):
         """Initialize EMEA adapter with line-by-line splitting.
 
@@ -28,8 +28,8 @@ class EMEAAdapter(BRATDatasetAdapter):
             data_dir: Path to EMEA data
             chunk_size: -1 for line-by-line (default), 0 for no chunking,
                         >0 for character-based chunks
-            filter_nested: If True (default), keep only coarsest granularity
-                          entities (matches CamemBERT-bio paper methodology)
+            filter_nested: If False (default), keep all entities including nested ones.
+                          Set to True for token-based NER (seqeval) which can't handle nesting.
         """
         super().__init__(
             data_dir=data_dir if data_dir else DEFAULT_DATA_DIR,

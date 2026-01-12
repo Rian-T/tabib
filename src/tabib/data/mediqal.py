@@ -2,11 +2,16 @@
 
 from __future__ import annotations
 
+import os
+from pathlib import Path
 from typing import Any, Iterable
 
 from datasets import Dataset, DatasetDict, load_dataset
 
 from tabib.data.base import DatasetAdapter
+
+# Local path for offline mode
+_LOCAL_PATH = Path("/lustre/fsn1/projects/rech/rua/uvb79kr/tabib/data/ANR-MALADES--MediQAl")
 from tabib.tasks.mcqa import MultipleChoiceTask
 from tabib.tasks.open_qa import OpenQATask
 
@@ -59,7 +64,11 @@ class _BaseMediQAlMCQAdapter(DatasetAdapter):
         return f"mediqal_{self.config_name}"
 
     def load_splits(self) -> dict[str, Dataset]:
-        dataset_dict: DatasetDict = load_dataset("ANR-MALADES/MediQAl", self.config_name)
+        # Use local path if available (offline mode)
+        if _LOCAL_PATH.exists():
+            dataset_dict: DatasetDict = load_dataset(str(_LOCAL_PATH), self.config_name)
+        else:
+            dataset_dict = load_dataset("ANR-MALADES/MediQAl", self.config_name)
         label_set: set[str] = set()
         for split in dataset_dict.values():
             label_set.update(self._iter_split_labels(split))
@@ -117,7 +126,11 @@ class MediQAlOEQAdapter(DatasetAdapter):
         return "mediqal_oeq"
 
     def load_splits(self) -> dict[str, Dataset]:
-        dataset_dict: DatasetDict = load_dataset("ANR-MALADES/MediQAl", self.config_name)
+        # Use local path if available (offline mode)
+        if _LOCAL_PATH.exists():
+            dataset_dict: DatasetDict = load_dataset(str(_LOCAL_PATH), self.config_name)
+        else:
+            dataset_dict = load_dataset("ANR-MALADES/MediQAl", self.config_name)
         return dict(dataset_dict)
 
     def preprocess(self, dataset: Dataset, task: Any) -> Dataset:

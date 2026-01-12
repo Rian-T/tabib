@@ -1,9 +1,12 @@
-"\"\"\"Shared helpers for configuring and running vLLM engines.\"\"\""
+"""Shared helpers for configuring and running vLLM engines."""
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from typing import Any, Mapping, MutableMapping, Sequence
+
+logger = logging.getLogger(__name__)
 
 
 _DEFAULT_SAMPLING_KWARGS: Mapping[str, Any] = {
@@ -106,21 +109,23 @@ def shutdown_vllm_engine(engine: VLLMEngine) -> None:
             if "Engine" in child.name or "Worker" in child.name:
                 child.terminate()
                 child.join(timeout=5)
-    except Exception:
-        pass
+    except Exception as e:
+        logger.debug(f"Failed to terminate child processes during cleanup: {e}")
 
     # Try vLLM's distributed cleanup if available
     try:
         from vllm.distributed.parallel_state import destroy_distributed_environment
         destroy_distributed_environment()
-    except (ImportError, Exception):
-        pass
+    except ImportError:
+        pass  # Expected if vLLM doesn't have distributed support
+    except Exception as e:
+        logger.debug(f"Failed to destroy distributed environment: {e}")
 
     # Delete the engine reference
     try:
         del engine.llm
-    except Exception:
-        pass
+    except Exception as e:
+        logger.debug(f"Failed to delete engine reference: {e}")
 
     # Force garbage collection
     gc.collect()
