@@ -1,0 +1,10 @@
+# SLERP ne supporte que 2 modèles, on va faire un merge progressif
+# D'abord merger HAL + ISTEX, puis ajouter les autres
+merge_method: slerp
+base_model: /lustre/fsn1/projects/rech/rua/uvb79kr/hf_cache/hub/models--almanach--moderncamembert-base/snapshots/b5bd7e6c8b92e0bff85c6c5d42fa13fe3b3f2899
+parameters:
+  t: 0.5
+dtype: bfloat16
+models:
+  - model: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-hal-original
+  - model: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-istex-scientific

@@ -1,0 +1,21 @@
+description: "Test Flash-Attn 10 seeds (5 parallel)"
+seeds: [42, 43, 44, 45, 46, 47, 48, 49, 50, 51]
+parallel_seeds: 5
+
+datasets:
+  multilabel: [fracco_icd_doc_top30, fracco_icd_doc_top100, frasimed_cantemist_doc_top100, frasimed_distemist_doc_top100, meddialog_women]
+  cls: [diamed]
+  ner_span: [emea, medline]
+
+model_groups:
+  test:
+    configs:
+      multilabel: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/configs/base/multilabel_bert_4096.yaml
+      cls: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/configs/base/cls_bert.yaml
+      ner_span: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/configs/base/ner_span_bert.yaml
+    models:
+      moderncamembert-base: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/almanach--moderncamembert-base
+
+output:
+  json: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/outputs/test_flash_attn_10seeds.json
+  markdown: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/outputs/test_flash_attn_10seeds.md

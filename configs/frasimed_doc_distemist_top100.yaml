@@ -1,0 +1,27 @@
+# FRASIMED DISTEMIST Document-Level Multilabel SNOMED Classification
+# Top 100 most frequent SNOMED codes (out of 2400)
+# Model: ModernCamemBERT-base
+
+task: multilabel
+dataset: frasimed_distemist_doc_top100
+model: bert_multilabel_cls
+model_name_or_path: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/almanach--moderncamembert-base
+
+backend_args:
+  max_length: 2048
+
+training:
+  output_dir: runs/frasimed_doc_distemist_top100
+  num_train_epochs: 10
+  per_device_train_batch_size: 4
+  per_device_eval_batch_size: 8
+  learning_rate: 2e-5
+  warmup_ratio: 0.1
+  eval_strategy: epoch
+  save_strategy: epoch
+  load_best_model_at_end: true
+  metric_for_best_model: eval_f1_micro
+  greater_is_better: true
+  bf16: true
+  logging_steps: 50
+  seed: 42

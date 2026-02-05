@@ -1,0 +1,16 @@
+description: "Test seqeval strict F1 IOB2 + coarse-grained filtering"
+seeds: [42, 43, 44, 45, 46]
+
+datasets:
+  ner: [emea, medline]
+
+model_groups:
+  test:
+    configs:
+      ner: base/ner_bert.yaml
+    models:
+      camembert-bio: /lustre/fsn1/projects/rech/rua/uvb79kr/almanach--camembert-bio-base
+
+output:
+  json: results/test-seqeval-ner.json
+  markdown: results/test-seqeval-ner.md

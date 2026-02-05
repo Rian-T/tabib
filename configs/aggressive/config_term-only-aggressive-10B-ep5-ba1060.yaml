@@ -1,0 +1,18 @@
+description: "Eval term-only-aggressive-10B-ep5-ba1060"
+seeds: [42, 43, 44]
+
+datasets:
+  ner_token: [quaero_emea_token, quaero_medline_token, e3c_token, cas1_token, cas2_token]
+  cls: [diamed]
+
+model_groups:
+  eval:
+    configs:
+      ner_token: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/configs/base/ner_token_bert.yaml
+      cls: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/configs/base/cls_bert.yaml
+    models:
+      term-only-aggressive-10B-ep5-ba1060: /lustre/fsn1/projects/rech/rua/uvb79kr/modernbert/hf-models/aggressive/term-only-aggressive-10B-ep5-ba1060
+
+output:
+  json: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/results/aggressive/results_term-only-aggressive-10B-ep5-ba1060.json
+  markdown: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/results/aggressive/results_term-only-aggressive-10B-ep5-ba1060.md

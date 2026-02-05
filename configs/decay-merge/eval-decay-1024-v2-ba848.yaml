@@ -1,0 +1,18 @@
+description: "Eval decay-1024-v2-ba848 (DIAMED + FRASIMED + MedDialog)"
+seeds: [42, 43, 44, 45, 46]
+
+datasets:
+  cls: [diamed, frasimed_cantemist_norm, frasimed_distemist_norm_top100]
+  multilabel: [meddialog_women]
+
+model_groups:
+  eval:
+    configs:
+      cls: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/configs/base/cls_bert.yaml
+      multilabel: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/configs/base/multilabel_bert.yaml
+    models:
+      decay-1024-v2-ba848: /lustre/fsn1/projects/rech/rua/uvb79kr/modernbert/hf-exports/decay-merge/decay-1024-v2-ba848
+
+output:
+  json: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/results/decay-merge/results_decay-1024-v2-ba848.json
+  markdown: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/results/decay-merge/results_decay-1024-v2-ba848.md

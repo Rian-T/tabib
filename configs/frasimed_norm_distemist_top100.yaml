@@ -1,0 +1,27 @@
+# FRASIMED DISTEMIST Entity Normalization (mention → SNOMED code)
+# Top 100 most frequent SNOMED codes (out of 2400)
+# Model: ModernCamemBERT-base
+
+task: classification
+dataset: frasimed_distemist_norm_top100
+model: bert_text_cls
+model_name_or_path: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/almanach--moderncamembert-base
+
+backend_args:
+  max_length: 128  # mentions: max ~50 tokens
+
+training:
+  output_dir: runs/frasimed_norm_distemist_top100
+  num_train_epochs: 10
+  per_device_train_batch_size: 32
+  per_device_eval_batch_size: 64
+  learning_rate: 2e-5
+  warmup_ratio: 0.1
+  eval_strategy: epoch
+  save_strategy: epoch
+  load_best_model_at_end: true
+  metric_for_best_model: eval_f1
+  greater_is_better: true
+  bf16: true
+  logging_steps: 50
+  seed: 42

@@ -1,0 +1,16 @@
+description: Test MorFITT multi-label classification
+seeds: [42]
+
+datasets:
+  multilabel: [morfitt]
+
+model_groups:
+  bert:
+    configs:
+      multilabel: base/multilabel_bert_morfitt.yaml
+    models:
+      camembert-bio: /lustre/fsn1/projects/rech/rua/uvb79kr/almanach--camembert-bio-base
+
+output:
+  json: configs/results/test-morfitt-multilabel.json
+  markdown: configs/results/test-morfitt-multilabel.md

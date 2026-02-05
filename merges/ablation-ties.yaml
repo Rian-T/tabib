@@ -1,0 +1,21 @@
+merge_method: ties
+base_model: /lustre/fsn1/projects/rech/rua/uvb79kr/almanach--moderncamembert-base
+parameters:
+  density: 0.5
+  weight: 1.0
+  normalize: true
+dtype: bfloat16
+models:
+  # Best from each ablation group
+  - model: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-hal-original
+    # HAL group best: 54.9%
+  - model: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-istex-scientific
+    # ISTEX group best: 53.9%
+  - model: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-emea-notice
+    # EMEA group best: 53.2%
+  - model: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-ccam
+    # Codes single best: 53.7%
+  - model: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-synthetic-clinical
+    # Synthetic: 54.2%
+  - model: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-pmc-patients
+    # PMC: 53.6%

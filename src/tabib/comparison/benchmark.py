@@ -29,6 +29,7 @@ import copy
 import json
 import statistics
 from collections import defaultdict
+import multiprocessing as mp
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -112,6 +113,7 @@ class BenchmarkSpec:
     output: OutputSpec
     seeds: list[int] | None = None  # None = single run with base config seed
     parallel_seeds: int = 1  # Number of seeds to run in parallel (1 = sequential)
+    cleanup_checkpoints: bool = True  # Remove checkpoints after benchmark to save disk
 
     def expand_runs(self) -> list[BenchmarkRun]:
         """Expand spec into individual run configurations.
@@ -253,6 +255,9 @@ def load_benchmark_spec(path: str | Path) -> BenchmarkSpec:
     # Parse output
     output = _parse_output(raw.get("output", {}), spec_path.parent)
 
+    # Parse cleanup_checkpoints (default: True)
+    cleanup_checkpoints = raw.get("cleanup_checkpoints", True)
+
     return BenchmarkSpec(
         path=spec_path,
         description=description,
@@ -261,6 +266,7 @@ def load_benchmark_spec(path: str | Path) -> BenchmarkSpec:
         output=output,
         seeds=seeds,
         parallel_seeds=parallel_seeds,
+        cleanup_checkpoints=cleanup_checkpoints,
     )
 
 
@@ -712,7 +718,9 @@ def run_benchmark(
                 if verbose and len(seed_runs) > parallel_seeds:
                     print(f"  Batch: seeds {batch_seeds}")
 
-                with ProcessPoolExecutor(max_workers=len(batch)) as executor:
+                # Use spawn context to avoid CUDA fork issues with flash-attention
+                ctx = mp.get_context('spawn')
+                with ProcessPoolExecutor(max_workers=len(batch), mp_context=ctx) as executor:
                     futures = {
                         executor.submit(_run_single_config, run.config): run
                         for run in batch
@@ -758,4 +766,39 @@ def run_benchmark(
         if verbose:
             print(f"W&B upload: {spec.output.wandb_project}/{spec.output.wandb_table}")
 
+    # Cleanup checkpoints after benchmark (saves disk space)
+    if spec.cleanup_checkpoints:
+        _cleanup_benchmark_checkpoints(runs, verbose=verbose)
+
     return results
+
+
+def _cleanup_benchmark_checkpoints(runs: list[BenchmarkRun], verbose: bool = True) -> None:
+    """Remove checkpoint directories created during benchmark to save disk space."""
+    import shutil
+
+    cleaned_dirs = 0
+    cleaned_size = 0
+
+    for run in runs:
+        output_dir = run.config.get("training", {}).get("output_dir")
+        if output_dir:
+            output_path = Path(output_dir)
+            if output_path.exists():
+                # Calculate size before deletion
+                try:
+                    size = sum(f.stat().st_size for f in output_path.rglob("*") if f.is_file())
+                    cleaned_size += size
+                except Exception:
+                    pass
+
+                try:
+                    shutil.rmtree(output_path)
+                    cleaned_dirs += 1
+                except Exception as e:
+                    if verbose:
+                        print(f"  Warning: could not remove {output_path}: {e}")
+
+    if verbose and cleaned_dirs > 0:
+        size_gb = cleaned_size / (1024**3)
+        print(f"\nCleanup: removed {cleaned_dirs} checkpoint directories ({size_gb:.1f} GB)")

@@ -1,0 +1,16 @@
+description: "Eval decay-1024-v2-ba1696 (NER only)"
+seeds: [42, 43, 44, 45, 46]
+
+datasets:
+  ner_span: [emea, medline, cas1, cas2]
+
+model_groups:
+  eval:
+    configs:
+      ner_span: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/configs/base/ner_span_bert.yaml
+    models:
+      decay-1024-v2-ba1696: /lustre/fsn1/projects/rech/rua/uvb79kr/modernbert/hf-exports/decay-merge/decay-1024-v2-ba1696
+
+output:
+  json: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/results/decay-merge/results_ner_decay-1024-v2-ba1696.json
+  markdown: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/results/decay-merge/results_ner_decay-1024-v2-ba1696.md

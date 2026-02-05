@@ -1,0 +1,13 @@
+slices:
+  - sources:
+      - model: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-hal-original
+        layer_range: [0, 22]
+      - model: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-istex-scientific
+        layer_range: [0, 22]
+merge_method: slerp
+base_model: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-hal-original
+parameters:
+  t: 0.5
+dtype: bfloat16
+# SLERP of top 2: HAL-original (54.9%) + ISTEX-scientific (53.9%)
+# t=0.5 means 50% HAL + 50% ISTEX

@@ -1,0 +1,33 @@
+# FRASIMED CANTEMIST NER (oncology morphology entities)
+# Entity type: morphology-onco
+# Model: ModernCamemBERT-base
+
+task: ner_span
+dataset: frasimed_cantemist
+model: bert_span_ner
+model_name_or_path: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/almanach--moderncamembert-base
+
+backend_args:
+  max_span_length: 40
+  use_crf: true
+  lstm_hidden_size: 400
+  dropout: 0.4
+
+training:
+  output_dir: runs/frasimed_ner_cantemist
+  max_steps: 4000
+  per_device_train_batch_size: 16
+  learning_rate: 0.001
+  bert_learning_rate: 0.00005
+  gradient_clip: 10.0
+  warmup_ratio: 0.1
+  eval_strategy: steps
+  eval_steps: 500
+  save_strategy: steps
+  save_steps: 500
+  load_best_model_at_end: true
+  metric_for_best_model: eval_f1
+  greater_is_better: true
+  bf16: true
+  logging_steps: 50
+  seed: 42

@@ -1,0 +1,16 @@
+description: Test DiaMED with weighted F1
+seeds: [42]
+
+datasets:
+  cls: [diamed]
+
+model_groups:
+  bert:
+    configs:
+      cls: base/cls_bert.yaml
+    models:
+      camembert-bio: /lustre/fsn1/projects/rech/rua/uvb79kr/almanach--camembert-bio-base
+
+output:
+  json: configs/results/test-diamed-weighted.json
+  markdown: configs/results/test-diamed-weighted.md

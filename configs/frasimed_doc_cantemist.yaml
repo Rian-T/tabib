@@ -1,0 +1,27 @@
+# FRASIMED CANTEMIST Document-Level Multilabel ICD Classification
+# 50 unique ICD-O-3.1 codes
+# Model: ModernCamemBERT-base
+
+task: multilabel
+dataset: frasimed_cantemist_doc
+model: bert_multilabel_cls
+model_name_or_path: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/almanach--moderncamembert-base
+
+backend_args:
+  max_length: 4096  # max doc ~4080 tokens
+
+training:
+  output_dir: runs/frasimed_doc_cantemist
+  num_train_epochs: 10
+  per_device_train_batch_size: 4
+  per_device_eval_batch_size: 8
+  learning_rate: 2e-5
+  warmup_ratio: 0.1
+  eval_strategy: epoch
+  save_strategy: epoch
+  load_best_model_at_end: true
+  metric_for_best_model: eval_f1_micro
+  greater_is_better: true
+  bf16: true
+  logging_steps: 50
+  seed: 42

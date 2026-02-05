@@ -332,6 +332,12 @@ class BERTSpanNER(nn.Module):
         if config.model_type == "modernbert":
             extra_kwargs["reference_compile"] = False
 
+        # Flash Attention 2 support (requires bf16/fp16)
+        if kwargs.get('attn_implementation'):
+            extra_kwargs["attn_implementation"] = kwargs['attn_implementation']
+            if kwargs['attn_implementation'] == 'flash_attention_2':
+                extra_kwargs["torch_dtype"] = torch.bfloat16
+
         self.encoder = AutoModel.from_pretrained(
             model_name_or_path,
             cache_dir=cache_dir,
@@ -630,7 +636,8 @@ class BERTSpanNERAdapter(ModelAdapter):
                 offset_mapping = tokenized['offset_mapping'][i]
 
                 spans = self._prepare_spans(
-                    entities, offset_mapping, self._max_span_length, self._negative_ratio
+                    entities, offset_mapping, self._max_span_length, self._negative_ratio,
+                    text=texts[i]
                 )
 
                 all_span_indices.append([s[:2] for s in spans])
@@ -654,6 +661,7 @@ class BERTSpanNERAdapter(ModelAdapter):
         offset_mapping: list[tuple[int, int]],
         max_span_length: int,
         negative_ratio: int,
+        text: str | None = None,
     ) -> list[tuple[int, int, int]]:
         """Convert char spans to token spans and add negative samples."""
         # Find valid token range (skip CLS at start and SEP at end)
@@ -674,8 +682,12 @@ class BERTSpanNERAdapter(ModelAdapter):
         # Convert entity char spans to token spans
         positive_spans = []
         for ent in entities:
-            start_token = self._char_to_token(ent['start'], offset_mapping, valid_start, valid_end)
-            end_token = self._char_to_token(ent['end'] - 1, offset_mapping, valid_start, valid_end, is_end=True)
+            start_token = self._char_to_token(
+                ent['start'], offset_mapping, valid_start, valid_end, text=text
+            )
+            end_token = self._char_to_token(
+                ent['end'] - 1, offset_mapping, valid_start, valid_end, is_end=True, text=text
+            )
 
             if start_token is not None and end_token is not None and start_token <= end_token:
                 label_id = self._label_to_id.get(ent['label'], 0)
@@ -714,24 +726,59 @@ class BERTSpanNERAdapter(ModelAdapter):
         valid_start: int,
         valid_end: int,
         is_end: bool = False,
+        text: str | None = None,
     ) -> int | None:
-        """Convert character position to token index."""
+        """Convert character position to token index.
+
+        Handles SentencePiece tokenizers which may include leading spaces in offsets,
+        causing gaps between token boundaries.
+        """
+        # For end positions, we want the token containing char_pos-1
+        search_pos = char_pos - 1 if is_end and char_pos > 0 else char_pos
+
         for i in range(valid_start, valid_end):
             start, end = offset_mapping[i]
             if start == 0 and end == 0:
                 continue
-            if start <= char_pos < end:
+            if start <= search_pos < end:
                 return i
 
-        # Fallback: find closest token
+        # SentencePiece fix: check for gaps caused by whitespace
+        # If char_pos is a space, find the next token
+        if text is not None and char_pos < len(text) and text[char_pos].isspace():
+            for i in range(valid_start, valid_end):
+                start, end = offset_mapping[i]
+                if start == 0 and end == 0:
+                    continue
+                if start > char_pos:
+                    return i
+
+        # Fallback: find closest token (handles remaining edge cases)
         for i in range(valid_start, valid_end):
             start, end = offset_mapping[i]
             if start == 0 and end == 0:
                 continue
-            if char_pos < end:
+            if char_pos <= end:
                 return i
 
         return None
+
+    @staticmethod
+    def _normalize_char_offsets(text: str, start: int, end: int) -> tuple[int, int]:
+        """Normalize character offsets by stripping leading/trailing whitespace.
+
+        SentencePiece tokenizers (CamemBERT-bio, DrBERT) include leading spaces
+        in token offsets, which causes off-by-one errors in span extraction.
+        """
+        # Strip leading whitespace
+        while start < end and start < len(text) and text[start].isspace():
+            start += 1
+
+        # Strip trailing whitespace
+        while end > start and text[end - 1].isspace():
+            end -= 1
+
+        return start, end
 
     def _create_compute_metrics_fn(self):
         """Create compute_metrics function for Trainer."""
@@ -931,6 +978,11 @@ class BERTSpanNERAdapter(ModelAdapter):
                     label_id = max_idx.item() + 1
                     char_start = offset_mapping[start_tok][0]
                     char_end = offset_mapping[end_tok][1]
+
+                    # Normalize offsets (fix SentencePiece whitespace issues)
+                    char_start, char_end = self._normalize_char_offsets(
+                        text, char_start, char_end
+                    )
 
                     if char_start < char_end:
                         entities.append({

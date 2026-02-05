@@ -1,0 +1,21 @@
+description: Ablation V1 Evaluation
+seeds: [42, 43, 44]
+parallel_seeds: 3
+
+datasets:
+  cls: [diamed]
+  multilabel: [meddialog_women, fracco_icd_doc_top30, frasimed_cantemist_doc_top100, frasimed_distemist_doc_top100]
+  ner_span: [emea, medline]
+
+model_groups:
+  bert:
+    configs:
+      cls: base/cls_bert.yaml
+      multilabel: base/multilabel_bert_4096.yaml
+      ner_span: base/ner_span_bert.yaml
+    models:
+      MODEL_PLACEHOLDER: MODEL_PATH_PLACEHOLDER
+
+output:
+  json: OUTPUT_JSON_PLACEHOLDER
+  markdown: OUTPUT_MD_PLACEHOLDER

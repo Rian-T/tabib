@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "generated_at": "2025-12-19T23:23:41.473960+00:00",
+    "spec_path": "/lustre/fswork/projects/rech/rua/uvb79kr/tabib/configs/test_meddialog_multilabel.yaml",
+    "description": "Test MedDialog multi-label classification",
+    "num_runs": 1,
+    "dry_run": false
+  },
+  "results": {
+    "test": {
+      "multilabel": {
+        "meddialog_women": {
+          "camembert-bio.seed42": {
+            "metrics": {
+              "f1_micro": 0.3623693379790941,
+              "f1_macro": 0.2612112666486403,
+              "f1_samples": 0.3825285264679204,
+              "precision_micro": 0.2289308176100629,
+              "recall_micro": 0.8687350835322196
+            },
+            "status": "success",
+            "error": null,
+            "seed": 42
+          }
+        }
+      }
+    }
+  }
+}

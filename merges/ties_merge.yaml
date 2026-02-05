@@ -1,0 +1,32 @@
+merge_method: ties
+base_model: /lustre/fsn1/projects/rech/rua/uvb79kr/hf_cache/hub/models--almanach--moderncamembert-base/snapshots/b5bd7e6c8b92e0bff85c6c5d42fa13fe3b3f2899
+parameters:
+  density: 0.5
+  weight: 1.0
+  normalize: true
+dtype: bfloat16
+models:
+  - model: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-hal-original
+    parameters:
+      weight: 1.0
+  - model: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-istex-scientific
+    parameters:
+      weight: 1.0
+  - model: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-emea-notice
+    parameters:
+      weight: 1.0
+  - model: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-cim10
+    parameters:
+      weight: 1.0
+  - model: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-ccam
+    parameters:
+      weight: 1.0
+  - model: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-atc
+    parameters:
+      weight: 1.0
+  - model: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-synthetic-clinical
+    parameters:
+      weight: 1.0
+  - model: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-pmc-patients
+    parameters:
+      weight: 1.0

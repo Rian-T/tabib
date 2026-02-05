@@ -1,0 +1,16 @@
+description: "Test E3C/CAS token-level datasets (CamemBERT-bio methodology)"
+seeds: [42, 43, 44, 45, 46]
+
+datasets:
+  ner_token: [e3c_token, cas1_token, cas2_token]
+
+model_groups:
+  test:
+    configs:
+      ner_token: base/ner_token_bert.yaml
+    models:
+      camembert-bio: /lustre/fsn1/projects/rech/rua/uvb79kr/almanach--camembert-bio-base
+
+output:
+  json: results/test-e3c-cas-token.json
+  markdown: results/test-e3c-cas-token.md

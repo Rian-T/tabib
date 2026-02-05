@@ -1,0 +1,15 @@
+merge_method: dare_ties
+base_model: /lustre/fsn1/projects/rech/rua/uvb79kr/almanach--moderncamembert-base
+parameters:
+  density: 0.5
+  weight: 1.0
+  normalize: true
+dtype: bfloat16
+models:
+  # Best from each ablation group (same as TIES)
+  - model: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-hal-original
+  - model: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-istex-scientific
+  - model: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-emea-notice
+  - model: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-ccam
+  - model: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-synthetic-clinical
+  - model: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/moderncamembert-pmc-patients

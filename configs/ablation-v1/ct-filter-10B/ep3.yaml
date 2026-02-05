@@ -1,0 +1,21 @@
+description: "Ablation V1: ct-filter-10B-ep3"
+seeds: [42, 43, 44]
+parallel_seeds: 3
+
+datasets:
+  cls: [diamed]
+  multilabel: [meddialog_women, fracco_icd_doc_top30, frasimed_cantemist_doc_top100, frasimed_distemist_doc_top100]
+  ner_span: [emea, medline]
+
+model_groups:
+  bert:
+    configs:
+      cls: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/configs/base/cls_bert.yaml
+      multilabel: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/configs/base/multilabel_bert_4096.yaml
+      ner_span: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/configs/base/ner_span_bert.yaml
+    models:
+      ct-filter-10B-ep3: /lustre/fsn1/projects/rech/rua/uvb79kr/modernbert/hf/ablation-v1/ct-filter-10B/ep3
+
+output:
+  json: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/results/ablation-v1/ct-filter-10B/ep3.json
+  markdown: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/results/ablation-v1/ct-filter-10B/ep3.md

@@ -1,0 +1,19 @@
+description: Download baseline model and datasets for offline evaluation
+
+datasets:
+  ner: [emea, cas1, cas2, e3c, medline, mantragsc]
+  cls: [diamed, morfitt, fracco_icd_classification, meddialog_women]
+  sim: [clister]
+
+model_groups:
+  baseline:
+    configs:
+      ner: base/ner_bert.yaml
+      cls: base/cls_bert.yaml
+      sim: base/sim_bert.yaml
+    models:
+      moderncamembert-base: almanach/moderncamembert-base
+
+output:
+  json: ../results/baseline.json
+  markdown: ../results/baseline.md

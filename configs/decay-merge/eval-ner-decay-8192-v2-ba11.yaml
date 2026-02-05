@@ -1,0 +1,16 @@
+description: "Eval decay-8192-v2-ba11 (NER only)"
+seeds: [42, 43, 44, 45, 46]
+
+datasets:
+  ner_span: [emea, medline, cas1, cas2]
+
+model_groups:
+  eval:
+    configs:
+      ner_span: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/configs/base/ner_span_bert.yaml
+    models:
+      decay-8192-v2-ba11: /lustre/fsn1/projects/rech/rua/uvb79kr/modernbert/hf-exports/decay-merge/decay-8192-v2-ba11
+
+output:
+  json: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/results/decay-merge/results_ner_decay-8192-v2-ba11.json
+  markdown: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/results/decay-merge/results_ner_decay-8192-v2-ba11.md

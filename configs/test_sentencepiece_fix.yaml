@@ -1,0 +1,19 @@
+description: "Test SentencePiece offset fix for NER span"
+seeds: [42]
+parallel_seeds: 1
+cleanup_checkpoints: true
+
+datasets:
+  ner_span: [emea]
+
+model_groups:
+  bert:
+    configs:
+      ner_span: base/ner_span_bert_512.yaml
+    models:
+      camembert-bio: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/camembert-bio-base
+      drbert: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/DrBERT-7GB
+
+output:
+  json: outputs/test_sentencepiece_fix.json
+  markdown: outputs/test_sentencepiece_fix.md

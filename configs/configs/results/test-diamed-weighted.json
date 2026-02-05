@@ -1,0 +1,28 @@
+{
+  "metadata": {
+    "generated_at": "2025-12-20T00:12:49.651114+00:00",
+    "spec_path": "/lustre/fswork/projects/rech/rua/uvb79kr/tabib/configs/test_diamed_weighted.yaml",
+    "description": "Test DiaMED with weighted F1",
+    "num_runs": 1,
+    "dry_run": false
+  },
+  "results": {
+    "bert": {
+      "cls": {
+        "diamed": {
+          "camembert-bio.seed42": {
+            "metrics": {
+              "accuracy": 0.577922077922078,
+              "precision": 0.5632315337482511,
+              "recall": 0.577922077922078,
+              "f1": 0.5576688137226384
+            },
+            "status": "success",
+            "error": null,
+            "seed": 42
+          }
+        }
+      }
+    }
+  }
+}

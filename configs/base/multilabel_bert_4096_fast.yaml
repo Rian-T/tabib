@@ -1,0 +1,27 @@
+task: multilabel
+dataset: __DATASET__
+model: bert_multilabel_cls
+model_name_or_path: __MODEL__
+do_train: true
+do_eval: true
+training:
+  output_dir: __OUTPUT_DIR__
+  num_train_epochs: 15
+  per_device_train_batch_size: 8  # 2x bigger (A100 80GB can handle it)
+  per_device_eval_batch_size: 16  # 2x bigger
+  learning_rate: 2e-5
+  warmup_ratio: 0.1
+  weight_decay: 0.01
+  seed: 42
+  save_total_limit: 1
+  eval_strategy: epoch  # Still eval each epoch but faster
+  save_strategy: epoch
+  load_best_model_at_end: true
+  metric_for_best_model: eval_f1_micro
+  greater_is_better: true
+  bf16: true
+  dataloader_num_workers: 4  # Parallel data loading
+  torch_compile: false  # Disable - can cause issues
+  gradient_checkpointing: false  # Disable for speed (we have memory)
+backend_args:
+  max_length: 4096

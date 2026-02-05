@@ -1,0 +1,16 @@
+description: "Test QUAERO token-level datasets (exact CamemBERT-bio methodology)"
+seeds: [42, 43, 44, 45, 46, 47, 48, 49, 50, 51]
+
+datasets:
+  ner_token: [quaero_emea_token, quaero_medline_token]
+
+model_groups:
+  test:
+    configs:
+      ner_token: base/ner_token_bert.yaml
+    models:
+      camembert-bio: /lustre/fsn1/projects/rech/rua/uvb79kr/almanach--camembert-bio-base
+
+output:
+  json: results/test-quaero-token.json
+  markdown: results/test-quaero-token.md

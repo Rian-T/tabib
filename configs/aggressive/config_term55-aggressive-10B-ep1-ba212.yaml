@@ -1,0 +1,18 @@
+description: "Eval term55-aggressive-10B-ep1-ba212"
+seeds: [42, 43, 44]
+
+datasets:
+  ner_token: [quaero_emea_token, quaero_medline_token, e3c_token, cas1_token, cas2_token]
+  cls: [diamed]
+
+model_groups:
+  eval:
+    configs:
+      ner_token: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/configs/base/ner_token_bert.yaml
+      cls: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/configs/base/cls_bert.yaml
+    models:
+      term55-aggressive-10B-ep1-ba212: /lustre/fsn1/projects/rech/rua/uvb79kr/modernbert/hf-models/aggressive/term55-aggressive-10B-ep1-ba212
+
+output:
+  json: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/results/aggressive/results_term55-aggressive-10B-ep1-ba212.json
+  markdown: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/results/aggressive/results_term55-aggressive-10B-ep1-ba212.md

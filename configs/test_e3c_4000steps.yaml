@@ -1,0 +1,16 @@
+description: "Test E3C with 4000 steps (more training)"
+seeds: [42, 43, 44, 45, 46]
+
+datasets:
+  ner_token: [e3c_token]
+
+model_groups:
+  test:
+    configs:
+      ner_token: base/ner_token_bert_4000.yaml
+    models:
+      camembert-bio: /lustre/fsn1/projects/rech/rua/uvb79kr/almanach--camembert-bio-base
+
+output:
+  json: configs/results/test-e3c-4000steps.json
+  markdown: configs/results/test-e3c-4000steps.md

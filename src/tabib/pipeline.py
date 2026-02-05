@@ -48,7 +48,7 @@ class Pipeline:
         if config.preprocessing:
             self.preprocessor = self._create_preprocessor(config.preprocessing)
     
-    def run(self) -> None:
+    def run(self) -> dict[str, Any]:
         """Run the pipeline (train or evaluate).
 
         Returns:

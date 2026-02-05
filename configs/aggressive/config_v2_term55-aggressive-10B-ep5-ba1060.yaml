@@ -1,0 +1,20 @@
+description: "Eval term55-aggressive-10B-ep5-ba1060 (span NER + FRASIMED + MedDialog + DIAMED)"
+seeds: [42, 43, 44]
+
+datasets:
+  ner: [emea, medline, cas1, cas2]
+  cls: [diamed, frasimed_cantemist_norm, frasimed_distemist_norm_top100]
+  multilabel: [meddialog_women]
+
+model_groups:
+  eval:
+    configs:
+      ner: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/configs/base/ner_span_bert.yaml
+      cls: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/configs/base/cls_bert.yaml
+      multilabel: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/configs/base/multilabel_bert.yaml
+    models:
+      term55-aggressive-10B-ep5-ba1060: /lustre/fsn1/projects/rech/rua/uvb79kr/modernbert/hf-models/aggressive/term55-aggressive-10B-ep5-ba1060
+
+output:
+  json: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/results/aggressive/results_v2_term55-aggressive-10B-ep5-ba1060.json
+  markdown: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/results/aggressive/results_v2_term55-aggressive-10B-ep5-ba1060.md

@@ -147,6 +147,12 @@ class BERTMultiLabelAdapter(ModelAdapter):
         if config.model_type == "modernbert":
             extra_kwargs["reference_compile"] = False
 
+        # Flash Attention 2 support (requires bf16/fp16)
+        if kwargs.get('attn_implementation'):
+            extra_kwargs["attn_implementation"] = kwargs['attn_implementation']
+            if kwargs['attn_implementation'] == 'flash_attention_2':
+                extra_kwargs["torch_dtype"] = torch.bfloat16
+
         # Configure for multi-label classification
         model = AutoModelForSequenceClassification.from_pretrained(
             model_name_or_path,

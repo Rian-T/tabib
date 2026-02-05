@@ -1,0 +1,18 @@
+# Test parallel seeds feature
+description: Test parallel seeds on DiaMED
+seeds: [42, 43, 44]
+parallel_seeds: 3  # Run all 3 seeds in parallel
+
+datasets:
+  cls: [diamed]
+
+model_groups:
+  test:
+    configs:
+      cls: base/cls_bert_512.yaml
+    models:
+      moderncamembert: /lustre/fsn1/projects/rech/rua/uvb79kr/tabib/models/almanach--moderncamembert-base
+
+output:
+  json: results/test_parallel_seeds.json
+  markdown: results/test_parallel_seeds.md

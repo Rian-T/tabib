@@ -1,0 +1,18 @@
+description: "Eval camembert-bio on cas1, cas2, diamed"
+seeds: [42, 43, 44]
+
+datasets:
+  ner: [cas1, cas2]
+  cls: [diamed]
+
+model_groups:
+  eval:
+    configs:
+      ner: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/configs/base/ner_span_bert.yaml
+      cls: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/configs/base/cls_bert.yaml
+    models:
+      camembert-bio: almanach/camembert-bio-base
+
+output:
+  json: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/results/aggressive/results_camembert_bio_cas_diamed.json
+  markdown: /lustre/fswork/projects/rech/rua/uvb79kr/tabib/results/aggressive/results_camembert_bio_cas_diamed.md

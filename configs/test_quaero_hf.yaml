@@ -1,0 +1,16 @@
+description: "Test QUAERO HF datasets (exact CamemBERT-bio methodology)"
+seeds: [42, 43, 44, 45, 46]
+
+datasets:
+  ner: [quaero_emea_hf, quaero_medline_hf]
+
+model_groups:
+  test:
+    configs:
+      ner: base/ner_bert.yaml
+    models:
+      camembert-bio: /lustre/fsn1/projects/rech/rua/uvb79kr/almanach--camembert-bio-base
+
+output:
+  json: results/test-quaero-hf.json
+  markdown: results/test-quaero-hf.md

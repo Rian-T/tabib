@@ -1,0 +1,16 @@
+description: "Test MedDialog multi-label classification"
+seeds: [42]
+
+datasets:
+  multilabel: [meddialog_women]
+
+model_groups:
+  test:
+    configs:
+      multilabel: base/multilabel_bert.yaml
+    models:
+      camembert-bio: /lustre/fsn1/projects/rech/rua/uvb79kr/almanach--camembert-bio-base
+
+output:
+  json: configs/results/test-meddialog-multilabel.json
+  markdown: configs/results/test-meddialog-multilabel.md
