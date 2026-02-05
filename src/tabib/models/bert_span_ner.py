@@ -730,35 +730,48 @@ class BERTSpanNERAdapter(ModelAdapter):
     ) -> int | None:
         """Convert character position to token index.
 
-        Handles SentencePiece tokenizers which may include leading spaces in offsets,
-        causing gaps between token boundaries.
+        Handles SentencePiece tokenizers which have two quirks:
+        1. Gaps between tokens (spaces not included in offsets)
+        2. Overlapping offsets when '▁' is a separate token, e.g.:
+           - '▁' at (17, 18) and 'hypertension' at (17, 29)
+           We must prefer the longer token in case of overlap.
         """
         # For end positions, we want the token containing char_pos-1
         search_pos = char_pos - 1 if is_end and char_pos > 0 else char_pos
 
+        # First pass: find all tokens that contain search_pos
+        # (there may be multiple due to overlapping offsets in CamemBERT)
+        candidates = []
         for i in range(valid_start, valid_end):
             start, end = offset_mapping[i]
             if start == 0 and end == 0:
                 continue
             if start <= search_pos < end:
-                return i
+                candidates.append((i, end - start))  # (token_idx, token_length)
 
-        # SentencePiece fix: check for gaps caused by whitespace
-        # If char_pos is a space, find the next token
-        if text is not None and char_pos < len(text) and text[char_pos].isspace():
+        # If we have candidates, prefer the longest token (skip standalone '▁')
+        if candidates:
+            # Sort by length descending, return the longest
+            candidates.sort(key=lambda x: x[1], reverse=True)
+            return candidates[0][0]
+
+        # Second pass: handle gaps (CamemBERT doesn't include spaces in offsets)
+        # Find the token that starts at or right after search_pos
+        if text is not None and search_pos < len(text) and text[search_pos].isspace():
             for i in range(valid_start, valid_end):
                 start, end = offset_mapping[i]
                 if start == 0 and end == 0:
                     continue
-                if start > char_pos:
+                if start > search_pos:
                     return i
 
-        # Fallback: find closest token (handles remaining edge cases)
+        # Third pass: handle gaps for non-space characters
+        # Find the first token whose end is past search_pos
         for i in range(valid_start, valid_end):
             start, end = offset_mapping[i]
             if start == 0 and end == 0:
                 continue
-            if char_pos <= end:
+            if search_pos < end:
                 return i
 
         return None
